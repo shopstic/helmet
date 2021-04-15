@@ -8,6 +8,7 @@ import blacklistInstance from "./actions/blacklist-instance.ts";
 import ensureInstanceWhitelisted from "./actions/ensure-instance-whitelisted.ts";
 import { CliProgram } from "./deps/cli-utils.ts";
 import showVersion from "./actions/show-version.ts";
+import { bold, red } from "./deps/std-fmt-colors.ts";
 
 const program = new CliProgram()
   .addAction("compile", compile)
@@ -26,7 +27,7 @@ try {
   if (Deno.env.get("HELMET_ENABLE_STACKTRACE") === "1") {
     throw e;
   } else {
-    console.error("[Error]", e.message);
+    console.error(bold(red("[Error]")), e.message);
     Deno.exit(1);
   }
 }

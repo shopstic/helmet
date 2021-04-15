@@ -4,6 +4,7 @@ import { joinPath, resolvePath } from "../deps/std-path.ts";
 import { createCliAction, ExitCode } from "../deps/cli-utils.ts";
 import { Type } from "../deps/typebox.ts";
 import { readAll } from "../deps/std-io.ts";
+import { cyan } from "../deps/std-fmt-colors.ts";
 
 async function generateChildChart(
   { crdsPath, resourcesPath, namespacesPath, instance }: {
@@ -137,7 +138,7 @@ export async function generateParentChart(
           namespacesPath: joinPath(namespacesPath, "templates"),
           instance,
         })
-          .then(() => console.error(`Generated instance: ${instance.name}`))
+          .then(() => console.error("Generated instance", cyan(instance.name)))
       ),
   );
 }
@@ -153,7 +154,7 @@ export async function compile(
   const source = resolvePath(args.source);
   const destination = resolvePath(args.destination);
 
-  console.error(`Importing module "${source}"`);
+  console.error("Importing module", cyan(source));
 
   const chartModule = await import(source);
 
@@ -171,7 +172,7 @@ export async function compile(
     );
   }
 
-  console.error(`Creating instance "${instanceId}"`);
+  console.error("Creating bundle with id", cyan(instanceId));
   const chartInstances = await chartModule.default(args.inputs);
 
   if (!Array.isArray(chartInstances)) {
@@ -180,7 +181,7 @@ export async function compile(
     );
   }
 
-  console.error(`Compiling "${source}" to "${destination}"`);
+  console.error("Compiling", cyan(source), "to", cyan(destination));
 
   await generateParentChart(
     {

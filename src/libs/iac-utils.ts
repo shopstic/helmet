@@ -24,6 +24,7 @@ import {
 } from "./types.ts";
 import { memoizePromise } from "../deps/async-utils.ts";
 import { parseMultiDocumentsYaml, stringifyYamlRelaxed } from "./yaml-utils.ts";
+import { gray } from "../deps/std-fmt-colors.ts";
 
 export interface ImportDef {
   props: string[];
@@ -159,7 +160,7 @@ export async function helmTemplate(
         run: {
           cmd: helmTemplateCmd,
         },
-        stderrTag: `[$ helm template ${chartInstance.name}]`,
+        stderrTag: gray("[$ helm template ${chartInstance.name}]"),
         stdin: stringifyYamlRelaxed(
           chartInstance.values as Record<string, unknown>,
         ),
