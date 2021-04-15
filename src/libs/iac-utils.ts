@@ -5,6 +5,8 @@ import {
   K8sResource,
   K8sResourceSchema,
 } from "../deps/k8s-utils.ts";
+// TODO: Temporary workaround until this ends up in the next deno release https://github.com/denoland/deno/issues/10174
+export { joinGlobs } from "https://deno.land/std@0.93.0/path/glob.ts";
 import { expandGlob, fsExists } from "../deps/std-fs.ts";
 import { basename, dirname, fromFileUrl, joinPath } from "../deps/std-path.ts";
 import { parseYaml } from "../deps/std-yaml.ts";

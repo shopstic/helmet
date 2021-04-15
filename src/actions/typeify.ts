@@ -1,15 +1,14 @@
 import { deepMerge } from "../libs/patch-utils.ts";
-import { K8sCrd } from "../libs/types.ts";
 
-import { parseMultiDocumentsYaml } from "../libs/yaml-utils.ts";
-import type { ImportDef, TypeifyPatch } from "../libs/iac-utils.ts";
+import { ImportDef, readChartCrds, TypeifyPatch } from "../libs/iac-utils.ts";
 import { basename, joinPath, resolvePath } from "../deps/std-path.ts";
+// TODO: Temporary workaround until this ends up in the next deno release https://github.com/denoland/deno/issues/10174
+export { joinGlobs } from "https://deno.land/std@0.93.0/path/glob.ts";
 import { expandGlob, expandGlobSync, fsExists } from "../deps/std-fs.ts";
 import { parseYaml } from "../deps/std-yaml.ts";
 import { toPascalCase } from "../deps/case.ts";
 import { captureExec, inheritExec } from "../deps/exec-utils.ts";
-import { validate } from "../deps/validation-utils.ts";
-import { K8sCrdApiVersionV1beta1, K8sCrdSchema } from "../deps/k8s-utils.ts";
+import { K8sCrdApiVersionV1beta1 } from "../deps/k8s-utils.ts";
 import { createCliAction, ExitCode } from "../deps/cli-utils.ts";
 import { Type } from "../deps/typebox.ts";
 
@@ -513,38 +512,6 @@ async function generateCrdInterface(
   } finally {
     await Deno.remove(tempDir, { recursive: true });
   }
-}
-
-export async function readChartCrds(chartPath: string): Promise<K8sCrd[]> {
-  const crdsPath = joinPath(chartPath, "crds");
-  const crds: K8sCrd[] = [];
-
-  if (!await fsExists(crdsPath)) {
-    return crds;
-  }
-
-  for await (
-    const entry of expandGlob("**/*.yaml", {
-      root: crdsPath,
-    })
-  ) {
-    const rawCrd = await parseMultiDocumentsYaml(
-      await Deno.readTextFile(entry.path),
-    );
-    const crdResult = validate(Type.Array(K8sCrdSchema), rawCrd);
-
-    if (!crdResult.isSuccess) {
-      throw new Error(
-        `Invalid CRD at "${entry.path}". Reasons: ${
-          JSON.stringify(crdResult.errors, null, 2)
-        }`,
-      );
-    }
-
-    crds.push.apply(crds, crdResult.value);
-  }
-
-  return crds;
 }
 
 export async function typeifyChart(chartPath: string, typesPath: string) {

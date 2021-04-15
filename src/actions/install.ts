@@ -2,6 +2,8 @@ import { captureExec, inheritExec } from "../deps/exec-utils.ts";
 import { validate } from "../deps/validation-utils.ts";
 import { Type } from "../deps/typebox.ts";
 import { joinPath, resolvePath } from "../deps/std-path.ts";
+// TODO: Temporary workaround until this ends up in the next deno release https://github.com/denoland/deno/issues/10174
+export { joinGlobs } from "https://deno.land/std@0.93.0/path/glob.ts";
 import { expandGlobSync } from "../deps/std-fs.ts";
 import { createCliAction, ExitCode } from "../deps/cli-utils.ts";
 

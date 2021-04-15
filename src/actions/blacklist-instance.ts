@@ -6,6 +6,7 @@ import {
   updateWhitelist,
 } from "./whitelist-instance.ts";
 import { resolvePath } from "../deps/std-path.ts";
+import { bold, red } from "../deps/std-fmt-colors.ts";
 
 export default createCliAction(
   Type.Object({
@@ -20,11 +21,12 @@ export default createCliAction(
     const instanceId = await loadInstanceId(source);
     const whitelistedSet = await fetchCurrentWhitelist();
 
-    if (whitelistedSet.has(instanceId)) {
+    if (!whitelistedSet.has(instanceId)) {
       console.error(
-        `Instance "${instanceId}" does not exist in the current whitelisted set of: ${
-          Array.from(whitelistedSet).join(", ")
-        }`,
+        "Bundle instance",
+        bold(red(instanceId)),
+        "does not exist in the current whitelisted set of",
+        whitelistedSet,
       );
       return ExitCode.One;
     }
