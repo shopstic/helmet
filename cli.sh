@@ -13,7 +13,7 @@ code_quality() {
 build() {
   local VERSION=${1:-"latest"}
   printf "%s\n" "export default \"${VERSION}\";" > ./src/version.ts
-  deno compile -A --unstable --lite -o ./images/release/helmet ./src/helmet.ts
+  deno bundle ./src/helmet.ts ./images/release/helmet.js
 }
 
 run() {

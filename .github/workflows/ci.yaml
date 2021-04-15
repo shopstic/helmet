@@ -101,10 +101,11 @@ jobs:
 
           ./cli.sh code_quality
           ./cli.sh build "${RELEASE_VERSION}"
+          deno install -A --unstable ./images/release/helmet.js
 
-          # Test that the built binary works fine
-          if [[ "\$(./images/release/helmet version)" != "${RELEASE_VERSION}" ]]; then
-            echo "Built binary test failed"
+          # Test that the bundle works fine
+          if [[ "\$(helmet version)" != "${RELEASE_VERSION}" ]]; then
+            echo "Bundle test failed"
             exit 1
           fi
 
