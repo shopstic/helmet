@@ -153,6 +153,8 @@ export async function compile(
   const source = resolvePath(args.source);
   const destination = resolvePath(args.destination);
 
+  console.error(`Importing module "${source}"`);
+
   const chartModule = await import(source);
 
   if (!chartModule.id) {
@@ -161,12 +163,15 @@ export async function compile(
     );
   }
 
+  const instanceId = chartModule.id;
+
   if (typeof chartModule.default !== "function") {
     throw new Error(
       `Instance module does not export a default function, please check: ${source}`,
     );
   }
 
+  console.error(`Creating instance "${instanceId}"`);
   const chartInstances = await chartModule.default(args.inputs);
 
   if (!Array.isArray(chartInstances)) {
