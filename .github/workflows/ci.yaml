@@ -102,8 +102,8 @@ jobs:
           ./cli.sh code_quality
           ./cli.sh build "${RELEASE_VERSION}"
 
-          mkdir -p /usr/local/lib/helmet/
-          cp ./images/release/helmet.js /usr/local/lib/helmet/
+          mkdir -p /usr/lib/helmet/
+          cp ./images/release/helmet.js /usr/lib/helmet/
 
           # Test that the bundle works fine
           if [[ "\$(./images/release/helmet version)" != "${RELEASE_VERSION}" ]]; then
