@@ -160,7 +160,7 @@ export async function helmTemplate(
         run: {
           cmd: helmTemplateCmd,
         },
-        stderrTag: gray("[$ helm template ${chartInstance.name}]"),
+        stderrTag: gray(`[$ helm template ${chartInstance.name}]`),
         stdin: stringifyYamlRelaxed(
           chartInstance.values as Record<string, unknown>,
         ),
