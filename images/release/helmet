@@ -1,0 +1,2 @@
+#!/bin/sh
+exec deno run -A --unstable /usr/local/lib/helmet/helmet.js "$@"

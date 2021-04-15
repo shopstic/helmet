@@ -31,4 +31,9 @@ COPY --from=bin-deno /usr/bin/deno /usr/bin/deno
 COPY --from=bin-yq /usr/bin/yq /usr/bin/yq
 COPY --from=kube-ps1 /root/kube-ps1.sh /root/kube-ps1.sh
 
+ENV PATH="/root/.deno/bin:$PATH"
+
 COPY ./.profile /root/.profile
+
+RUN \
+  printf "\n%s\n" "export PATH=\"${PATH}\"" >> /root/.profile
