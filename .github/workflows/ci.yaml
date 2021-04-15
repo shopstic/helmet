@@ -103,7 +103,7 @@ jobs:
           ./cli.sh build "${RELEASE_VERSION}"
 
           # Test that the built binary works fine
-          if [[ "$(./images/release/helmet version)" != "${RELEASE_VERSION}"]]; then
+          if [[ "$(./images/release/helmet version)" != "${RELEASE_VERSION}" ]]; then
             echo "Built binary test failed"
             exit 1
           fi
