@@ -19,7 +19,7 @@ import {
   RemoteChartSource,
 } from "../libs/types.ts";
 import { typeifyChart } from "./typeify.ts";
-import { bold, cyan, gray, green, red } from "../deps/std-fmt-colors.ts";
+import { bold, gray, green, red } from "../deps/std-fmt-colors.ts";
 
 interface ChartUpdateFailure {
   isSuccess: false;
