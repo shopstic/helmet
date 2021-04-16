@@ -650,14 +650,14 @@ ${crdInterfaces}
   );
 
   await inheritExec({
-    run: {
-      cmd: [
-        "deno",
-        "fmt",
-        outputPath,
-      ],
-    },
+    run: { cmd: ["deno", "fmt", outputPath] },
     stderrTag: gray(`[$ deno fmt ${chartName}.ts]`),
+  });
+
+  // Need to run deno fmt once more for the result to be deterministic...
+  await inheritExec({
+    run: { cmd: ["deno", "fmt", outputPath] },
+    ignoreStderr: true,
   });
 }
 
