@@ -6,6 +6,7 @@ import { joinPath, resolvePath } from "../deps/std-path.ts";
 export { joinGlobs } from "https://deno.land/std@0.93.0/path/glob.ts";
 import { expandGlobSync } from "../deps/std-fs.ts";
 import { createCliAction, ExitCode } from "../deps/cli-utils.ts";
+import { cyan, gray } from "../deps/std-fmt-colors.ts";
 
 const HelmLsResultSchema = Type.Array(Type.Object({
   name: Type.String(),
@@ -61,8 +62,14 @@ async function helmInstall(
       chartPath,
     ];
 
-  console.log(`Executing command: ${helmUpgradeCmd.join(" ")}`);
-  await inheritExec({ run: { cmd: helmUpgradeCmd } });
+  console.log(`Executing:`, cyan(helmUpgradeCmd.join(" ")));
+
+  const tag = gray(`[$ ${helmUpgradeCmd.slice(0, 2).join(" ")} ...]`);
+  await inheritExec({
+    run: { cmd: helmUpgradeCmd },
+    stderrTag: tag,
+    stdoutTag: tag,
+  });
 }
 
 export async function install(
@@ -81,9 +88,12 @@ export async function install(
   if (hasCrds) {
     const kubectlApplyCmd = ["kubectl", "apply", "-f", crdsTemplatesPath];
 
-    console.log(`Executing command: ${kubectlApplyCmd.join(" ")}`);
+    console.log("Executing:", cyan(kubectlApplyCmd.join(" ")));
+    const tag = gray(`[$ ${kubectlApplyCmd.slice(0, 2).join(" ")} ...]`);
     await inheritExec({
       run: { cmd: kubectlApplyCmd },
+      stderrTag: tag,
+      stdoutTag: tag,
     });
   }
 

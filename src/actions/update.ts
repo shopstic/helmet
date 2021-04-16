@@ -19,6 +19,7 @@ import {
   RemoteChartSource,
 } from "../libs/types.ts";
 import { typeifyChart } from "./typeify.ts";
+import { bold, cyan, gray, green, red } from "../deps/std-fmt-colors.ts";
 
 interface ChartUpdateFailure {
   isSuccess: false;
@@ -48,8 +49,11 @@ async function getCurrentChartMetadata(
 
     if (!currentChartMetaResult.isSuccess) {
       throw new Error(
-        `Failed validating "Chart.yaml" from ${chartPath}. Errors: ${
-          JSON.stringify(currentChartMetaResult.errors, null, 2)
+        `Failed validating "Chart.yaml" from ${chartPath}. Errors:\n${
+          currentChartMetaResult.errorsToString({
+            separator: "\n",
+            dataVar: "  -",
+          })
         }`,
       );
     }
@@ -297,8 +301,11 @@ async function updateHelmRepoChart({
 
   if (!remoteRepoIndexResult.isSuccess) {
     throw new Error(
-      `Failed validating "index.yaml" for "${chartName}" repo at "${remoteRepoUrl}". Errors: ${
-        JSON.stringify(remoteRepoIndexResult.errors, null, 2)
+      `Failed validating "index.yaml" for "${chartName}" repo at "${remoteRepoUrl}". Errors:\n${
+        remoteRepoIndexResult.errorsToString({
+          separator: "\n",
+          dataVar: "  -",
+        })
       }`,
     );
   }
@@ -460,6 +467,7 @@ export default createCliAction(
       .keys(remoteCharts)
       .filter((chartName) => only ? chartName.indexOf(only) !== -1 : true)
       .map((chartName) => {
+        const tag = `[${chartName}]`;
         const remote = remoteCharts[chartName];
         const chartPath = joinPath(resolvedChartsPath, chartName);
 
@@ -474,20 +482,37 @@ export default createCliAction(
 
             if (result.isSuccess) {
               if (result.isUpdated) {
-                return `[${chartName}] Updated charts "${result.fromVersion ||
-                  "never"}" to "${result.toVersion}"`;
+                return [
+                  green(tag),
+                  "Updated chart from",
+                  green(result.fromVersion ?? "never"),
+                  "to",
+                  green(result.toVersion),
+                ];
               } else {
-                return `[${chartName}] Already up to date at version "${result.toVersion}"`;
+                return [
+                  gray(tag),
+                  "Already up to date at version",
+                  result.toVersion,
+                ];
               }
             } else {
-              return `[${chartName}] Failed updating due to: ${result.reason}`;
+              return [
+                bold(red(tag)),
+                "Failed updating due to",
+                result.reason,
+              ];
             }
           } catch (e) {
-            return `[${chartName}] Failed updating due to an unexpected error: ${e.toString()}`;
+            return [
+              bold(red(tag)),
+              "Failed updating due to an unexpected error:",
+              e.message,
+            ];
           }
         };
       })
-      .map((fn) => fn().then((result) => console.log(result)));
+      .map((fn) => fn().then((result) => console.log.apply(console, result)));
 
     await Promise.all(promises);
 

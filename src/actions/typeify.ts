@@ -11,6 +11,7 @@ import { captureExec, inheritExec } from "../deps/exec-utils.ts";
 import { K8sCrdApiVersionV1beta1 } from "../deps/k8s-utils.ts";
 import { createCliAction, ExitCode } from "../deps/cli-utils.ts";
 import { Type } from "../deps/typebox.ts";
+import { cyan, gray } from "../deps/std-fmt-colors.ts";
 
 export type ClassifiedType =
   | "array"
@@ -580,7 +581,7 @@ export async function typeifyChart(chartPath: string, typesPath: string) {
   const hasPatch = await fsExists(patchPath);
 
   if (hasPatch) {
-    console.log(`Applying patch charts ${patchPath}`);
+    console.log(cyan(`[${chartName}]`), "Applying patch", patchPath);
   }
 
   const patch = (hasPatch)
@@ -656,18 +657,7 @@ ${crdInterfaces}
         outputPath,
       ],
     },
-  });
-
-  // fmt charts is unstable until running it a second round...
-  await inheritExec({
-    run: {
-      cmd: [
-        "deno",
-        "fmt",
-        outputPath,
-      ],
-    },
-    ignoreStderr: true,
+    stderrTag: gray(`[$ deno fmt ${chartName}.ts]`),
   });
 }
 

@@ -181,7 +181,7 @@ export async function compile(
     );
   }
 
-  console.error("Compiling", cyan(source), "to", cyan(destination));
+  console.error("Compiling", source, "to", destination);
 
   await generateParentChart(
     {

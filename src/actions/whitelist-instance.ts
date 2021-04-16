@@ -3,6 +3,7 @@ import { createK8sConfigMap } from "../deps/k8s-utils.ts";
 import { createCliAction, ExitCode } from "../deps/cli-utils.ts";
 import { Type } from "../deps/typebox.ts";
 import { resolvePath } from "../deps/std-path.ts";
+import { gray } from "../deps/std-fmt-colors.ts";
 
 export const CONFIG_MAP_NAME = "helmet-whitelist";
 export const CONFIG_MAP_NAMESPACE = "default";
@@ -55,6 +56,8 @@ export async function updateWhitelist(
       cmd: ["kubectl", "apply", "-f", "-"],
     },
     stdin: JSON.stringify(newConfigMap),
+    stdoutTag: gray(`[$ kubectl apply ...]`),
+    stderrTag: gray(`[$ kubectl apply ...]`),
   });
 }
 
