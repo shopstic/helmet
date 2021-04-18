@@ -1,5 +1,5 @@
-import { createCliAction, ExitCode } from "../deps/cli-utils.ts";
-import { inheritExec } from "../deps/exec-utils.ts";
+import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
+import { inheritExec } from "../deps/exec_utils.ts";
 import { Type } from "../deps/typebox.ts";
 
 export default createCliAction(

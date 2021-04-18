@@ -1,9 +1,9 @@
-import { createCliAction, ExitCode } from "../deps/cli-utils.ts";
-import { captureExec } from "../deps/exec-utils.ts";
-import { bold, cyan, red } from "../deps/std-fmt-colors.ts";
-import { resolvePath } from "../deps/std-path.ts";
+import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
+import { captureExec } from "../deps/exec_utils.ts";
+import { bold, cyan, red } from "../deps/std_fmt_colors.ts";
+import { resolvePath } from "../deps/std_path.ts";
 import { Type } from "../deps/typebox.ts";
-import { fetchCurrentWhitelist, loadInstanceId } from "./whitelist-instance.ts";
+import { fetchCurrentWhitelist, loadInstanceId } from "./whitelist_instance.ts";
 
 export default createCliAction(
   Type.Object({

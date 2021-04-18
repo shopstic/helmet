@@ -1,12 +1,12 @@
-import { inheritExec } from "../deps/exec-utils.ts";
-import { fsExists } from "../deps/std-fs.ts";
-import { joinPath, resolvePath } from "../deps/std-path.ts";
-import { parseYaml } from "../deps/std-yaml.ts";
+import { inheritExec } from "../deps/exec_utils.ts";
+import { fsExists } from "../deps/std_fs.ts";
+import { joinPath, resolvePath } from "../deps/std_path.ts";
+import { parseYaml } from "../deps/std_yaml.ts";
 import { Type } from "../deps/typebox.ts";
-import { validate } from "../deps/validation-utils.ts";
+import { validate } from "../deps/validation_utils.ts";
 import { coerceSemver, maxSatisfyingSemver, SemVer } from "../deps/semver.ts";
-import { quoteShellCmd } from "../deps/quote-shell.ts";
-import { createCliAction, ExitCode } from "../deps/cli-utils.ts";
+import { quoteShellCmd } from "../deps/quote_shell.ts";
+import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import {
   ChartMetadata,
   ChartMetadataSchema,
@@ -19,7 +19,7 @@ import {
   RemoteChartSource,
 } from "../libs/types.ts";
 import { typeifyChart } from "./typeify.ts";
-import { bold, gray, green, red } from "../deps/std-fmt-colors.ts";
+import { bold, gray, green, red } from "../deps/std_fmt_colors.ts";
 
 interface ChartUpdateFailure {
   isSuccess: false;

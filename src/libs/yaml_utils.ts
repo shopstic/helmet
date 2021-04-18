@@ -1,5 +1,5 @@
-import { stringifyYaml, YAMLError } from "../deps/std-yaml.ts";
-import { captureExec } from "../deps/exec-utils.ts";
+import { stringifyYaml, YAMLError } from "../deps/std_yaml.ts";
+import { captureExec } from "../deps/exec_utils.ts";
 
 export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
   try {

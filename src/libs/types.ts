@@ -1,4 +1,4 @@
-import { K8sCrdSchema, K8sResource } from "../deps/k8s-utils.ts";
+import { K8sCrdSchema, K8sResource } from "../deps/k8s_utils.ts";
 import { SemverRange } from "../deps/semver.ts";
 import { Static, TObject, TProperties, Type } from "../deps/typebox.ts";
 

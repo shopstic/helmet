@@ -1,10 +1,10 @@
-import { stringifyYamlRelaxed } from "../libs/yaml-utils.ts";
+import { stringifyYamlRelaxed } from "../libs/yaml_utils.ts";
 import { ChartInstance } from "../libs/types.ts";
-import { joinPath, resolvePath } from "../deps/std-path.ts";
-import { createCliAction, ExitCode } from "../deps/cli-utils.ts";
+import { joinPath, resolvePath } from "../deps/std_path.ts";
+import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { Type } from "../deps/typebox.ts";
-import { readAll } from "../deps/std-io.ts";
-import { cyan } from "../deps/std-fmt-colors.ts";
+import { readAll } from "../deps/std_io.ts";
+import { cyan } from "../deps/std_fmt_colors.ts";
 
 async function generateChildChart(
   { crdsPath, resourcesPath, namespacesPath, instance }: {

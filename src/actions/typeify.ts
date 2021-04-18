@@ -1,17 +1,17 @@
-import { deepMerge } from "../libs/patch-utils.ts";
+import { deepMerge } from "../libs/patch_utils.ts";
 
-import { ImportDef, readChartCrds, TypeifyPatch } from "../libs/iac-utils.ts";
-import { basename, joinPath, resolvePath } from "../deps/std-path.ts";
+import { ImportDef, readChartCrds, TypeifyPatch } from "../libs/iac_utils.ts";
+import { basename, joinPath, resolvePath } from "../deps/std_path.ts";
 // TODO: Temporary workaround until this ends up in the next deno release https://github.com/denoland/deno/issues/10174
 export { joinGlobs } from "https://deno.land/std@0.93.0/path/glob.ts";
-import { expandGlob, expandGlobSync, fsExists } from "../deps/std-fs.ts";
-import { parseYaml } from "../deps/std-yaml.ts";
+import { expandGlob, expandGlobSync, fsExists } from "../deps/std_fs.ts";
+import { parseYaml } from "../deps/std_yaml.ts";
 import { toPascalCase } from "../deps/case.ts";
-import { captureExec, inheritExec } from "../deps/exec-utils.ts";
-import { K8sCrdApiVersionV1beta1 } from "../deps/k8s-utils.ts";
-import { createCliAction, ExitCode } from "../deps/cli-utils.ts";
+import { captureExec, inheritExec } from "../deps/exec_utils.ts";
+import { K8sCrdApiVersionV1beta1 } from "../deps/k8s_utils.ts";
+import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { Type } from "../deps/typebox.ts";
-import { cyan, gray } from "../deps/std-fmt-colors.ts";
+import { cyan, gray } from "../deps/std_fmt_colors.ts";
 
 export type ClassifiedType =
   | "array"

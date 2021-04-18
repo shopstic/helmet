@@ -3,12 +3,12 @@ import install from "./actions/install.ts";
 import uninstall from "./actions/uninstall.ts";
 import typeify from "./actions/typeify.ts";
 import update from "./actions/update.ts";
-import whitelistInstance from "./actions/whitelist-instance.ts";
-import blacklistInstance from "./actions/blacklist-instance.ts";
-import ensureInstanceWhitelisted from "./actions/ensure-instance-whitelisted.ts";
-import { CliProgram } from "./deps/cli-utils.ts";
-import showVersion from "./actions/show-version.ts";
-import { bold, red } from "./deps/std-fmt-colors.ts";
+import whitelistInstance from "./actions/whitelist_instance.ts";
+import blacklistInstance from "./actions/blacklist_instance.ts";
+import ensureInstanceWhitelisted from "./actions/ensure_instance_whitelisted.ts";
+import { CliProgram } from "./deps/cli_utils.ts";
+import showVersion from "./actions/show_version.ts";
+import { bold, red } from "./deps/std_fmt_colors.ts";
 
 const program = new CliProgram()
   .addAction("compile", compile)

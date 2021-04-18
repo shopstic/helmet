@@ -1,22 +1,22 @@
-import { captureExec } from "../deps/exec-utils.ts";
+import { captureExec } from "../deps/exec_utils.ts";
 import {
   K8sCrdKind,
   K8sCrdSchema,
   K8sResource,
   K8sResourceSchema,
-} from "../deps/k8s-utils.ts";
+} from "../deps/k8s_utils.ts";
 // TODO: Temporary workaround until this ends up in the next deno release https://github.com/denoland/deno/issues/10174
 export { joinGlobs } from "https://deno.land/std@0.93.0/path/glob.ts";
-import { expandGlob, fsExists } from "../deps/std-fs.ts";
-import { basename, dirname, fromFileUrl, joinPath } from "../deps/std-path.ts";
-import { parseYaml } from "../deps/std-yaml.ts";
+import { expandGlob, fsExists } from "../deps/std_fs.ts";
+import { basename, dirname, fromFileUrl, joinPath } from "../deps/std_path.ts";
+import { parseYaml } from "../deps/std_yaml.ts";
 import { Static, TObject, Type } from "../deps/typebox.ts";
 import { TProperties } from "../deps/typebox.ts";
 import {
   createValidator,
   validate,
   ValidationResult,
-} from "../deps/validation-utils.ts";
+} from "../deps/validation_utils.ts";
 import {
   ChartInstance,
   ChartInstanceConfig,
@@ -24,9 +24,9 @@ import {
   ChartMetadataSchema,
   K8sCrd,
 } from "./types.ts";
-import { memoizePromise } from "../deps/async-utils.ts";
-import { parseMultiDocumentsYaml, stringifyYamlRelaxed } from "./yaml-utils.ts";
-import { gray } from "../deps/std-fmt-colors.ts";
+import { memoizePromise } from "../deps/async_utils.ts";
+import { parseMultiDocumentsYaml, stringifyYamlRelaxed } from "./yaml_utils.ts";
+import { gray } from "../deps/std_fmt_colors.ts";
 
 export interface ImportDef {
   props: string[];

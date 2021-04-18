@@ -1,9 +1,9 @@
-import { inheritExec } from "../deps/exec-utils.ts";
-import { createK8sConfigMap } from "../deps/k8s-utils.ts";
-import { createCliAction, ExitCode } from "../deps/cli-utils.ts";
+import { inheritExec } from "../deps/exec_utils.ts";
+import { createK8sConfigMap } from "../deps/k8s_utils.ts";
+import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { Type } from "../deps/typebox.ts";
-import { resolvePath } from "../deps/std-path.ts";
-import { gray } from "../deps/std-fmt-colors.ts";
+import { resolvePath } from "../deps/std_path.ts";
+import { gray } from "../deps/std_fmt_colors.ts";
 
 export const CONFIG_MAP_NAME = "helmet-whitelist";
 export const CONFIG_MAP_NAMESPACE = "default";
