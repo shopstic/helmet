@@ -47,7 +47,7 @@ async function helmInstall(
       "helm",
       "upgrade",
       "--install",
-      "--history-max=1",
+      "--history-max=5",
       ...(waitOnSubsequentInstalls
         ? ["--atomic", "--cleanup-on-fail", "--timeout=10m"]
         : []),
