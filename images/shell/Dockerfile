@@ -1,5 +1,5 @@
 FROM shopstic/bin-kubectl:1.20.4 as bin-kubectl
-FROM shopstic/bin-deno:1.9.1 as bin-deno
+FROM shopstic/bin-deno:1.9.2 as bin-deno
 FROM shopstic/bin-helm:3.5.3 as bin-helm
 FROM shopstic/bin-yq:4.6.3 as bin-yq
 

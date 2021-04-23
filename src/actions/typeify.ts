@@ -2,8 +2,6 @@ import { deepMerge } from "../libs/patch_utils.ts";
 
 import { ImportDef, readChartCrds, TypeifyPatch } from "../libs/iac_utils.ts";
 import { basename, joinPath, resolvePath } from "../deps/std_path.ts";
-// TODO: Temporary workaround until this ends up in the next deno release https://github.com/denoland/deno/issues/10174
-export { joinGlobs } from "https://deno.land/std@0.93.0/path/glob.ts";
 import { expandGlob, expandGlobSync, fsExists } from "../deps/std_fs.ts";
 import { parseYaml } from "../deps/std_yaml.ts";
 import { toPascalCase } from "../deps/case.ts";

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ENTRY_FILE="./src/helmet.ts"
+
 code_quality() {
   echo "Checking formatting..."
   deno fmt --unstable --check ./src
@@ -13,11 +15,19 @@ code_quality() {
 build() {
   local VERSION=${1:-"latest"}
   printf "%s\n" "export default \"${VERSION}\";" > ./src/version.ts
-  deno bundle ./src/helmet.ts ./images/release/helmet.js
+  deno bundle "${ENTRY_FILE}" --lock ./lock.json ./images/release/helmet.js
+}
+
+reload_cache() {
+  deno cache --reload --lock=lock.json "${ENTRY_FILE}"
+}
+
+update_lock() {
+  deno cache "${ENTRY_FILE}" --lock ./lock.json --lock-write
 }
 
 run() {
-  deno run -A --unstable ./src/helmet.ts "$@"
+  deno run --lock ./lock.json --cached-only -A --unstable "${ENTRY_FILE}" "$@"
 }
 
 "$@"
