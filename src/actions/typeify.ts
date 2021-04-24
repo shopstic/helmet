@@ -2,7 +2,7 @@ import { deepMerge } from "../libs/patch_utils.ts";
 
 import { ImportDef, readChartCrds, TypeifyPatch } from "../libs/iac_utils.ts";
 import { basename, joinPath, resolvePath } from "../deps/std_path.ts";
-import { expandGlob, expandGlobSync, fsExists } from "../deps/std_fs.ts";
+import { expandGlobSync, fsExists } from "../deps/std_fs.ts";
 import { parseYaml } from "../deps/std_yaml.ts";
 import { toPascalCase } from "../deps/case.ts";
 import { captureExec, inheritExec } from "../deps/exec_utils.ts";
