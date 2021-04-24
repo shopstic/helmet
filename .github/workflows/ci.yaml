@@ -11,16 +11,16 @@ jobs:
     name: Build CI environment image
     runs-on: ubuntu-20.04
     outputs:
-      image: ${{ steps.buildkit.outputs.image }}
-      imageRef: ${{ steps.buildkit.outputs.image }}:${{ steps.buildkit.outputs.tag }}    
+      image: ${{ steps.buildkit.outputs.image }}:${{ steps.buildkit.outputs.tag }}    
     steps:
       - uses: actions/checkout@v2
 
-      - name: Login to Docker Hub
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
 
       - run: chmod +r ~/.docker/config.json
 
@@ -29,7 +29,7 @@ jobs:
         uses: shopstic/buildkit-action@1.0.12
         with:
           context: ${{ github.workspace }}/images/shell
-          image: docker.io/shopstic/helmet-shell
+          image: ghcr.io.io/shopstic/helmet-ci
           tag: ${{ hashFiles('images/shell/*') }}
           skipIfExists: true
 
@@ -48,6 +48,13 @@ jobs:
           key: deno-${{ github.sha }}
           restore-keys: |
             deno-
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
     
       - name: Login to Docker Hub
         uses: docker/login-action@v1
@@ -70,7 +77,7 @@ jobs:
 
       - name: Build
         env:
-          SHELL_IMAGE: ${{ needs.build-env.outputs.imageRef }}
+          SHELL_IMAGE: ${{ needs.build-env.outputs.image }}
           DENO_DIR: ${{ github.workspace }}/.cache/deno
           GITHUB_TAG: ${{ steps.ref_name.outputs.tag }}
         run: |-
@@ -129,8 +136,18 @@ jobs:
       - name: Build and push shell Docker image to tag
         if: steps.ref_name.outputs.tag != ''
         env:
-          FROM_SHELL_IMAGE_REF: ${{ needs.build-env.outputs.imageRef }}
-          TO_SHELL_IMAGE_REF: ${{ needs.build-env.outputs.image }}:${{ steps.ref_name.outputs.tag }}
+          SHELL_IMAGE: ${{ needs.build-env.outputs.image }}
+          RELEASE_VERSION: ${{ steps.ref_name.outputs.tag }}
+          RELEASE_IMAGE: docker.io/shopstic/helmet-shell
         run: |
-          docker tag "${FROM_SHELL_IMAGE_REF}" "${TO_SHELL_IMAGE_REF}"
-          docker push "${TO_SHELL_IMAGE_REF}"
+          TEMP_DIR=$(mktemp -d)
+          cd "${TEMP_DIR}"
+
+          cat << EOF > "./Dockerfile"
+          FROM shopstic/bin-helmet:${RELEASE_VERSION} as bin-helmet
+          FROM ${SHELL_IMAGE_REF}
+          COPY --from bin-helmet / /
+          EOF
+
+          docker build -t "${RELEASE_IMAGE}:${RELEASE_VERSION}" .
+          docker push "${RELEASE_IMAGE}:${RELEASE_VERSION}"
