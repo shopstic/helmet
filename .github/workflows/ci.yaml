@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-20.04
     outputs:
       image: ${{ steps.buildkit.outputs.image }}
-      imageRef: ${{ steps.buildkit.outputs.tag }}:${{ steps.buildkit.outputs.tag }}    
+      imageRef: ${{ steps.buildkit.outputs.image }}:${{ steps.buildkit.outputs.tag }}    
     steps:
       - uses: actions/checkout@v2
 
