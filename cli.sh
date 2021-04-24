@@ -18,8 +18,8 @@ build() {
   deno bundle "${ENTRY_FILE}" --lock ./lock.json ./images/release/helmet.js
 }
 
-reload_cache() {
-  deno cache --reload --lock=lock.json "${ENTRY_FILE}"
+update_cache() {
+  deno cache --lock=lock.json "${ENTRY_FILE}"
 }
 
 update_lock() {

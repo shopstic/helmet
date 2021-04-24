@@ -99,7 +99,7 @@ jobs:
             bash -l
           set -euo pipefail
 
-          ./cli.sh reload_cache
+          ./cli.sh update_cache
           ./cli.sh code_quality
           ./cli.sh build "${RELEASE_VERSION}"
 
