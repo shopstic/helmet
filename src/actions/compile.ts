@@ -26,7 +26,7 @@ async function generateChildChart(
         ...r.metadata,
         labels: {
           ...r.metadata?.labels,
-          "shopstic.com/iac-metadata-name": r.metadata.name,
+          "helmet.run/iac-metadata-name": r.metadata.name,
         },
       },
     }));
