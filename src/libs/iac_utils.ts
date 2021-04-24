@@ -110,7 +110,7 @@ export async function readChartCrds(chartPath: string): Promise<K8sCrd[]> {
   const crdsPath = joinPath(chartPath, "crds");
   const crds: K8sCrd[] = [];
 
-  if (!await fsExists(crdsPath)) {
+  if (!(await fsExists(crdsPath))) {
     return crds;
   }
 

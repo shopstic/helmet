@@ -427,19 +427,30 @@ async function readChartValues(
 ): Promise<Record<string, unknown>> {
   const baseValues: Record<string, unknown> = {};
 
-  for await (
-    const entry of expandGlob("*", {
-      root: joinPath(chartPath, "charts"),
-    })
-  ) {
-    const subChartName = entry.name;
-    const subValues = await readChartValues(
-      joinPath(chartPath, "charts", subChartName),
-    );
-    deepMerge(baseValues, { [subChartName]: subValues });
+  const subChartsPath = joinPath(chartPath, "charts");
+
+  if (await fsExists(subChartsPath)) {
+    for await (
+      const entry of Deno.readDir(subChartsPath)
+    ) {
+      if (entry.isDirectory) {
+        const subChartName = entry.name;
+        const subValues = await readChartValues(
+          joinPath(chartPath, "charts", subChartName),
+        );
+        deepMerge(baseValues, { [subChartName]: subValues });
+      }
+    }
   }
 
   const valuesPath = joinPath(chartPath, "values.yaml");
+
+  if (!await fsExists(valuesPath)) {
+    throw new Error(
+      `Expected a 'values.yaml' file inside the Helm chart directory but none is found at ${valuesPath}`,
+    );
+  }
+
   const raw = await Deno.readTextFile(valuesPath);
 
   const parsed = (() => {
@@ -680,6 +691,7 @@ export default createCliAction(
         .from(expandGlobSync(charts, {
           root: Deno.cwd(),
         }))
+        .filter((entry) => entry.isDirectory)
         .map((entry) => typeifyChart(entry.path, resolvedTypesPath)),
     );
 
