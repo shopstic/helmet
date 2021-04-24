@@ -50,8 +50,7 @@ interface TypeDef {
   imports: ImportDef[];
 }
 
-const k8sModelImportRoot =
-  "https://raw.githubusercontent.com/shopstic/k8s-deno-client/1.19.2/models/";
+const k8sModelImportRoot = "https://deno.land/x/k8s@1.21/models/";
 
 export const localObjectReferencesType: TypeDef = {
   expectation: (value) => value === null || classifyType(value) === "array",
