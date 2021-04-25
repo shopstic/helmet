@@ -145,7 +145,7 @@ jobs:
 
           cat << EOF > "./Dockerfile"
           FROM shopstic/bin-helmet:${RELEASE_VERSION} as bin-helmet
-          FROM ${SHELL_IMAGE_REF}
+          FROM ${SHELL_IMAGE}
           COPY --from bin-helmet / /
           EOF
 
