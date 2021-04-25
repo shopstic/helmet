@@ -23,7 +23,7 @@ ENV TERM=xterm-256color
 # `unzip` is needed for `deno upgrade ...` and `deno compile --lite ...` to extract its downloaded archive
 RUN \
   apt-get update && \
-  apt-get install -y ca-certificates unzip
+  apt-get install -y curl ca-certificates unzip
 
 COPY --from=bin-kubectl / /
 COPY --from=bin-helm / /
