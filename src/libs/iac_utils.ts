@@ -47,11 +47,19 @@ export async function decryptAndValidateSecrets<T extends TProperties>(
   schema: TObject<T>,
   encryptedSecretsPath: string,
 ): Promise<ValidationResult<Static<TObject<T>>>> {
-  const decrypted = parseYaml(
-    await captureExec({
-      run: { cmd: ["sops", "-d", encryptedSecretsPath] },
-    }),
-  );
+  const raw = await (async () => {
+    try {
+      return await captureExec({
+        run: { cmd: ["sops", "-d", encryptedSecretsPath] },
+      });
+    } catch (e) {
+      throw new Error(
+        `Failed decrypting file '${encryptedSecretsPath}' with sops, error: ${e.message}`,
+      );
+    }
+  })();
+
+  const decrypted = parseYaml(raw);
 
   return validate(schema, decrypted);
 }
