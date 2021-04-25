@@ -146,7 +146,7 @@ jobs:
           cat << EOF > "./Dockerfile"
           FROM shopstic/bin-helmet:${RELEASE_VERSION} as bin-helmet
           FROM ${SHELL_IMAGE}
-          COPY --from bin-helmet / /
+          COPY --from=bin-helmet / /
           EOF
 
           docker build -t "${RELEASE_IMAGE}:${RELEASE_VERSION}" .
