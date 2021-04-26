@@ -45,7 +45,7 @@ async function helmInstall(
       "helm",
       "upgrade",
       "--install",
-      "--history-max=5",
+      "--history-max=2",
       ...(waitOnSubsequentInstalls
         ? ["--atomic", "--cleanup-on-fail", "--timeout=10m"]
         : []),
@@ -84,7 +84,13 @@ export async function install(
     })).length > 0;
 
   if (hasCrds) {
-    const kubectlApplyCmd = ["kubectl", "apply", "-f", crdsTemplatesPath];
+    const kubectlApplyCmd = [
+      "kubectl",
+      "apply",
+      "--server-side",
+      "-f",
+      crdsTemplatesPath,
+    ];
 
     console.log("Executing:", cyan(kubectlApplyCmd.join(" ")));
     const tag = gray(`[$ ${kubectlApplyCmd.slice(0, 2).join(" ")} ...]`);

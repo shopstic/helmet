@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ENTRY_FILE="./src/helmet.ts"
+MOD_FILE="./src/mod.ts"
 
 code_quality() {
   echo "Checking formatting..."
@@ -19,11 +20,11 @@ build() {
 }
 
 update_cache() {
-  deno cache --lock=lock.json "${ENTRY_FILE}"
+  deno cache --lock=lock.json "${ENTRY_FILE}" "${MOD_FILE}" 
 }
 
 update_lock() {
-  deno cache "${ENTRY_FILE}" --lock ./lock.json --lock-write
+  deno cache "${ENTRY_FILE}" "${MOD_FILE}"  --lock ./lock.json --lock-write
 }
 
 run() {
