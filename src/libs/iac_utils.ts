@@ -211,7 +211,8 @@ ${JSON.stringify(docResult.errors, null, 2)}
       return docResult.value;
     });
 
-  if (
+  return transformedDocs;
+  /* if (
     chartInstance.createNamespaceIfNotExists !== false &&
     !transformedDocs.find((d) =>
       d.kind === "Namespace" && d.metadata.name === chartInstance.namespace
@@ -226,7 +227,7 @@ ${JSON.stringify(docResult.errors, null, 2)}
     });
   } else {
     return transformedDocs;
-  }
+  } */
 }
 
 const validateK8sCrd = createValidator(K8sCrdSchema);

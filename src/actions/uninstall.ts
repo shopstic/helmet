@@ -8,14 +8,21 @@ export default createCliAction(
       description: "Instance name to uninstall",
       examples: ["iac-my-stack"],
     }),
+    namespace: Type.String({
+      description:
+        "The namespace where corresponding Helm releases of this instance were installed to",
+      examples: ["iac-my-stack"],
+    }),
   }),
-  async (args) => {
+  async ({ name, namespace }) => {
     await inheritExec({
-      run: { cmd: ["helm", "uninstall", `${args.name}-resources`] },
+      run: { cmd: ["helm", "uninstall", "-n", namespace, `${name}-resources`] },
     });
 
     await inheritExec({
-      run: { cmd: ["helm", "uninstall", `${args.name}-namespaces`] },
+      run: {
+        cmd: ["helm", "uninstall", "-n", namespace, `${namespace}-namespaces`],
+      },
     });
 
     return ExitCode.Zero;

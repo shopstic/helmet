@@ -85,7 +85,6 @@ export type ChartMetadata = Static<typeof ChartMetadataSchema>;
 export interface ChartInstanceConfig<V> {
   name: string;
   namespace: string;
-  createNamespaceIfNotExists?: boolean;
   path: string;
   values: V;
 }

@@ -1,6 +1,6 @@
 import { captureExec, inheritExec } from "../deps/exec_utils.ts";
 import { validate } from "../deps/validation_utils.ts";
-import { Type } from "../deps/typebox.ts";
+import { Static, Type } from "../deps/typebox.ts";
 import { joinPath, resolvePath } from "../deps/std_path.ts";
 import { expandGlobSync } from "../deps/std_fs.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
@@ -17,17 +17,19 @@ const HelmLsResultSchema = Type.Array(Type.Object({
 }));
 
 async function helmInstall(
-  { name, chartPath, waitOnFirstInstall, waitOnSubsequentInstalls }: {
-    name: string;
-    chartPath: string;
-    waitOnFirstInstall: boolean;
-    waitOnSubsequentInstalls: boolean;
-  },
+  { name, namespace, chartPath, waitOnFirstInstall, waitOnSubsequentInstalls }:
+    {
+      name: string;
+      namespace: string;
+      chartPath: string;
+      waitOnFirstInstall: boolean;
+      waitOnSubsequentInstalls: boolean;
+    },
 ) {
   const helmLsResultRaw = JSON.parse(
     await captureExec({
       run: {
-        cmd: ["helm", "ls", "-a", "-o=json"],
+        cmd: ["helm", "ls", "-a", "-n", namespace, "-o=json"],
       },
     }),
   );
@@ -45,6 +47,8 @@ async function helmInstall(
       "helm",
       "upgrade",
       "--install",
+      "-n",
+      namespace,
       "--history-max=2",
       ...(waitOnSubsequentInstalls
         ? ["--atomic", "--cleanup-on-fail", "--timeout=10m"]
@@ -55,6 +59,8 @@ async function helmInstall(
     : [
       "helm",
       "install",
+      "-n",
+      namespace,
       ...(waitOnFirstInstall ? ["--wait", "--timeout=10m"] : []),
       name,
       chartPath,
@@ -70,9 +76,29 @@ async function helmInstall(
   });
 }
 
+export const ParamsSchema = Type.Object({
+  name: Type.String({
+    description:
+      "Helm release base name. This will be used as the prefx of the different sub-releases (*-crds, *-namespaces and *-resources)",
+  }),
+  namespace: Type.String({
+    description: "The namespace where the Secrets for Helm releases are stored",
+  }),
+  source: Type.String({
+    description:
+      "Path to the compiled instance generated from `helmet compile ...`",
+  }),
+  wait: Type.Boolean({
+    description:
+      "Whether to pass --wait to the underlying `helm install ...` process",
+    examples: [false],
+  }),
+});
+
 export async function install(
-  args: { name: string; source: string; wait: boolean },
+  args: Static<typeof ParamsSchema>,
 ) {
+  const { namespace } = args;
   const source = resolvePath(args.source);
 
   console.log(`Installing ${source}`);
@@ -103,6 +129,7 @@ export async function install(
 
   await helmInstall({
     name: `${args.name}-namespaces`,
+    namespace,
     chartPath: joinPath(source, "namespaces"),
     waitOnFirstInstall: true,
     waitOnSubsequentInstalls: true,
@@ -120,20 +147,14 @@ export async function install(
  */
   await helmInstall({
     name: `${args.name}-resources`,
+    namespace,
     chartPath: joinPath(source, "resources"),
     waitOnFirstInstall: false,
     waitOnSubsequentInstalls: args.wait,
   });
 }
 
-export default createCliAction(
-  Type.Object({
-    name: Type.String(),
-    source: Type.String(),
-    wait: Type.Boolean(),
-  }),
-  async (args) => {
-    await install(args);
-    return ExitCode.Zero;
-  },
-);
+export default createCliAction(ParamsSchema, async (args) => {
+  await install(args);
+  return ExitCode.Zero;
+});
