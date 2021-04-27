@@ -4,6 +4,7 @@ import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { Type } from "../deps/typebox.ts";
 import { resolvePath } from "../deps/std_path.ts";
 import { gray } from "../deps/std_fmt_colors.ts";
+import { importBundleModule } from "../libs/iac_utils.ts";
 
 export const CONFIG_MAP_NAME = "helmet-whitelist";
 export const CONFIG_MAP_NAMESPACE = "default";
@@ -61,18 +62,6 @@ export async function updateWhitelist(
   });
 }
 
-export async function loadInstanceId(path: string): Promise<string> {
-  const chartModule = await import(path);
-
-  if (!chartModule.id) {
-    throw new Error(
-      `Instance module does not export an 'id' const, please check: ${path}`,
-    );
-  }
-
-  return chartModule.id as string;
-}
-
 export default createCliAction(
   Type.Object({
     path: Type.String({
@@ -83,10 +72,11 @@ export default createCliAction(
   async ({ path }) => {
     const source = resolvePath(path);
 
-    const instanceId = await loadInstanceId(source);
+    const bundleModule = await importBundleModule(source);
+    const { releaseId } = bundleModule;
     const whitelistedSet = await fetchCurrentWhitelist();
 
-    whitelistedSet.add(instanceId);
+    whitelistedSet.add(releaseId);
 
     await updateWhitelist(whitelistedSet);
 

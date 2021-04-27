@@ -91,11 +91,17 @@ export interface ChartInstanceConfig<V> {
 
 export type K8sCrd = Static<typeof K8sCrdSchema>;
 
-export interface ChartInstance {
+export interface HelmetChartInstance {
   name: string;
   namespace: string;
   version: string;
   labels: { [key: string]: string };
   resources: K8sResource[];
   crds: K8sCrd[];
+}
+
+export interface HelmetBundle {
+  releaseId: string;
+  releaseNamespace: string;
+  create: () => Promise<HelmetChartInstance[]>;
 }

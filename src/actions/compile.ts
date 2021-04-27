@@ -1,17 +1,17 @@
 import { stringifyYamlRelaxed } from "../libs/yaml_utils.ts";
-import { ChartInstance } from "../libs/types.ts";
+import { HelmetChartInstance } from "../libs/types.ts";
 import { joinPath, resolvePath } from "../deps/std_path.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { Type } from "../deps/typebox.ts";
-import { readAll } from "../deps/std_io.ts";
 import { cyan } from "../deps/std_fmt_colors.ts";
+import { importBundleModule } from "../libs/iac_utils.ts";
 
 async function generateChildChart(
   { crdsPath, resourcesPath, namespacesPath, instance }: {
     crdsPath: string;
     resourcesPath: string;
     namespacesPath: string;
-    instance: ChartInstance;
+    instance: HelmetChartInstance;
   },
 ): Promise<void> {
   const resourcesWithoutNamespaces = instance.resources.filter((r) =>
@@ -104,7 +104,7 @@ export async function generateParentChart(
     name: string;
     version: string;
     targetPath: string;
-    children: ChartInstance[];
+    children: HelmetChartInstance[];
   },
 ): Promise<void> {
   const crdsPath = joinPath(targetPath, "crds");
@@ -148,7 +148,6 @@ export async function compile(
     version: string;
     source: string;
     destination: string;
-    inputs: unknown;
   },
 ) {
   const source = resolvePath(args.source);
@@ -156,28 +155,22 @@ export async function compile(
 
   console.error("Importing module", cyan(source));
 
-  const chartModule = await import(source);
+  const bundleModule = await importBundleModule(source);
 
-  if (!chartModule.id) {
+  if (!bundleModule.releaseId) {
     throw new Error(
       `Instance module does not export an 'id' const, please check: ${source}`,
     );
   }
 
-  const instanceId = chartModule.id;
+  const releaseId = bundleModule.releaseId;
 
-  if (typeof chartModule.default !== "function") {
-    throw new Error(
-      `Instance module does not export a default function, please check: ${source}`,
-    );
-  }
-
-  console.error("Creating bundle with id", cyan(instanceId));
-  const chartInstances = await chartModule.default(args.inputs);
+  console.error("Creating bundle with releaseId", cyan(releaseId));
+  const chartInstances = await bundleModule.create();
 
   if (!Array.isArray(chartInstances)) {
     throw new Error(
-      `Instance module default function does not return a Promise<ChartInstance[]>, please check: ${source}`,
+      `Instance module 'create' function does not return Promise<HelmetChartInstance[]>, please check: ${source}`,
     );
   }
 
@@ -185,7 +178,7 @@ export async function compile(
 
   await generateParentChart(
     {
-      name: chartModule.id,
+      name: releaseId,
       version: args.version,
       targetPath: destination,
       children: chartInstances,
@@ -207,45 +200,12 @@ export default createCliAction(
       description: "Destination path to generate the Helm chart to",
       examples: ["/path/to/compiled-prod-chart"],
     }),
-    inputs: Type.Optional(Type.String({
-      description:
-        "Optional path to the input JSON payload to pass to the instance's factory as inputs. Use '-' to read from stdin",
-      examples: ["-"],
-    })),
   }),
-  async ({ version, source, destination, inputs }) => {
-    const inputsData: unknown = await (async () => {
-      if (inputs === undefined) {
-        return {};
-      }
-
-      console.error(
-        `Reading inputs from: ${inputs === "-" ? "stdin" : inputs}`,
-      );
-
-      const inputsFile = inputs === "-"
-        ? Deno.stdin
-        : await Deno.open(inputs, { read: true, write: false });
-
-      const stdin = new TextDecoder().decode(await readAll(inputsFile));
-
-      if (stdin.length > 0) {
-        try {
-          return JSON.parse(stdin);
-        } catch (e) {
-          console.error("Malformed inputs, not a valid JSON payload");
-          throw e;
-        }
-      }
-
-      return {};
-    })();
-
+  async ({ version, source, destination }) => {
     await compile({
       version,
       source,
       destination,
-      inputs: inputsData,
     });
 
     return ExitCode.Zero;

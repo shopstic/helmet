@@ -16,10 +16,11 @@ import {
   ValidationResult,
 } from "../deps/validation_utils.ts";
 import {
-  ChartInstance,
   ChartInstanceConfig,
   ChartMetadata,
   ChartMetadataSchema,
+  HelmetBundle,
+  HelmetChartInstance,
   K8sCrd,
 } from "./types.ts";
 import { memoizePromise } from "../deps/async_utils.ts";
@@ -234,7 +235,7 @@ const validateK8sCrd = createValidator(K8sCrdSchema);
 
 export async function compileChartInstance(
   instance: ChartInstanceConfig<unknown>,
-): Promise<ChartInstance> {
+): Promise<HelmetChartInstance> {
   const meta = await readChartMeta(instance.path);
   const resources = await helmTemplate(instance);
   const resourcesWithoutCrds = resources.filter((r) => r.kind !== K8sCrdKind);
@@ -272,37 +273,56 @@ export async function compileChartInstance(
   };
 }
 
-export function createBundleInstance<E>(
-  env: E,
-  chartInstanceFactories: Array<(e: E) => Promise<ChartInstance>>,
-): Promise<ChartInstance[]> {
-  return Promise
-    .all(
-      chartInstanceFactories
-        .map((f) => f(env)),
+export function defineBundle(
+  instance: HelmetBundle,
+): typeof instance {
+  return instance;
+}
+
+export async function importBundleModule(
+  path: string,
+): Promise<HelmetBundle> {
+  const bundleModule = await import(path);
+
+  if (typeof bundleModule.default !== "object") {
+    throw new Error(
+      `Bundle module does not have a default export, please check: ${path}`,
     );
+  }
+
+  const defaultExport = bundleModule.default;
+
+  if (
+    typeof defaultExport.releaseId !== "string" ||
+    defaultExport.releaseId.length === 0
+  ) {
+    throw new Error(
+      `Bundle module default export does not contain a valid 'releaseId' property, please check: ${path}`,
+    );
+  }
+
+  if (
+    typeof defaultExport.releaseNamespace !== "string" ||
+    defaultExport.releaseNamespace.length === 0
+  ) {
+    throw new Error(
+      `Bundle module default export does not contain a valid 'releaseNamespace' property, please check: ${path}`,
+    );
+  }
+
+  if (typeof defaultExport.create !== "function") {
+    throw new Error(
+      `Bundle module default export does not contain a 'create' property, please check: ${path}`,
+    );
+  }
+
+  return defaultExport as HelmetBundle;
 }
 
-export function defineBundleInstance<T extends TProperties>(
-  inputsSchema: TObject<T>,
-  factory: (inputs: Static<typeof inputsSchema>) => Promise<ChartInstance[]>,
-): (rawInputs: unknown) => Promise<ChartInstance[]> {
-  return (rawInputs: unknown) => {
-    const inputsResult = validate(inputsSchema, rawInputs);
-
-    if (!inputsResult.isSuccess) {
-      console.error(inputsResult.errors);
-      throw new Error(`Invalid inputs: ${JSON.stringify(rawInputs, null, 2)}`);
-    }
-
-    return factory(inputsResult.value);
-  };
-}
-
-export function defineChartInstance<E>(
-  fn: (args: E) => Promise<ChartInstance>,
-): typeof fn {
-  return fn;
+export function defineChart<E>(
+  create: (args: E) => Promise<HelmetChartInstance>,
+): typeof create {
+  return create;
 }
 
 export function deriveName(moduleMeta: { url: string }): string {

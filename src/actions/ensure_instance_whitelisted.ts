@@ -3,7 +3,8 @@ import { captureExec } from "../deps/exec_utils.ts";
 import { bold, cyan, red } from "../deps/std_fmt_colors.ts";
 import { resolvePath } from "../deps/std_path.ts";
 import { Type } from "../deps/typebox.ts";
-import { fetchCurrentWhitelist, loadInstanceId } from "./whitelist_instance.ts";
+import { importBundleModule } from "../libs/iac_utils.ts";
+import { fetchCurrentWhitelist } from "./whitelist_instance.ts";
 
 export default createCliAction(
   Type.Object({
@@ -15,10 +16,11 @@ export default createCliAction(
   async ({ path }) => {
     const source = resolvePath(path);
 
-    const instanceId = await loadInstanceId(source);
+    const bundleModule = await importBundleModule(source);
+    const { releaseId, releaseNamespace } = bundleModule;
     const whitelistedSet = await fetchCurrentWhitelist();
 
-    if (!whitelistedSet.has(instanceId)) {
+    if (!whitelistedSet.has(releaseId)) {
       const currentKubeContext = await captureExec({
         run: {
           cmd: ["kubectl", "config", "current-context"],
@@ -26,7 +28,7 @@ export default createCliAction(
       });
       console.error(
         "Bundle instance",
-        bold(red(instanceId)),
+        bold(red(releaseId)),
         "is not whitelisted",
       );
       console.error(
@@ -40,7 +42,12 @@ export default createCliAction(
       return ExitCode.One;
     }
 
-    console.log(instanceId);
+    console.log(
+      JSON.stringify({
+        releaseId,
+        releaseNamespace,
+      }),
+    );
     return ExitCode.Zero;
   },
 );
