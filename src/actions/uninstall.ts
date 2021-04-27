@@ -21,7 +21,7 @@ export default createCliAction(
 
     await inheritExec({
       run: {
-        cmd: ["helm", "uninstall", "-n", namespace, `${namespace}-namespaces`],
+        cmd: ["helm", "uninstall", "-n", namespace, `${name}-namespaces`],
       },
     });
 
