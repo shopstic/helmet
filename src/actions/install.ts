@@ -114,6 +114,7 @@ export async function install(
       "kubectl",
       "apply",
       "--server-side",
+      "--force-conflicts",
       "-f",
       crdsTemplatesPath,
     ];
