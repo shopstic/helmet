@@ -1,6 +1,6 @@
 import { inheritExec } from "../deps/exec_utils.ts";
-import { fsExists } from "../deps/std_fs.ts";
-import { joinPath, resolvePath } from "../deps/std_path.ts";
+import { expandGlobSync, fsExists } from "../deps/std_fs.ts";
+import { dirname, joinPath, resolvePath } from "../deps/std_path.ts";
 import { parseYaml } from "../deps/std_yaml.ts";
 import { Type } from "../deps/typebox.ts";
 import { validate } from "../deps/validation_utils.ts";
@@ -246,6 +246,22 @@ async function updateOciChart(
         },
       },
     });
+
+    await Promise.all(
+      Array
+        .from(expandGlobSync("*/charts/*.tgz", {
+          root: tempDir,
+        }))
+        .map(async (entry) => {
+          const subChartsPath = dirname(entry.path);
+          await inheritExec({
+            run: {
+              cmd: ["tar", "-xz", "-C", subChartsPath, "-f", entry.path],
+            },
+          });
+          await Deno.remove(entry.path);
+        }),
+    );
 
     if (currentChartMeta) {
       await Deno.remove(chartPath, { recursive: true });
