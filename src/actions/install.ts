@@ -17,14 +17,16 @@ const HelmLsResultSchema = Type.Array(Type.Object({
 }));
 
 async function helmInstall(
-  { name, namespace, chartPath, waitOnFirstInstall, waitOnSubsequentInstalls }:
-    {
-      name: string;
-      namespace: string;
-      chartPath: string;
-      waitOnFirstInstall: boolean;
-      waitOnSubsequentInstalls: boolean;
-    },
+  { name, namespace, chartPath, wait, cleanupOnFail, atomic, timeout, force }: {
+    name: string;
+    namespace: string;
+    chartPath: string;
+    wait: boolean;
+    cleanupOnFail: boolean;
+    atomic: boolean;
+    timeout?: string;
+    force: boolean;
+  },
 ) {
   const helmLsResultRaw = JSON.parse(
     await captureExec({
@@ -46,13 +48,14 @@ async function helmInstall(
     ? [
       "helm",
       "upgrade",
-      "--install",
       "-n",
       namespace,
       "--history-max=2",
-      ...(waitOnSubsequentInstalls
-        ? ["--atomic", "--cleanup-on-fail", "--timeout=10m"]
-        : []),
+      ...(wait ? ["--wait"] : []),
+      ...(cleanupOnFail ? ["--cleanup-on-fail"] : []),
+      ...(atomic ? ["--atomic"] : []),
+      ...(timeout ? [`--timeout=${timeout}`] : []),
+      ...(force ? ["--force"] : []),
       name,
       chartPath,
     ]
@@ -61,7 +64,9 @@ async function helmInstall(
       "install",
       "-n",
       namespace,
-      ...(waitOnFirstInstall ? ["--wait", "--timeout=10m"] : []),
+      ...(wait ? ["--wait"] : []),
+      ...(atomic ? ["--atomic"] : []),
+      ...(timeout ? [`--timeout=${timeout}`] : []),
       name,
       chartPath,
     ];
@@ -88,21 +93,53 @@ export const ParamsSchema = Type.Object({
     description:
       "Path to the compiled instance generated from `helmet compile ...`",
   }),
-  wait: Type.Boolean({
+  wait: Type.Optional(Type.Boolean({
     description:
-      "Whether to pass --wait to the underlying `helm install ...` process",
+      "Whether to pass --wait to the underlying `helm upgrade ...` process",
+    default: false,
     examples: [false],
-  }),
+  })),
+  atomic: Type.Optional(Type.Boolean({
+    description:
+      "Whether to pass --atomic to the underlying `helm upgrade ...` process",
+    default: false,
+    examples: [false],
+  })),
+  cleanupOnFail: Type.Optional(Type.Boolean({
+    description:
+      "Whether to pass --cleanup-on-fail to the underlying `helm upgrade ...` process",
+    default: false,
+    examples: [false],
+  })),
+  force: Type.Optional(Type.Boolean({
+    description:
+      "Whether to pass --force to the underlying `helm upgrade ...` process",
+    default: false,
+    examples: [false],
+  })),
+  timeout: Type.Optional(Type.String({
+    description: "Pass --timeout to the underlying `helm upgrade ...` process",
+    default: "",
+    examples: ["5m0s"],
+  })),
 });
 
 export async function install(
-  args: Static<typeof ParamsSchema>,
+  {
+    name,
+    namespace,
+    source,
+    wait = false,
+    atomic = false,
+    cleanupOnFail = false,
+    force = false,
+    timeout,
+  }: Static<typeof ParamsSchema>,
 ) {
-  const { namespace } = args;
-  const source = resolvePath(args.source);
+  const resolvedSource = resolvePath(source);
 
-  console.log(`Installing ${source}`);
-  const crdsTemplatesPath = joinPath(source, "crds/templates");
+  console.log(`Installing ${resolvedSource}`);
+  const crdsTemplatesPath = joinPath(resolvedSource, "crds/templates");
 
   const hasCrds = Array
     .from(expandGlobSync("*.yaml", {
@@ -129,11 +166,14 @@ export async function install(
   }
 
   await helmInstall({
-    name: `${args.name}-namespaces`,
+    name: `${name}-namespaces`,
     namespace,
-    chartPath: joinPath(source, "namespaces"),
-    waitOnFirstInstall: true,
-    waitOnSubsequentInstalls: true,
+    chartPath: joinPath(resolvedSource, "namespaces"),
+    wait,
+    atomic,
+    cleanupOnFail,
+    force,
+    timeout,
   });
 
   /* await inheritExec({
@@ -147,11 +187,14 @@ export async function install(
     });
  */
   await helmInstall({
-    name: `${args.name}-resources`,
+    name: `${name}-resources`,
     namespace,
-    chartPath: joinPath(source, "resources"),
-    waitOnFirstInstall: false,
-    waitOnSubsequentInstalls: args.wait,
+    chartPath: joinPath(resolvedSource, "resources"),
+    wait,
+    atomic,
+    cleanupOnFail,
+    force,
+    timeout,
   });
 }
 
