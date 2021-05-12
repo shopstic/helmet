@@ -541,7 +541,8 @@ export async function typeifyChart(chartPath: string, typesPath: string) {
       }];
 
       return versions.map((version) => {
-        const schema = version.schema || crd.spec.validation?.openAPIV3Schema;
+        const schema = version.schema?.openAPIV3Schema ||
+          crd.spec.validation?.openAPIV3Schema;
 
         if (schema) {
           return generateCrdInterface(
