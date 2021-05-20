@@ -17,7 +17,17 @@ const HelmLsResultSchema = Type.Array(Type.Object({
 }));
 
 async function helmInstall(
-  { name, namespace, chartPath, wait, cleanupOnFail, atomic, timeout, force }: {
+  {
+    name,
+    namespace,
+    chartPath,
+    wait,
+    cleanupOnFail,
+    atomic,
+    timeout,
+    force,
+    createNamespace,
+  }: {
     name: string;
     namespace: string;
     chartPath: string;
@@ -26,6 +36,7 @@ async function helmInstall(
     atomic: boolean;
     timeout?: string;
     force: boolean;
+    createNamespace: boolean;
   },
 ) {
   const helmLsResultRaw = JSON.parse(
@@ -56,6 +67,7 @@ async function helmInstall(
       ...(atomic ? ["--atomic"] : []),
       ...(timeout ? [`--timeout=${timeout}`] : []),
       ...(force ? ["--force"] : []),
+      ...(createNamespace ? ["--create-namespace"] : []),
       name,
       chartPath,
     ]
@@ -67,6 +79,7 @@ async function helmInstall(
       ...(wait ? ["--wait"] : []),
       ...(atomic ? ["--atomic"] : []),
       ...(timeout ? [`--timeout=${timeout}`] : []),
+      ...(createNamespace ? ["--create-namespace"] : []),
       name,
       chartPath,
     ];
@@ -122,6 +135,12 @@ export const ParamsSchema = Type.Object({
     default: "",
     examples: ["5m0s"],
   })),
+  createNamespace: Type.Optional(Type.Boolean({
+    description:
+      "Whether to pass --create-namespace to the underlying `helm upgrade ...` process",
+    default: false,
+    examples: [false],
+  })),
 });
 
 export async function install(
@@ -133,6 +152,7 @@ export async function install(
     atomic = false,
     cleanupOnFail = false,
     force = false,
+    createNamespace = false,
     timeout,
   }: Static<typeof ParamsSchema>,
 ) {
@@ -174,6 +194,7 @@ export async function install(
     cleanupOnFail,
     force,
     timeout,
+    createNamespace,
   });
 
   /* await inheritExec({
@@ -195,6 +216,7 @@ export async function install(
     cleanupOnFail,
     force,
     timeout,
+    createNamespace,
   });
 }
 
