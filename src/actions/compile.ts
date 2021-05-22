@@ -26,7 +26,9 @@ async function generateChildChart(
         ...r.metadata,
         labels: {
           ...r.metadata?.labels,
-          "helmet.run/iac-metadata-name": r.metadata.name,
+          // Kubernetes 1.21+ adds this by default. We're adding it explicitly
+          // for <1.21 clusters
+          "kubernetes.io/metadata.name": r.metadata.name,
         },
       },
     }));
