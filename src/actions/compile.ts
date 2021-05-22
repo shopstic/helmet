@@ -176,6 +176,21 @@ export async function compile(
     );
   }
 
+  const duplicateDetectionMap = chartInstances.reduce((map, { name }) => {
+    const count = map.get(name) ?? 0;
+    map.set(name, count + 1);
+    return map;
+  }, new Map<string, number>());
+
+  Array
+    .from(duplicateDetectionMap.entries())
+    .filter(([_, count]) => count > 1)
+    .forEach(([name, count]) => {
+      throw new Error(
+        `There are ${count} instances with the same name of '${name}'`,
+      );
+    });
+
   console.error("Compiling", source, "to", destination);
 
   await generateParentChart(
