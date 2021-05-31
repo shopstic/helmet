@@ -2,10 +2,14 @@
 set -euo pipefail
 
 SHELL_NAME=${SHELL_NAME:-"helmet-shell"}
+export DOCKER_SCAN_SUGGEST=false
 export DOCKER_BUILDKIT=1
 
-docker build ./images/shell
-IMAGE_ID=$(docker build -q ./images/shell | head -n1)
+TEMP_FILE=$(mktemp)
+trap "rm -f ${TEMP_FILE}" EXIT
+
+docker build ./images/shell --iidfile "${TEMP_FILE}"
+IMAGE_ID=$(cat "${TEMP_FILE}")
 
 docker run \
   -it --rm \
