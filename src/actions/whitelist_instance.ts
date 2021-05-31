@@ -27,10 +27,14 @@ export async function fetchCurrentWhitelist(): Promise<Set<string>> {
   const stderr = new TextDecoder().decode(await child.stderrOutput());
   const { code } = await child.status();
 
-  if (
-    stdout.length === 0 ||
-    (code !== 0 && stderr.indexOf("not found") !== -1)
-  ) {
+  if (code !== 0) {
+    if (stderr.indexOf("not found") === -1) {
+      throw new Error(stderr);
+    }
+    return new Set<string>();
+  }
+
+  if (stdout.length === 0) {
     return new Set<string>();
   }
 
