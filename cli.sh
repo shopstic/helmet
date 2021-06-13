@@ -6,9 +6,9 @@ MOD_FILE="./src/mod.ts"
 
 code_quality() {
   echo "Checking formatting..."
-  deno fmt --unstable --check ./src
+  deno fmt --check ./src
   echo "Linting..."
-  deno lint --unstable ./src
+  deno lint ./src
   # echo "Runnning tests..."
   # deno test -A
 }
