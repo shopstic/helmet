@@ -1,4 +1,4 @@
-FROM shopstic/bin-kubectl:1.20.4 as bin-kubectl
+FROM shopstic/bin-kubectl:1.21.0 as bin-kubectl
 FROM shopstic/bin-deno:1.11.0 as bin-deno
 FROM shopstic/bin-helm:3.6.0 as bin-helm
 FROM shopstic/bin-yq:4.6.3 as bin-yq
