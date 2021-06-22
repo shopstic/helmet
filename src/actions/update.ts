@@ -256,7 +256,15 @@ async function updateOciChart(
           const subChartsPath = dirname(entry.path);
           await inheritExec({
             run: {
-              cmd: ["tar", "-xz", "-C", subChartsPath, "-f", entry.path],
+              cmd: [
+                "tar",
+                "-xz",
+                "--warning=no-timestamp",
+                "-C",
+                subChartsPath,
+                "-f",
+                entry.path,
+              ],
             },
           });
           await Deno.remove(entry.path);
