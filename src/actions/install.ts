@@ -159,11 +159,11 @@ export async function install(
   const resolvedSource = resolvePath(source);
 
   console.log(`Installing ${resolvedSource}`);
-  const crdsTemplatesPath = joinPath(resolvedSource, "crds/templates");
+  const crdsRenderedPath = joinPath(resolvedSource, "crds/rendered");
 
   const hasCrds = Array
     .from(expandGlobSync("*.yaml", {
-      root: crdsTemplatesPath,
+      root: crdsRenderedPath,
     })).length > 0;
 
   if (hasCrds) {
@@ -173,7 +173,7 @@ export async function install(
       "--server-side",
       "--force-conflicts",
       "-f",
-      crdsTemplatesPath,
+      crdsRenderedPath,
     ];
 
     console.log("Executing:", cyan(kubectlApplyCmd.join(" ")));
