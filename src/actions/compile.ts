@@ -88,8 +88,11 @@ async function generateChart(
   },
 ) {
   const templatesPath = joinPath(chartPath, "templates");
+  const renderedPath = joinPath(chartPath, "rendered");
 
   await Deno.mkdir(templatesPath, { recursive: true });
+  await Deno.mkdir(renderedPath, { recursive: true });
+
   await Deno.writeTextFile(
     joinPath(chartPath, "Chart.yaml"),
     stringifyYamlRelaxed({
@@ -98,6 +101,17 @@ async function generateChart(
       name: name,
       version,
     }),
+  );
+
+  await Deno.writeTextFile(
+    joinPath(templatesPath, "template.yaml"),
+    `{{ $currentScope := .}}
+{{ range $path, $_ :=  .Files.Glob  "rendered/*.yaml" }}
+{{- with $currentScope}}
+---
+{{ .Files.Get $path }}
+{{- end }}
+{{ end }}`,
   );
 }
 
@@ -135,9 +149,9 @@ export async function generateParentChart(
     children
       .map((instance) =>
         generateChildChart({
-          crdsPath: joinPath(crdsPath, "templates"),
-          resourcesPath: joinPath(resourcesPath, "templates"),
-          namespacesPath: joinPath(namespacesPath, "templates"),
+          crdsPath: joinPath(crdsPath, "rendered"),
+          resourcesPath: joinPath(resourcesPath, "rendered"),
+          namespacesPath: joinPath(namespacesPath, "rendered"),
           instance,
         })
           .then(() => console.error("Generated instance", cyan(instance.name)))
