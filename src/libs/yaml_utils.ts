@@ -24,7 +24,7 @@ export async function parseMultiDocumentsYaml(
       cmd: [
         "yq",
         "ea",
-        "-j",
+        "-o=json",
         "-N",
         ". as $doc ireduce ([]; . + $doc)",
         "-",

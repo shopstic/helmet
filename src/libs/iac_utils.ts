@@ -213,22 +213,6 @@ ${JSON.stringify(docResult.errors, null, 2)}
     });
 
   return transformedDocs;
-  /* if (
-    chartInstance.createNamespaceIfNotExists !== false &&
-    !transformedDocs.find((d) =>
-      d.kind === "Namespace" && d.metadata.name === chartInstance.namespace
-    )
-  ) {
-    return transformedDocs.concat({
-      apiVersion: "v1",
-      kind: "Namespace",
-      metadata: {
-        name: chartInstance.namespace,
-      },
-    });
-  } else {
-    return transformedDocs;
-  } */
 }
 
 const validateK8sCrd = createValidator(K8sCrdSchema);
@@ -238,6 +222,7 @@ export async function compileChartInstance(
 ): Promise<HelmetChartInstance> {
   const meta = await readChartMeta(instance.path);
   const resources = await helmTemplate(instance);
+
   const resourcesWithoutCrds = resources.filter((r) => r.kind !== K8sCrdKind);
   const misplacedCrds = resources
     .filter((r) => r.kind === K8sCrdKind)
