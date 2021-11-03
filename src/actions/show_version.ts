@@ -6,6 +6,6 @@ export default createCliAction(
   Type.Object({}),
   () => {
     console.log(version);
-    return Promise.resolve(ExitCode.One);
+    return Promise.resolve(ExitCode.Zero);
   },
 );
