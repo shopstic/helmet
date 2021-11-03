@@ -52,7 +52,7 @@ export async function updateWhitelist(
       namespace: CONFIG_MAP_NAMESPACE,
     },
     data: Object.fromEntries(
-      Array.from(instances).map((name) => ([name, "yes"])),
+      Array.from(instances).map((name) => [name, "yes"]),
     ),
   });
 

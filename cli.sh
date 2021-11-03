@@ -13,10 +13,16 @@ code_quality() {
   # deno test -A
 }
 
-build() {
+auto_fmt() {
+  deno fmt ./src
+}
+
+compile() {
   local VERSION=${1:-"latest"}
+  local OUTPUT=${2:-$(mktemp -d)}
+
   printf "%s\n" "export default \"${VERSION}\";" > ./src/version.ts
-  deno bundle "${ENTRY_FILE}" --lock ./lock.json ./images/release/helmet.js
+  deno compile --unstable -A --output "${OUTPUT}/helmet" --lock ./lock.json "${ENTRY_FILE}"
 }
 
 update_cache() {
