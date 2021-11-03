@@ -22,7 +22,7 @@
               buildPhase = ''
                 export DENO_DIR="$TMPDIR/.deno"
                 mkdir -p "$out/bin"
-                ./cli.sh compile "${version}" "$out/bin"
+                bash ./cli.sh compile "${version}" "$out/bin"
               '';
               installPhase = ''
                 wrapProgram $out/bin/helmet --set PATH ${pkgs.lib.makeBinPath shell.runtimeInputs}
