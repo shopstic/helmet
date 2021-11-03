@@ -63,9 +63,10 @@ jobs:
         run: |
           export DENO_DIR=$PWD/.deno
           nix develop -c ./cli.sh update_cache
+          git add "${DENO_DIR}"
 
       - name: Build
-        run: nix build -L --no-link --impure
+        run: nix build -L --no-link
 
       - name: Update shell nix cache
         if: github.ref == 'refs/heads/main'
