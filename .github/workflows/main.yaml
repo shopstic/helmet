@@ -59,14 +59,8 @@ jobs:
       - name: Check
         run: nix develop -c ./cli.sh code_quality
 
-      - name: Fetch deno dependencies
-        run: |
-          export DENO_DIR=$PWD/.deno
-          nix develop -c ./cli.sh update_cache
-          git add "${DENO_DIR}"
-
       - name: Build
-        run: nix build -L --no-link
+        run: nix build --option sandbox relaxed -L --no-link
 
       - name: Update shell nix cache
         if: github.ref == 'refs/heads/main'
