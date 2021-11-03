@@ -20,8 +20,9 @@
               src = ./.;
               buildInputs = devShell.buildInputs ++ [ pkgs.makeWrapper ];
               buildPhase = ''
-                export DENO_DIR="$TMPDIR/.deno"
+                export DENO_DIR="$PWD/.deno"
                 mkdir -p "$out/bin"
+                ls -la
                 bash ./cli.sh compile "${version}" "$out/bin"
               '';
               installPhase = ''
