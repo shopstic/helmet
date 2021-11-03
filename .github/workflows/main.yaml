@@ -60,7 +60,9 @@ jobs:
         run: nix develop -c ./cli.sh code_quality
 
       - name: Fetch deno dependencies
-        run: nix develop -c ./cli.sh update_cache
+        run: |
+          export DENO_DIR=$PWD/.deno
+          nix develop -c ./cli.sh update_cache
 
       - name: Build
         run: nix build -L --no-link --impure
