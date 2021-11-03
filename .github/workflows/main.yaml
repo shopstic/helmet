@@ -53,6 +53,9 @@ jobs:
           nix show-derivation
           nix path-info || true
 
+      - name: Build dev env
+        run: nix build .#devEnv -L --no-link
+
       - name: Check
         run: nix develop -c ./cli.sh code_quality
 
