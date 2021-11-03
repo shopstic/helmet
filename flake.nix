@@ -33,7 +33,6 @@
                 export DENO_DIR="$TMPDIR/.deno"
                 mkdir -p "''${DENO_DIR}"
                 ln -s "${denoDir}/deps" "''${DENO_DIR}/deps"
-                ls -la "''${DENO_DIR}/deps"
                 mkdir -p "$out/bin"
                 bash ./cli.sh compile "${version}" "$out/bin"
               '';
