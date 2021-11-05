@@ -8,7 +8,7 @@ rec {
   runtimeInputs = [
     deno-bin
     kubectl
-    yq
+    yq-go
     sops
     kubernetes-helm
     nodePkgs."json-schema-to-typescript-10.1.5"
