@@ -8,16 +8,7 @@ rec {
   derivation = mkShell rec {
     deno-bin = callPackage ./deno-bin.nix { };
     buildInputs = [
-      nixpkgs-fmt
       deno-bin
-      # k9s
-      # kubectx
-      # terraform
-      # awscli2
-      # cachix
-      # stern
-      # jq
-      # parallel
       nodePackages.node2nix
     ] ++ runtimeInputs;
   };

@@ -12,7 +12,7 @@
           shell = (import ./nix/shell.nix { inherit pkgs; });
           denoDir = pkgs.stdenv.mkDerivation {
             name = "helmet-deno-deps";
-            src = ./.;
+            src = builtins.path { path = ./.; name = "helmet"; };
             buildInputs = shell.derivation.buildInputs;
             __noChroot = true;
             installPhase = ''
@@ -27,7 +27,7 @@
             devEnv = devShell.inputDerivation;
             helmet = pkgs.stdenv.mkDerivation {
               name = "helmet";
-              src = ./.;
+              src = builtins.path { path = ./.; name = "helmet"; };
               buildInputs = devShell.buildInputs ++ [ pkgs.makeWrapper ];
               buildPhase = ''
                 export DENO_DIR="$TMPDIR/.deno"
