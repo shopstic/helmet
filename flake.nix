@@ -17,7 +17,8 @@
             __noChroot = true;
             installPhase = ''
               export DENO_DIR="$out"
-              bash ./cli.sh update_cache
+              patchShebangs ./cli.sh
+              ./cli.sh update_cache
             '';
           };
         in
@@ -36,8 +37,9 @@
                 mkdir -p "$out/bin"
 
                 ln -s "${denoDir}/deps" "''${DENO_DIR}/deps"
+                patchShebangs ./cli.sh
 
-                bash ./cli.sh install "${version}" "$out/bin"
+                ./cli.sh install "${version}" "$out/bin"
               '';
               installPhase = ''
                 wrapProgram $out/bin/helmet --set PATH ${pkgs.lib.makeBinPath shell.runtimeInputs}
