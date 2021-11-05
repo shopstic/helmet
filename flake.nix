@@ -42,7 +42,7 @@
                 ./cli.sh install "${version}" "$out/bin"
               '';
               installPhase = ''
-                wrapProgram $out/bin/helmet --set PATH ${pkgs.lib.makeBinPath shell.runtimeInputs}
+                wrapProgram $out/bin/helmet --prefix PATH : "${pkgs.lib.makeBinPath shell.runtimeInputs}"
               '';
             };
           };
