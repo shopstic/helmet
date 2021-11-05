@@ -30,7 +30,7 @@ install() {
   local OUTPUT=${2:-$(mktemp -d)}
 
   "$0" build "${VERSION}" "${OUTPUT}"
-  deno install --unstable -A -f --lock ./lock.json "${OUTPUT}/helmet.js"
+  deno install --unstable -A -f "${OUTPUT}/helmet.js"
 }
 
 update_cache() {

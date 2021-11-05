@@ -38,7 +38,6 @@ jobs:
             printenv NIX_CACHE_PRIVATE_KEY > ~/.secrets/nix-cache-key
           fi
 
-
       - uses: nixbuild/nix-quick-install-action@v7
         with:
           nix_version: 2.4pre20210908_3c56f62
