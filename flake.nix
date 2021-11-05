@@ -31,10 +31,13 @@
               buildInputs = devShell.buildInputs ++ [ pkgs.makeWrapper ];
               buildPhase = ''
                 export DENO_DIR="$TMPDIR/.deno"
+                export DENO_INSTALL_ROOT="$out"
                 mkdir -p "''${DENO_DIR}"
-                ln -s "${denoDir}/deps" "''${DENO_DIR}/deps"
                 mkdir -p "$out/bin"
-                bash ./cli.sh compile "${version}" "$out/bin"
+
+                ln -s "${denoDir}/deps" "''${DENO_DIR}/deps"
+
+                bash ./cli.sh install "${version}" "$out/bin"
               '';
               installPhase = ''
                 wrapProgram $out/bin/helmet --set PATH ${pkgs.lib.makeBinPath shell.runtimeInputs}

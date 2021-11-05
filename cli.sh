@@ -17,12 +17,20 @@ auto_fmt() {
   deno fmt ./src
 }
 
-compile() {
+build() {
   local VERSION=${1:-"latest"}
   local OUTPUT=${2:-$(mktemp -d)}
 
   printf "%s\n" "export default \"${VERSION}\";" > ./src/version.ts
-  deno compile --unstable -A --output "${OUTPUT}/helmet" --lock ./lock.json "${ENTRY_FILE}"
+  deno bundle --lock ./lock.json "${ENTRY_FILE}" "${OUTPUT}/helmet.js"
+}
+
+install() {
+  local VERSION=${1:-"latest"}
+  local OUTPUT=${2:-$(mktemp -d)}
+
+  "$0" build "${VERSION}" "${OUTPUT}"
+  deno install --unstable -A -f --lock ./lock.json "${OUTPUT}/helmet.js"
 }
 
 update_cache() {
