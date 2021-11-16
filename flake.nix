@@ -21,9 +21,7 @@
           pkgs = nixpkgs.legacyPackages.${system};
           hotPot = nixHotPot.packages.${system};
           shell = (import ./nix/shell.nix { inherit pkgs hotPot; });
-          denoDir = pkgs.stdenv.mkDerivation {
-            name = "helmet-deno-deps";
-            src = builtins.path
+          helmetSrc = builtins.path
               {
                 path = ./.;
                 name = "helmet-src";
@@ -33,6 +31,9 @@
                   hasSuffix "/lock.json" path
                 );
               };
+          denoDir = pkgs.stdenv.mkDerivation {
+            name = "helmet-deno-deps";
+            src = helmetSrc;
             buildInputs = shell.derivation.buildInputs;
             __noChroot = true;
             installPhase = ''
@@ -49,7 +50,7 @@
             devEnv = devShell.inputDerivation;
             helmet = pkgs.stdenv.mkDerivation {
               name = "helmet";
-              src = builtins.path { path = ./.; name = "helmet"; };
+              src = helmetSrc;
               buildInputs = devShell.buildInputs ++ [ pkgs.makeWrapper ];
               buildPhase = ''
                 export DENO_DIR="$TMPDIR/.deno"
