@@ -1,4 +1,0 @@
-#!/bin/sh
-
-export HELMET_ENABLE_STACKTRACE=${HELMET_ENABLE_STACKTRACE:-"0"}
-exec deno run --cached-only -A --unstable /usr/lib/helmet/helmet.js "$@"
