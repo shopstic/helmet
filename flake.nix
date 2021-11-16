@@ -2,20 +2,32 @@
   description = "Type-safe Helm";
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.nixHotPot.url = "github:shopstic/nix-hot-pot";
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, nixHotPot }:
     let version = if (self ? rev) then self.rev else "latest"; in
-    flake-utils.lib.eachDefaultSystem
+    flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ]
       (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          shell = (import ./nix/shell.nix { inherit pkgs; });
+          hotPot = nixHotPot.packages.${system};
+          shell = (import ./nix/shell.nix { inherit pkgs hotPot; });
           denoDir = pkgs.stdenv.mkDerivation {
             name = "helmet-deno-deps";
-            src = builtins.path { path = ./.; name = "helmet"; };
+            src = builtins.path
+              {
+                path = ./.;
+                name = "helmet-src";
+                filter = with pkgs.lib; (path: type:
+                  hasInfix "/src" path ||
+                  hasSuffix "/cli.sh" path ||
+                  hasSuffix "/lock.json" path
+                );
+              };
             buildInputs = shell.derivation.buildInputs;
             __noChroot = true;
             installPhase = ''
+              ls -la .
               export DENO_DIR="$out"
               patchShebangs ./cli.sh
               ./cli.sh update_cache

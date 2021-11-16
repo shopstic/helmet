@@ -1,6 +1,6 @@
 name: Main Workflow
 
-on: [push, pull_request]
+on: [push]
 
 defaults:
   run:
@@ -9,66 +9,43 @@ defaults:
 jobs:
   build:
     name: Build
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-10.15]
-    environment:
-      name: ${{ github.ref }}
-    env:
-      NIX_CACHE_S3: s3://nixed/cache?profile=nix-cache&scheme=https
+        arch:
+          - x86_64-linux
+          - x86_64-darwin
+          - aarch64-linux
+          - aarch64-darwin
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
 
-      - name: Create secrets
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          NIX_CACHE_PRIVATE_KEY: ${{ secrets.NIX_CACHE_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.aws
-          cat <<EOF > ~/.aws/credentials
-          [nix-cache]
-          aws_access_key_id = ${AWS_ACCESS_KEY_ID}
-          aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
-          EOF
-
-          if [[ "${NIX_CACHE_PRIVATE_KEY}" != "" ]]; then
-            mkdir ~/.secrets
-            printenv NIX_CACHE_PRIVATE_KEY > ~/.secrets/nix-cache-key
-          fi
-
-      - uses: nixbuild/nix-quick-install-action@v7
+      - name: Setup
+        uses: shopstic/tailscale-nix-builder/setup@5d038bf4bfb3dea2f3b588efe6388796e263c6d4
+        timeout-minutes: 1
         with:
-          nix_version: 2.4pre20210908_3c56f62
-          nix_conf: |
-            experimental-features = nix-command flakes
-            substituters = ${{ env.NIX_CACHE_S3 }} https://cache.nixos.org/
-            trusted-users = root runner
-            trusted-public-keys = nix-cache:jxOpK2dQOv/7JIb5/30+W4oidtUgmFMXLc/3mC09mKM= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
-
-      - name: Info
-        run: |
-          nix show-derivation
-          nix path-info || true
+          tailscaleAuthKey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          nixBuildSshKey: ${{ secrets.NIX_BUILD_SSH_KEY }}
+          nixCacheS3AccessKeyId: ${{ secrets.NIX_CACHE_S3_ACCESS_KEY_ID }}
+          nixCacheS3SecretAccessKey: ${{ secrets.NIX_CACHE_S3_SECRET_ACCESS_KEY }}
 
       - name: Build dev env
-        run: nix build .#devEnv -L --no-link
+        run: nix build -L -v --no-link '.#packages.${{ matrix.arch }}.devEnv'
 
       - name: Check
         run: nix develop -c ./cli.sh code_quality
 
       - name: Build
-        run: nix build --option sandbox relaxed -L --no-link
+        run: nix build -L -v --no-link '.#defaultPackage.${{ matrix.arch }}'
 
-      - name: Update shell nix cache
-        if: github.ref == 'refs/heads/main'
-        run: |
-          nix store sign -r .#devEnv -k ~/.secrets/nix-cache-key -v
-          nix copy .#devEnv --to '${{ env.NIX_CACHE_S3 }}' -v
+      - name: Cache dev env
+        uses: shopstic/tailscale-nix-builder/cache@5d038bf4bfb3dea2f3b588efe6388796e263c6d4
+        with:
+          nixOutput: .#packages.${{ matrix.arch }}.devEnv
+          nixCachePrivateKey: ${{ secrets.NIX_CACHE_PRIVATE_KEY }}
 
-      - name: Update nix cache
-        if: github.ref == 'refs/heads/main'
-        run: |
-          nix store sign -r -k ~/.secrets/nix-cache-key -v
-          nix copy --to '${{ env.NIX_CACHE_S3 }}' -v
+      - name: Cache helmet
+        uses: shopstic/tailscale-nix-builder/cache@5d038bf4bfb3dea2f3b588efe6388796e263c6d4
+        with:
+          nixOutput: .#defaultPackage.${{ matrix.arch }}
+          nixCachePrivateKey: ${{ secrets.NIX_CACHE_PRIVATE_KEY }}

@@ -1,21 +1,23 @@
-{ pkgs ? import <nixpkgs> { } }:
-with pkgs;
+{ pkgs, hotPot }:
 let
   nodePkgs = import ./node2nix-default.nix { pkgs = pkgs; };
-  deno-bin = callPackage ./deno-bin.nix { };
 in
 rec {
-  runtimeInputs = [
-    deno-bin
-    kubectl
-    yq-go
-    sops
-    kubernetes-helm
+  runtimeInputs = builtins.attrValues
+    {
+      inherit (pkgs)
+        kubectl
+        yq-go
+        sops
+        kubernetes-helm
+        ;
+    } ++ [
+    hotPot.deno
     nodePkgs."json-schema-to-typescript-10.1.5"
   ];
-  derivation = mkShell rec {
+  derivation = pkgs.mkShellNoCC {
     buildInputs = [
-      nodePackages.node2nix
+      pkgs.nodePackages.node2nix
     ] ++ runtimeInputs;
   };
 }
