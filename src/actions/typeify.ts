@@ -271,7 +271,7 @@ function generateTypeForObject(obj: Record<string, unknown>): GeneratedType {
     };
 
   const result = Object.entries(obj).reduce((acc, [key, value]) => {
-    if (propToTypeMap.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(propToTypeMap, key)) {
       const { output, imports } = generateTypeForKnownKey(
         key as KnownKey,
         value,

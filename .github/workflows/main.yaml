@@ -35,14 +35,14 @@ jobs:
       - name: Check
         run: nix develop -c ./cli.sh code_quality
 
-      - name: Build
-        run: nix build -L -v --no-link '.#defaultPackage.${{ matrix.arch }}'
-
       - name: Cache dev env
         uses: shopstic/tailscale-nix-builder/cache@5d038bf4bfb3dea2f3b588efe6388796e263c6d4
         with:
           nixOutput: .#packages.${{ matrix.arch }}.devEnv
           nixCachePrivateKey: ${{ secrets.NIX_CACHE_PRIVATE_KEY }}
+
+      - name: Build
+        run: nix build -L -v --no-link '.#defaultPackage.${{ matrix.arch }}'
 
       - name: Cache helmet
         uses: shopstic/tailscale-nix-builder/cache@5d038bf4bfb3dea2f3b588efe6388796e263c6d4
