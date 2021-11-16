@@ -1,21 +1,6 @@
 {
   "nodes": {
-    "flake-utils": {
-      "locked": {
-        "lastModified": 1634851050,
-        "narHash": "sha256-N83GlSGPJJdcqhUxSCS/WwW5pksYf3VP1M13cDRTSVA=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "c91f3de5adaf1de973b797ef7485e441a65b8935",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
-    "flake-utils_2": {
+    "flakeUtils": {
       "locked": {
         "lastModified": 1637014545,
         "narHash": "sha256-26IZAc5yzlD9FlDT54io1oqG/bBoyka+FJk5guaX4x4=",
@@ -32,15 +17,19 @@
     },
     "nixHotPot": {
       "inputs": {
-        "flake-utils": "flake-utils_2",
-        "nixpkgs": "nixpkgs"
+        "flakeUtils": [
+          "flakeUtils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
-        "lastModified": 1637031583,
-        "narHash": "sha256-i/BMepA9T1JCL65kMJLS1GON/AKH6nBiId4KnjH1OIs=",
+        "lastModified": 1637036015,
+        "narHash": "sha256-kminoWe9kAveii4RLpiMehs4o2M0vJ5uveWgAH2F9vQ=",
         "owner": "shopstic",
         "repo": "nix-hot-pot",
-        "rev": "2b27f246216d7856c7b34a5461d046c2401bf046",
+        "rev": "1acc90d76c9403df2f81702e6b91458414d0fed7",
         "type": "github"
       },
       "original": {
@@ -51,25 +40,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1637028241,
-        "narHash": "sha256-3Ku3wt9zSVgwGsThGgk2ZpH3O/WLXH0Li7Ucn3o3UwA=",
+        "lastModified": 1637033054,
+        "narHash": "sha256-9pTe6MCx6m2UswFrLOww0rIRe8c7Z2tlp7anhkdRRGk=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "18d56c5c6ef6843903ce5fe4ddc15b931a44d3f0",
-        "type": "github"
-      },
-      "original": {
-        "id": "nixpkgs",
-        "type": "indirect"
-      }
-    },
-    "nixpkgs_2": {
-      "locked": {
-        "lastModified": 1635483403,
-        "narHash": "sha256-PgBLj7a6yxF0+g2fAANQkvJpLJ97x9i6yjfIL+g9xn0=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "20f4c99c6510ae4c09bd094bedb22c7f58d61fb2",
+        "rev": "c8920ed7ceda97a7613f020af10ed5477bf5b942",
         "type": "github"
       },
       "original": {
@@ -79,9 +54,9 @@
     },
     "root": {
       "inputs": {
-        "flake-utils": "flake-utils",
+        "flakeUtils": "flakeUtils",
         "nixHotPot": "nixHotPot",
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs"
       }
     }
   },

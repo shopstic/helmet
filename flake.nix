@@ -1,12 +1,21 @@
 {
   description = "Type-safe Helm";
 
-  inputs.flake-utils.url = "github:numtide/flake-utils";
-  inputs.nixHotPot.url = "github:shopstic/nix-hot-pot";
+  inputs = {
+    flakeUtils = {
+      url = "github:numtide/flake-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixHotPot = {
+      url = "github:shopstic/nix-hot-pot";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flakeUtils.follows = "flakeUtils";
+    };
+  };
 
-  outputs = { self, nixpkgs, flake-utils, nixHotPot }:
+  outputs = { self, nixpkgs, flakeUtils, nixHotPot }:
     let version = if (self ? rev) then self.rev else "latest"; in
-    flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ]
+    flakeUtils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ]
       (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
