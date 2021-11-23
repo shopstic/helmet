@@ -2,6 +2,7 @@
   description = "Type-safe Helm";
 
   inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/29830319abf5a925921885974faae5509312b940";
     flakeUtils = {
       url = "github:numtide/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
