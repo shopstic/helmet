@@ -1,7 +1,8 @@
-import { stringifyYaml, YAMLError } from "../deps/std_yaml.ts";
+// import { stringifyYaml, YAMLError } from "../deps/std_yaml.ts";
 import { captureExec } from "../deps/exec_utils.ts";
 
-export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
+// TODO: Bring this back once this issue is fixed: https://github.com/denoland/deno/issues/12885
+/* export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
   try {
     return stringifyYaml(value);
   } catch (e) {
@@ -13,6 +14,24 @@ export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
     } else {
       throw e;
     }
+  }
+} */
+
+export async function stringifyYamlRelaxed(
+  value: Record<string, unknown>,
+): Promise<string> {
+  try {
+    return await captureExec({
+      run: {
+        cmd: ["yq", "e", "-", "-P"],
+      },
+      stdin: JSON.stringify(value),
+    });
+  } catch (e) {
+    console.error(value);
+    throw new Error(
+      `Failed serializing object to YAML: ${e.toString()}`,
+    );
   }
 }
 

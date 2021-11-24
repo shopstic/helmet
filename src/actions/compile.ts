@@ -33,7 +33,7 @@ async function generateChildChart(
       },
     }));
 
-  const combinedResourcesYaml = resourcesWithoutNamespaces
+  const combinedResourcesYaml = (await Promise.all(resourcesWithoutNamespaces
     .map((doc) => {
       const namespace = (doc.metadata.namespace !== undefined)
         ? doc.metadata.namespace
@@ -50,16 +50,16 @@ async function generateChildChart(
           },
         },
       });
-    })
+    })))
     .join("---\n");
 
-  const combinedNamespacesYaml = namespaces
-    .map((doc) => stringifyYamlRelaxed(doc))
+  const combinedNamespacesYaml = (await Promise.all(namespaces
+    .map((doc) => stringifyYamlRelaxed(doc))))
     .join("---\n");
 
-  const combinedCrdsYaml = instance
+  const combinedCrdsYaml = (await Promise.all(instance
     .crds
-    .map((doc) => stringifyYamlRelaxed(doc))
+    .map((doc) => stringifyYamlRelaxed(doc))))
     .join("---\n");
 
   await Promise.all([
@@ -95,7 +95,7 @@ async function generateChart(
 
   await Deno.writeTextFile(
     joinPath(chartPath, "Chart.yaml"),
-    stringifyYamlRelaxed({
+    await stringifyYamlRelaxed({
       apiVersion: "v2",
       type: "application",
       name: name,

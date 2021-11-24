@@ -170,7 +170,7 @@ export async function helmTemplate(
           cmd: helmTemplateCmd,
         },
         stderrTag: gray(`[$ helm template ${chartInstance.name}]`),
-        stdin: stringifyYamlRelaxed(
+        stdin: await stringifyYamlRelaxed(
           chartInstance.values as Record<string, unknown>,
         ),
       });
@@ -179,7 +179,9 @@ export async function helmTemplate(
         "INPUT -------------------------------------------------------------",
       );
       console.error(
-        stringifyYamlRelaxed(chartInstance.values as Record<string, unknown>),
+        await stringifyYamlRelaxed(
+          chartInstance.values as Record<string, unknown>,
+        ),
       );
       console.error(
         "COMMAND -------------------------------------------------------------",
@@ -193,24 +195,26 @@ export async function helmTemplate(
 
   const docs = await parseMultiDocumentsYaml(rawYaml);
 
-  const transformedDocs: K8sResource[] = docs
-    .filter((doc) => Boolean(doc))
-    .map((rawDoc) => {
-      const docResult = validateK8sResource(rawDoc);
+  const transformedDocs: K8sResource[] = await Promise.all(
+    docs
+      .filter((doc) => Boolean(doc))
+      .map(async (rawDoc) => {
+        const docResult = validateK8sResource(rawDoc);
 
-      if (!docResult.isSuccess) {
-        throw new Error(
-          `Invalid K8s resource:
-${stringifyYamlRelaxed(rawDoc)}
+        if (!docResult.isSuccess) {
+          throw new Error(
+            `Invalid K8s resource:
+${await stringifyYamlRelaxed(rawDoc)}
 --------------------------------
 Reasons:
 ${JSON.stringify(docResult.errors, null, 2)}
 `,
-        );
-      }
+          );
+        }
 
-      return docResult.value;
-    });
+        return docResult.value;
+      }),
+  );
 
   return transformedDocs;
 }
