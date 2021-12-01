@@ -5,7 +5,7 @@ import {
   K8sResource,
   K8sResourceSchema,
 } from "../deps/k8s_utils.ts";
-import { expandGlob, fsExists } from "../deps/std_fs.ts";
+import { expandGlob } from "../deps/std_fs.ts";
 import { basename, dirname, fromFileUrl, joinPath } from "../deps/std_path.ts";
 import { parseYaml } from "../deps/std_yaml.ts";
 import { Static, TObject, Type } from "../deps/typebox.ts";
