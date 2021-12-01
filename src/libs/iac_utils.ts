@@ -115,36 +115,60 @@ export async function readChartMeta(chartPath: string): Promise<ChartMetadata> {
 
 const validateCrds = createValidator(Type.Array(K8sCrdSchema));
 
-export async function readChartCrds(chartPath: string): Promise<K8sCrd[]> {
+export async function collectCrdFiles(chartPath: string) {
   const crdsPath = joinPath(chartPath, "crds");
-  const crds: K8sCrd[] = [];
+  const subChartsPath = joinPath(chartPath, "charts");
+  const crdFiles: string[] = [];
 
-  if (!(await fsExists(crdsPath))) {
-    return crds;
+  for await (
+    const entry of expandGlob("**/*.yaml", { root: crdsPath })
+  ) {
+    crdFiles.push(entry.path);
   }
 
   for await (
-    const entry of expandGlob("**/*.yaml", {
-      root: crdsPath,
-    })
+    const entry of expandGlob("*", { root: subChartsPath })
   ) {
+    if (entry.isDirectory) {
+      crdFiles.push.apply(crdFiles, await collectCrdFiles(entry.path));
+    }
+  }
+
+  return crdFiles;
+}
+
+export async function readChartCrds(chartPath: string): Promise<K8sCrd[]> {
+  const crdFiles: string[] = await collectCrdFiles(chartPath);
+  const parsed = await Promise.all(crdFiles.map(async (crdFile) => {
     const rawCrd = await parseMultiDocumentsYaml(
-      await Deno.readTextFile(entry.path),
+      await Deno.readTextFile(crdFile),
     );
     const crdResult = validateCrds(rawCrd);
 
     if (!crdResult.isSuccess) {
       throw new Error(
-        `Invalid CRD at "${entry.path}". Reasons: ${
+        `Invalid CRD at "${crdFile}". Reasons: ${
           JSON.stringify(crdResult.errors, null, 2)
         }`,
       );
     }
 
-    crds.push.apply(crds, crdResult.value);
-  }
+    return crdResult.value;
+  }));
 
-  return crds;
+  const allCrds = parsed.flat();
+
+  return Array.from(
+    allCrds.reduce((map, crd) => {
+      const name = crd.metadata.name;
+
+      if (!map.has(name)) {
+        map.set(name, crd);
+      }
+
+      return map;
+    }, new Map<string, K8sCrd>()).values(),
+  );
 }
 
 const validateK8sResource = createValidator(K8sResourceSchema);
