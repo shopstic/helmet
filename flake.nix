@@ -56,7 +56,7 @@
           };
           packages = {
             devEnv = devShell.inputDerivation;
-            helmet = pkgs.runCommand "helmet-wrapped"
+            helmet = pkgs.runCommandNoCC "helmet-wrapped"
               {
                 buildInputs = [ pkgs.makeWrapper ];
               }
