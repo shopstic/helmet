@@ -2,72 +2,67 @@
   description = "Type-safe Helm";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/29830319abf5a925921885974faae5509312b940";
-    flakeUtils = {
-      url = "github:numtide/flake-utils";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixHotPot = {
-      url = "github:shopstic/nix-hot-pot";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flakeUtils.follows = "flakeUtils";
+    hotPot.url = "github:shopstic/nix-hot-pot";
+    nixpkgs.follows = "hotPot/nixpkgs";
+    flakeUtils.follows = "hotPot/flakeUtils";
+    npmlock2nix = {
+      url = "github:nix-community/npmlock2nix/master";
+      flake = false;
     };
   };
 
-  outputs = { self, nixpkgs, flakeUtils, nixHotPot }:
+  outputs = { self, nixpkgs, flakeUtils, hotPot, npmlock2nix }:
     let version = if (self ? rev) then self.rev else "latest"; in
     flakeUtils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ]
       (system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
-          hotPot = nixHotPot.packages.${system};
-          shell = (import ./nix/shell.nix { inherit pkgs hotPot; });
-          helmetSrc = builtins.path
-              {
-                path = ./.;
-                name = "helmet-src";
-                filter = with pkgs.lib; (path: type:
-                  hasInfix "/src" path ||
-                  hasSuffix "/cli.sh" path ||
-                  hasSuffix "/lock.json" path
-                );
-              };
-          denoDir = pkgs.stdenv.mkDerivation {
-            name = "helmet-deno-deps";
-            src = helmetSrc;
-            buildInputs = shell.derivation.buildInputs;
-            __noChroot = true;
-            installPhase = ''
-              ls -la .
-              export DENO_DIR="$out"
-              patchShebangs ./cli.sh
-              ./cli.sh update_cache
-            '';
+          pkgs = import nixpkgs { inherit system; };
+          hotPotPkgs = hotPot.packages.${system};
+          json2ts = pkgs.callPackage ./nix/json2ts {
+            npmlock2nix = import npmlock2nix { inherit pkgs; };
           };
+          runtimeInputs = builtins.attrValues
+            {
+              inherit json2ts;
+              inherit (pkgs)
+                kubectl
+                yq-go
+                sops
+                kubernetes-helm
+                ;
+              inherit (hotPotPkgs)
+                deno
+                ;
+            };
+          helmet = pkgs.callPackage hotPot.lib.denoAppBuild
+            {
+              inherit (hotPotPkgs) deno;
+              name = "helmet";
+              src = builtins.path
+                {
+                  path = ./.;
+                  name = "helmet-src";
+                  filter = with pkgs.lib; (path: /* type */_:
+                    hasInfix "/src" path ||
+                    hasSuffix "/lock.json" path
+                  );
+                };
+              appSrcPath = "./src/helmet.ts";
+            };
         in
         rec {
-          devShell = shell.derivation;
+          devShell = pkgs.mkShellNoCC {
+            buildInputs = runtimeInputs;
+          };
           packages = {
             devEnv = devShell.inputDerivation;
-            helmet = pkgs.stdenv.mkDerivation {
-              name = "helmet";
-              src = helmetSrc;
-              buildInputs = devShell.buildInputs ++ [ pkgs.makeWrapper ];
-              buildPhase = ''
-                export DENO_DIR="$TMPDIR/.deno"
-                export DENO_INSTALL_ROOT="$out"
-                mkdir -p "''${DENO_DIR}"
-                mkdir -p "$out/bin"
-
-                ln -s "${denoDir}/deps" "''${DENO_DIR}/deps"
-                patchShebangs ./cli.sh
-
-                ./cli.sh install "${version}" "$out/bin"
+            helmet = pkgs.runCommand "helmet-wrapped"
+              {
+                buildInputs = [ pkgs.makeWrapper ];
+              }
+              ''
+                makeWrapper ${helmet}/bin/helmet $out/bin/helmet --prefix PATH : "${pkgs.lib.makeBinPath runtimeInputs}"
               '';
-              installPhase = ''
-                wrapProgram $out/bin/helmet --prefix PATH : "${pkgs.lib.makeBinPath shell.runtimeInputs}"
-              '';
-            };
           };
           defaultPackage = packages.helmet;
         }

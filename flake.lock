@@ -15,21 +15,17 @@
         "type": "github"
       }
     },
-    "nixHotPot": {
+    "hotPot": {
       "inputs": {
-        "flakeUtils": [
-          "flakeUtils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "flakeUtils": "flakeUtils",
+        "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1637735110,
-        "narHash": "sha256-tCh2wHTK0E9m4ORW8SFr6DOcjPH2gm0FGGB+yCzZJPU=",
+        "lastModified": 1638264157,
+        "narHash": "sha256-nFa7TzSQyRtD3/+g3+2XvkUucCFE/yg9z60ltfK8iLs=",
         "owner": "shopstic",
         "repo": "nix-hot-pot",
-        "rev": "aedd1fee6b8b3f079ffc967bb7dfe82f9f564cb3",
+        "rev": "86e04efbed49d837ddd9e1496b83e97c6fe39473",
         "type": "github"
       },
       "original": {
@@ -42,23 +38,47 @@
       "locked": {
         "lastModified": 1636637818,
         "narHash": "sha256-hC117rP0yLZIMHlrLsgoM9yUBXX/pIPITAfmesuk3sM=",
-        "owner": "nixos",
+        "owner": "NixOS",
         "repo": "nixpkgs",
         "rev": "29830319abf5a925921885974faae5509312b940",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
+        "owner": "NixOS",
         "repo": "nixpkgs",
         "rev": "29830319abf5a925921885974faae5509312b940",
         "type": "github"
       }
     },
+    "npmlock2nix": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1636969172,
+        "narHash": "sha256-h1ryeJDSQ+l4t7W0n4vnLFXMOJgEiIXIAznYO+cjwlA=",
+        "owner": "nix-community",
+        "repo": "npmlock2nix",
+        "rev": "ff17a3c59233911f776d8d462d61d82a3e41df34",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "master",
+        "repo": "npmlock2nix",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
-        "flakeUtils": "flakeUtils",
-        "nixHotPot": "nixHotPot",
-        "nixpkgs": "nixpkgs"
+        "flakeUtils": [
+          "hotPot",
+          "flakeUtils"
+        ],
+        "hotPot": "hotPot",
+        "nixpkgs": [
+          "hotPot",
+          "nixpkgs"
+        ],
+        "npmlock2nix": "npmlock2nix"
       }
     }
   },
