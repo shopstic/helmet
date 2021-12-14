@@ -228,28 +228,19 @@ async function updateOciChart(
   const tempDir = await Deno.makeTempDir();
 
   try {
-    const fullOciRef = `${remote.ociRef}:${remote.version}`;
     await inheritExec({
       run: {
-        cmd: ["helm", "chart", "pull", fullOciRef],
+        cmd: ["helm", "pull", remote.ociRef, "--version", remote.version],
         env: {
           HELM_EXPERIMENTAL_OCI: "1",
         },
-      },
-    });
-
-    await inheritExec({
-      run: {
-        cmd: ["helm", "chart", "export", fullOciRef, "-d", tempDir],
-        env: {
-          HELM_EXPERIMENTAL_OCI: "1",
-        },
+        cwd: tempDir,
       },
     });
 
     await Promise.all(
       Array
-        .from(expandGlobSync("*/charts/*.tgz", {
+        .from(expandGlobSync("*.tgz", {
           root: tempDir,
         }))
         .map(async (entry) => {
