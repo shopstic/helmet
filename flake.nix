@@ -21,17 +21,15 @@
           json2ts = pkgs.callPackage ./nix/json2ts {
             npmlock2nix = import npmlock2nix { inherit pkgs; };
           };
+          deno = hotPotPkgs.deno;
           runtimeInputs = builtins.attrValues
             {
-              inherit json2ts;
+              inherit json2ts deno;
               inherit (pkgs)
                 kubectl
                 yq-go
                 sops
                 kubernetes-helm
-                ;
-              inherit (hotPotPkgs)
-                deno
                 ;
             };
           helmet = pkgs.callPackage hotPot.lib.denoAppBuild
@@ -50,10 +48,38 @@
                 };
               appSrcPath = "./src/helmet.ts";
             };
+          vscodeSettings = pkgs.writeTextFile {
+            name = "vscode-settings.json";
+            text = builtins.toJSON {
+              "deno.enable" = true;
+              "deno.lint" = true;
+              "deno.unstable" = true;
+              "deno.path" = deno + "/bin/deno";
+              "deno.suggest.imports.hosts" = {
+                "https://deno.land" = false;
+              };
+              "editor.tabSize" = 2;
+              "[typescript]" = {
+                "editor.defaultFormatter" = "denoland.vscode-deno";
+                "editor.formatOnSave" = true;
+              };
+              "yaml.schemaStore.enable" = true;
+              "yaml.schemas" = {
+                "https://json.schemastore.org/github-workflow.json" = ".github/workflows/*.yaml";
+              };
+              "nix.enableLanguageServer" = true;
+              "nix.formatterPath" = pkgs.nixpkgs-fmt + "/bin/nixpkgs-fmt";
+              "nix.serverPath" = pkgs.rnix-lsp + "/bin/rnix-lsp";
+            };
+          };
         in
         rec {
           devShell = pkgs.mkShellNoCC {
             buildInputs = runtimeInputs;
+            shellHook = ''
+              mkdir -p ./.vscode
+              cat ${vscodeSettings} > ./.vscode/settings.json
+            '';
           };
           packages = {
             devEnv = devShell.inputDerivation;

@@ -1,8 +1,8 @@
 import { K8sCrdSchema, K8sResource } from "../deps/k8s_utils.ts";
 import { SemverRange } from "../deps/semver.ts";
-import { Static, TObject, TProperties, Type } from "../deps/typebox.ts";
+import { Static, Type } from "../deps/typebox.ts";
 
-export const ChartRepoReleaseSchema = RelaxedObject({
+export const ChartRepoReleaseSchema = Type.PartialObject({
   apiVersion: Type.Optional(Type.String()),
   version: Type.String(),
   name: Type.String(),
@@ -11,9 +11,10 @@ export const ChartRepoReleaseSchema = RelaxedObject({
 
 export type ChartRepoRelease = Static<typeof ChartRepoReleaseSchema>;
 
-export const ChartRepoIndexSchema = RelaxedObject({
+export const ChartRepoIndexSchema = Type.PartialObject({
   apiVersion: Type.String(),
-  entries: Type.Dict(
+  entries: Type.Record(
+    Type.String(),
     Type.Array(ChartRepoReleaseSchema),
   ),
 });
@@ -56,13 +57,7 @@ export type RemoteChartConfigMap = {
   [name: string]: RemoteChartConfig;
 };
 
-function RelaxedObject<T extends TProperties>(
-  properties: T,
-): TObject<T> {
-  return Type.Object<T>(properties, { additionalProperties: true });
-}
-
-export const ChartMetadataSchema = RelaxedObject({
+export const ChartMetadataSchema = Type.PartialObject({
   apiVersion: Type.String(),
   name: Type.String(),
   version: Type.String(),
