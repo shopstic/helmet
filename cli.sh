@@ -38,6 +38,7 @@ update_cache() {
 }
 
 update_lock() {
+  deno cache --reload "${ENTRY_FILE}" "${MOD_FILE}"
   deno cache "${ENTRY_FILE}" "${MOD_FILE}"  --lock ./lock.json --lock-write
 }
 
