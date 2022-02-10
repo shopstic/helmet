@@ -1,4 +1,4 @@
-import { captureExec } from "../deps/exec_utils.ts";
+import { captureExec, printErrLines } from "../deps/exec_utils.ts";
 import {
   K8sCrdKind,
   K8sCrdSchema,
@@ -50,9 +50,9 @@ export async function decryptAndValidateSecrets<T extends TProperties>(
 ): Promise<ValidationResult<Static<TObject<T>>>> {
   const raw = await (async () => {
     try {
-      return await captureExec({
-        run: { cmd: ["sops", "-d", encryptedSecretsPath] },
-      });
+      return (await captureExec({
+        cmd: ["sops", "-d", encryptedSecretsPath],
+      })).out;
     } catch (e) {
       throw new Error(
         `Failed decrypting file '${encryptedSecretsPath}' with sops, error: ${e.message}`,
@@ -189,15 +189,18 @@ export async function helmTemplate(
 
   const rawYaml = await (async () => {
     try {
-      return await captureExec({
-        run: {
-          cmd: helmTemplateCmd,
+      const tag = gray(`[$ helm template ${chartInstance.name}]`);
+      return (await captureExec({
+        cmd: helmTemplateCmd,
+        stderr: {
+          read: printErrLines((line) => `${tag} ${line}`),
         },
-        stderrTag: gray(`[$ helm template ${chartInstance.name}]`),
-        stdin: await stringifyYamlRelaxed(
-          chartInstance.values as Record<string, unknown>,
-        ),
-      });
+        stdin: {
+          pipe: await stringifyYamlRelaxed(
+            chartInstance.values as Record<string, unknown>,
+          ),
+        },
+      })).out;
     } catch (e) {
       console.error(
         "INPUT -------------------------------------------------------------",

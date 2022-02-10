@@ -1,7 +1,6 @@
 import { stringifyYaml, YAMLError } from "../deps/std_yaml.ts";
 import { captureExec } from "../deps/exec_utils.ts";
 
-// TODO: Bring this back once this issue is fixed: https://github.com/denoland/deno/issues/12885
 export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
   try {
     return stringifyYaml(value);
@@ -17,6 +16,7 @@ export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
   }
 }
 
+// Note: alternative implementation due to this https://github.com/denoland/deno/issues/12885
 /* export async function stringifyYamlRelaxed(
   value: Record<string, unknown>,
 ): Promise<string> {
@@ -38,18 +38,18 @@ export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
 export async function parseMultiDocumentsYaml(
   rawYaml: string,
 ): Promise<Record<string, unknown>[]> {
-  const rawJson = await captureExec({
-    run: {
-      cmd: [
-        "yq",
-        "ea",
-        "-o=json",
-        "-N",
-        ". as $doc ireduce ([]; . + $doc)",
-        "-",
-      ],
+  const raw = await captureExec({
+    cmd: [
+      "yq",
+      "ea",
+      "-o=json",
+      "-N",
+      ". as $doc ireduce ([]; . + $doc)",
+      "-",
+    ],
+    stdin: {
+      pipe: rawYaml,
     },
-    stdin: rawYaml,
   }).catch((e) => {
     console.error(rawYaml);
     return Promise.reject(
@@ -59,5 +59,5 @@ export async function parseMultiDocumentsYaml(
     );
   });
 
-  return JSON.parse(rawJson);
+  return JSON.parse(raw.out);
 }

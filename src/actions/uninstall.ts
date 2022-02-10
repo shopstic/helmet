@@ -16,13 +16,11 @@ export default createCliAction(
   }),
   async ({ name, namespace }) => {
     await inheritExec({
-      run: { cmd: ["helm", "uninstall", "-n", namespace, `${name}-resources`] },
+      cmd: ["helm", "uninstall", "-n", namespace, `${name}-resources`],
     });
 
     await inheritExec({
-      run: {
-        cmd: ["helm", "uninstall", "-n", namespace, `${name}-namespaces`],
-      },
+      cmd: ["helm", "uninstall", "-n", namespace, `${name}-namespaces`],
     });
 
     return ExitCode.Zero;

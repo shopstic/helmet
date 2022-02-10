@@ -1,4 +1,9 @@
-import { captureExec, inheritExec } from "../deps/exec_utils.ts";
+import {
+  captureExec,
+  inheritExec,
+  printErrLines,
+  printOutLines,
+} from "../deps/exec_utils.ts";
 import { validate } from "../deps/validation_utils.ts";
 import { Static, Type } from "../deps/typebox.ts";
 import { joinPath, resolvePath } from "../deps/std_path.ts";
@@ -40,11 +45,9 @@ async function helmInstall(
   },
 ) {
   const helmLsResultRaw = JSON.parse(
-    await captureExec({
-      run: {
-        cmd: ["helm", "ls", "-a", "-n", namespace, "-o=json"],
-      },
-    }),
+    (await captureExec({
+      cmd: ["helm", "ls", "-a", "-n", namespace, "-o=json"],
+    })).out,
   );
 
   const helmLsResult = validate(HelmLsResultSchema, helmLsResultRaw);
@@ -88,9 +91,13 @@ async function helmInstall(
 
   const tag = gray(`[$ ${helmUpgradeCmd.slice(0, 2).join(" ")} ...]`);
   await inheritExec({
-    run: { cmd: helmUpgradeCmd },
-    stderrTag: tag,
-    stdoutTag: tag,
+    cmd: helmUpgradeCmd,
+    stderr: {
+      read: printErrLines((line) => `${tag} ${line}`),
+    },
+    stdout: {
+      read: printOutLines((line) => `${tag} ${line}`),
+    },
   });
 }
 
@@ -179,9 +186,13 @@ export async function install(
     console.log("Executing:", cyan(kubectlApplyCmd.join(" ")));
     const tag = gray(`[$ ${kubectlApplyCmd.slice(0, 2).join(" ")} ...]`);
     await inheritExec({
-      run: { cmd: kubectlApplyCmd },
-      stderrTag: tag,
-      stdoutTag: tag,
+      cmd: kubectlApplyCmd,
+      stderr: {
+        read: printErrLines((line) => `${tag} ${line}`),
+      },
+      stdout: {
+        read: printOutLines((line) => `${tag} ${line}`),
+      },
     });
   }
 

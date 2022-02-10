@@ -21,11 +21,9 @@ export default createCliAction(
     const whitelistedSet = await fetchCurrentWhitelist();
 
     if (!whitelistedSet.has(releaseId)) {
-      const currentKubeContext = await captureExec({
-        run: {
-          cmd: ["kubectl", "config", "current-context"],
-        },
-      });
+      const currentKubeContext = (await captureExec({
+        cmd: ["kubectl", "config", "current-context"],
+      })).out;
       console.error(
         "Bundle instance",
         bold(red(releaseId)),

@@ -5,7 +5,7 @@ import { basename, joinPath, resolvePath } from "../deps/std_path.ts";
 import { expandGlobSync, fsExists } from "../deps/std_fs.ts";
 import { parseYaml } from "../deps/std_yaml.ts";
 import { toPascalCase } from "../deps/case.ts";
-import { captureExec, inheritExec } from "../deps/exec_utils.ts";
+import { captureExec, inheritExec, printErrLines } from "../deps/exec_utils.ts";
 import { K8sCrdApiVersionV1beta1 } from "../deps/k8s_utils.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { Type } from "../deps/typebox.ts";
@@ -489,15 +489,13 @@ async function generateCrdInterface(
       JSON.stringify(schema || {}, null, 2),
     );
 
-    const generated = await captureExec({
-      run: {
-        cmd: [
-          "json2ts",
-          `--input=${tempFile}`,
-          `--bannerComment=""`,
-        ],
-      },
-    });
+    const generated = (await captureExec({
+      cmd: [
+        "json2ts",
+        `--input=${tempFile}`,
+        `--bannerComment=""`,
+      ],
+    })).out;
 
     const apiVersion = `${group}/${version}`;
     const fixedGenerated = generated
@@ -658,15 +656,20 @@ ${crdInterfaces}
     output,
   );
 
+  const tag = gray(`[$ deno fmt ${chartName}.ts]`);
   await inheritExec({
-    run: { cmd: ["deno", "fmt", outputPath] },
-    stderrTag: gray(`[$ deno fmt ${chartName}.ts]`),
+    cmd: ["deno", "fmt", outputPath],
+    stderr: {
+      read: printErrLines((line) => `${tag} ${line}`),
+    },
   });
 
   // Need to run deno fmt once more for the result to be deterministic...
   await inheritExec({
-    run: { cmd: ["deno", "fmt", outputPath] },
-    ignoreStderr: true,
+    cmd: ["deno", "fmt", outputPath],
+    stderr: {
+      ignore: true,
+    },
   });
 }
 

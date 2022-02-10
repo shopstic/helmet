@@ -1,4 +1,8 @@
-import { inheritExec } from "../deps/exec_utils.ts";
+import {
+  inheritExec,
+  printErrLines,
+  printOutLines,
+} from "../deps/exec_utils.ts";
 import { createK8sConfigMap } from "../deps/k8s_utils.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { Type } from "../deps/typebox.ts";
@@ -56,13 +60,19 @@ export async function updateWhitelist(
     ),
   });
 
+  const tag = gray(`[$ kubectl apply ...]`);
+
   await inheritExec({
-    run: {
-      cmd: ["kubectl", "apply", "-f", "-"],
+    cmd: ["kubectl", "apply", "-f", "-"],
+    stdin: {
+      pipe: JSON.stringify(newConfigMap),
     },
-    stdin: JSON.stringify(newConfigMap),
-    stdoutTag: gray(`[$ kubectl apply ...]`),
-    stderrTag: gray(`[$ kubectl apply ...]`),
+    stderr: {
+      read: printErrLines((line) => `${tag} ${line}`),
+    },
+    stdout: {
+      read: printOutLines((line) => `${tag} ${line}`),
+    },
   });
 }
 

@@ -134,40 +134,36 @@ async function updateRemoteArchiveChart({
   try {
     if (archiveUrl.endsWith(".zip")) {
       await inheritExec({
-        run: {
-          cmd: [
-            "curl",
-            "-Lso",
-            "./temp.zip",
-            remote.archiveUrl,
-          ],
-          cwd: tempDir,
-        },
+        cmd: [
+          "curl",
+          "-Lso",
+          "./temp.zip",
+          remote.archiveUrl,
+        ],
+        cwd: tempDir,
       });
 
       await inheritExec({
-        run: {
-          cmd: [
-            "unzip",
-            "-qq",
-            "./temp.zip",
-            `*/${remote.extractPath}/*`,
-            "-d",
-            "out",
-          ],
-          cwd: tempDir,
-        },
+        cmd: [
+          "unzip",
+          "-qq",
+          "./temp.zip",
+          `*/${remote.extractPath}/*`,
+          "-d",
+          "out",
+        ],
+        cwd: tempDir,
       });
     } else if (archiveUrl.endsWith(".tgz") || archiveUrl.endsWith(".tar.gz")) {
       await Deno.mkdir(joinPath(tempDir, "out"));
 
       await inheritExec({
-        run: {
-          cmd: ["bash"],
+        cmd: ["bash"],
+        stdin: {
+          pipe: `curl -Ls ${quoteShellCmd([archiveUrl])} | tar -xz -C ${
+            quoteShellCmd([joinPath(tempDir, "out")])
+          }`,
         },
-        stdin: `curl -Ls ${quoteShellCmd([archiveUrl])} | tar -xz -C ${
-          quoteShellCmd([joinPath(tempDir, "out")])
-        }`,
       });
     } else {
       throw new Error(`Unsupport archive with URL: ${archiveUrl}`);
@@ -178,11 +174,11 @@ async function updateRemoteArchiveChart({
     }
 
     await inheritExec({
-      run: {
-        cmd: ["bash"],
-        cwd: tempDir,
+      cmd: ["bash"],
+      cwd: tempDir,
+      stdin: {
+        pipe: `mv ./out/*/"${remote.extractPath}" "${chartPath}"`,
       },
-      stdin: `mv ./out/*/"${remote.extractPath}" "${chartPath}"`,
     });
 
     await typeifyChart(chartPath, typesPath);
@@ -229,13 +225,11 @@ async function updateOciChart(
 
   try {
     await inheritExec({
-      run: {
-        cmd: ["helm", "pull", remote.ociRef, "--version", remote.version],
-        env: {
-          HELM_EXPERIMENTAL_OCI: "1",
-        },
-        cwd: tempDir,
+      cmd: ["helm", "pull", remote.ociRef, "--version", remote.version],
+      env: {
+        HELM_EXPERIMENTAL_OCI: "1",
       },
+      cwd: tempDir,
     });
 
     await Promise.all(
@@ -246,17 +240,15 @@ async function updateOciChart(
         .map(async (entry) => {
           const subChartsPath = dirname(entry.path);
           await inheritExec({
-            run: {
-              cmd: [
-                "tar",
-                "-xz",
-                "--warning=no-timestamp",
-                "-C",
-                subChartsPath,
-                "-f",
-                entry.path,
-              ],
-            },
+            cmd: [
+              "tar",
+              "-xz",
+              "--warning=no-timestamp",
+              "-C",
+              subChartsPath,
+              "-f",
+              entry.path,
+            ],
           });
           await Deno.remove(entry.path);
         }),
@@ -267,10 +259,10 @@ async function updateOciChart(
     }
 
     await inheritExec({
-      run: {
-        cmd: ["bash"],
+      cmd: ["bash"],
+      stdin: {
+        pipe: `mv "${tempDir}/"* "${chartPath}"`,
       },
-      stdin: `mv "${tempDir}/"* "${chartPath}"`,
     });
 
     await typeifyChart(chartPath, typesPath);
@@ -390,12 +382,12 @@ async function updateHelmRepoChart({
 
     try {
       await inheritExec({
-        run: {
-          cmd: ["bash"],
+        cmd: ["bash"],
+        stdin: {
+          pipe: `curl -Ls ${
+            quoteShellCmd([resolvedRemoteReleaseUrl])
+          } | tar -xz --strip-components 1 -C ${quoteShellCmd([tempDir])}`,
         },
-        stdin: `curl -Ls ${
-          quoteShellCmd([resolvedRemoteReleaseUrl])
-        } | tar -xz --strip-components 1 -C ${quoteShellCmd([tempDir])}`,
       });
 
       if (currentChartMeta) {
@@ -403,7 +395,7 @@ async function updateHelmRepoChart({
       }
 
       await inheritExec({
-        run: { cmd: ["cp", "-r", tempDir, chartPath] },
+        cmd: ["cp", "-r", tempDir, chartPath],
       });
 
       await typeifyChart(chartPath, typesPath);
