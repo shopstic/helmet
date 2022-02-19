@@ -35,7 +35,7 @@
           helmet = pkgs.callPackage hotPot.lib.denoAppBuild
             {
               inherit (hotPotPkgs) deno;
-              denoRunFlags = "--unstable -A";
+              denoRunFlags = "-A";
               name = "helmet";
               src = builtins.path
                 {
