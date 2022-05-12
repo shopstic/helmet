@@ -16,25 +16,6 @@ export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
   }
 }
 
-// Note: alternative implementation due to this https://github.com/denoland/deno/issues/12885
-/* export async function stringifyYamlRelaxed(
-  value: Record<string, unknown>,
-): Promise<string> {
-  try {
-    return await captureExec({
-      run: {
-        cmd: ["yq", "e", "-", "-P"],
-      },
-      stdin: JSON.stringify(value),
-    });
-  } catch (e) {
-    console.error(value);
-    throw new Error(
-      `Failed serializing object to YAML: ${e.toString()}`,
-    );
-  }
-} */
-
 export async function parseMultiDocumentsYaml(
   rawYaml: string,
 ): Promise<Record<string, unknown>[]> {
