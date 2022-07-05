@@ -55,7 +55,7 @@
   "https://cdn.shopstic.com/-/json-schema-traverse@v1.0.0-y7CGDEQhyU7xmTqGmQuU/dist=es2020,mode=imports/optimized/json-schema-traverse.js": "f14cb9d1c28e3c2b76812d9c8d0b8c3b06be4cd50e3d434ea226c6e497edf880",
   "https://cdn.shopstic.com/-/uri-js@v4.4.1-plDR6mA49h9eDAKXg27g/dist=es2020,mode=imports/optimized/uri-js.js": "62fb1eb57a8b1de1c48f8c581c232fa800eb5c9772f6e687265f35e98fa9a269",
   "https://cdn.shopstic.com/-/uri-js@v4.4.1-plDR6mA49h9eDAKXg27g/dist=es2020,mode=types/dist/es5/uri.all.d.ts": "9f3c5498245c38c9016a369795ec5ef1768d09db63643c8dba9656e5ab294825",
-  "https://cdn.shopstic.com/pin/ajv-formats@v2.1.1-vcFtNZ2SctUV93FmiL2Q/dist=es2020,mode=imports/optimized/ajv-formats.js": "e3d34b6ed6f8f1a49ccb163d66148529d9f0dfee93523cfb1da9e4a28fce09c2",
+  "https://cdn.shopstic.com/pin/ajv-formats@v2.1.1-vcFtNZ2SctUV93FmiL2Q/dist=es2020,mode=imports/optimized/ajv-formats.js": "0bbffbb46534bda1a8b8e57490d3f7dd7fdf483aea36dbaed2f47584b7b094db",
   "https://cdn.shopstic.com/pin/ajv-formats@v2.1.1-vcFtNZ2SctUV93FmiL2Q/dist=es2020,mode=types/dist/index.d.ts": "b9117a0b5e13de6dbd93dfa0732510945f415eda70afd6cec67ed1d333850bdd",
   "https://cdn.shopstic.com/pin/ajv@v8.6.2-hTXOSR89efxJTuZb2Htb/dist=es2020,mode=imports/optimized/ajv.js": "a8b8399d8fb5897571f5ab3c404746fb8741f1decb4e7067bf849e922c25b9ba",
   "https://cdn.shopstic.com/pin/ajv@v8.6.2-hTXOSR89efxJTuZb2Htb/dist=es2020,mode=types/index.d.ts": "df53509b688fc2acc3cf564c3431d4fa2feaffdce97b6ad8db1cb1e2dc191769",
