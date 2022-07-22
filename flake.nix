@@ -13,7 +13,7 @@
 
   outputs = { self, nixpkgs, flakeUtils, hotPot, npmlock2nix }:
     let version = if (self ? rev) then self.rev else "latest"; in
-    flakeUtils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ]
+    flakeUtils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ]
       (system:
         let
           pkgs = import nixpkgs { inherit system; };
