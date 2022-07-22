@@ -43,7 +43,7 @@ update_lock() {
 }
 
 run() {
-  deno run --lock ./lock.json --cached-only -A --unstable "${ENTRY_FILE}" "$@"
+  deno run --lock ./lock.json --cached-only -A --check --unstable "${ENTRY_FILE}" "$@"
 }
 
 "$@"
