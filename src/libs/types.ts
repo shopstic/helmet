@@ -28,35 +28,36 @@ export enum RemoteChartSource {
 }
 
 export interface ChartUpdateContext {
-  chartName: string;
   chartPath: string;
   typesPath: string;
   remote: RemoteChartConfig;
 }
 
-export interface HelmRepoChartConfig {
+interface ChartConfigHooks {
+  onDownloaded?: (ctx: ChartUpdateContext) => Promise<void>;
+  onUpdated?: (ctx: ChartUpdateContext) => Promise<void>;
+}
+
+export type HelmRepoChartConfig = {
   source: RemoteChartSource.HelmRepo;
   remoteName: string;
   remoteRepoUrl: string;
   apiVersion?: "v1" | "v2";
   version: string | SemverRange;
-  onUpdated?: (ctx: ChartUpdateContext) => Promise<void>;
-}
+} & ChartConfigHooks;
 
-export interface OciRegistryChartConfig {
+export type OciRegistryChartConfig = {
   source: RemoteChartSource.OciRegistry;
   ociRef: string;
   version: string;
-  onUpdated?: (ctx: ChartUpdateContext) => Promise<void>;
-}
+} & ChartConfigHooks;
 
-export interface RemoteArchiveChartConfig {
+export type RemoteArchiveChartConfig = {
   source: RemoteChartSource.RemoteArchive;
   archiveUrl: string;
   extractPath: string;
   version: string;
-  onUpdated?: (ctx: ChartUpdateContext) => Promise<void>;
-}
+} & ChartConfigHooks;
 
 export type RemoteChartConfig =
   | HelmRepoChartConfig

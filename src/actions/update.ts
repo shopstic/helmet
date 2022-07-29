@@ -76,7 +76,9 @@ function fetchRemoteRepoIndexYaml(url: string): Promise<string> {
 }
 
 async function updateChart(
-  ctx: ChartUpdateContext,
+  ctx: ChartUpdateContext & {
+    chartName: string;
+  },
 ): Promise<ChartUpdateResult> {
   const {
     chartName,
@@ -187,6 +189,9 @@ async function updateRemoteArchiveChart({
       },
     });
 
+    if (remote.onDownloaded) {
+      await remote.onDownloaded({ chartPath, typesPath, remote });
+    }
     await typeifyChart(chartPath, typesPath);
 
     return {
@@ -271,6 +276,9 @@ async function updateOciChart(
       },
     });
 
+    if (remote.onDownloaded) {
+      await remote.onDownloaded({ chartPath, typesPath, remote });
+    }
     await typeifyChart(chartPath, typesPath);
 
     return {
@@ -404,6 +412,9 @@ async function updateHelmRepoChart({
         cmd: ["cp", "-r", tempDir, chartPath],
       });
 
+      if (remote.onDownloaded) {
+        await remote.onDownloaded({ chartPath, typesPath, remote });
+      }
       await typeifyChart(chartPath, typesPath);
 
       return {
