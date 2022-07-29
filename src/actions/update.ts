@@ -12,10 +12,10 @@ import {
   ChartMetadataSchema,
   ChartRepoIndexSchema,
   ChartRepoRelease,
+  ChartUpdateContext,
   HelmRepoChartConfig,
   OciRegistryChartConfig,
   RemoteArchiveChartConfig,
-  RemoteChartConfig,
   RemoteChartSource,
 } from "../libs/types.ts";
 import { typeifyChart } from "./typeify.ts";
@@ -75,38 +75,44 @@ function fetchRemoteRepoIndexYaml(url: string): Promise<string> {
   return cachedPromise;
 }
 
-function updateChart({
-  chartName,
-  chartPath,
-  typesPath,
-  remote,
-}: {
-  chartName: string;
-  chartPath: string;
-  typesPath: string;
-  remote: RemoteChartConfig;
-}): Promise<ChartUpdateResult> {
-  switch (remote.source) {
-    case RemoteChartSource.HelmRepo:
-      return updateHelmRepoChart({
-        chartName,
-        chartPath,
-        typesPath,
-        remote,
-      });
-    case RemoteChartSource.OciRegistry:
-      return updateOciChart({
-        chartPath,
-        typesPath,
-        remote,
-      });
-    case RemoteChartSource.RemoteArchive:
-      return updateRemoteArchiveChart({
-        chartPath,
-        typesPath,
-        remote,
-      });
+async function updateChart(
+  ctx: ChartUpdateContext,
+): Promise<ChartUpdateResult> {
+  const {
+    chartName,
+    chartPath,
+    typesPath,
+    remote,
+  } = ctx;
+  const result = await (() => {
+    switch (remote.source) {
+      case RemoteChartSource.HelmRepo:
+        return updateHelmRepoChart({
+          chartName,
+          chartPath,
+          typesPath,
+          remote,
+        });
+      case RemoteChartSource.OciRegistry:
+        return updateOciChart({
+          chartPath,
+          typesPath,
+          remote,
+        });
+      case RemoteChartSource.RemoteArchive:
+        return updateRemoteArchiveChart({
+          chartPath,
+          typesPath,
+          remote,
+        });
+    }
+  })();
+
+  if (result.isSuccess && remote.onUpdated) {
+    await remote.onUpdated(ctx);
   }
+
+  return result;
 }
 
 async function updateRemoteArchiveChart({

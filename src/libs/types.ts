@@ -27,18 +27,27 @@ export enum RemoteChartSource {
   RemoteArchive,
 }
 
+export interface ChartUpdateContext {
+  chartName: string;
+  chartPath: string;
+  typesPath: string;
+  remote: RemoteChartConfig;
+}
+
 export interface HelmRepoChartConfig {
   source: RemoteChartSource.HelmRepo;
   remoteName: string;
   remoteRepoUrl: string;
   apiVersion?: "v1" | "v2";
   version: string | SemverRange;
+  onUpdated?: (ctx: ChartUpdateContext) => Promise<void>;
 }
 
 export interface OciRegistryChartConfig {
   source: RemoteChartSource.OciRegistry;
   ociRef: string;
   version: string;
+  onUpdated?: (ctx: ChartUpdateContext) => Promise<void>;
 }
 
 export interface RemoteArchiveChartConfig {
@@ -46,6 +55,7 @@ export interface RemoteArchiveChartConfig {
   archiveUrl: string;
   extractPath: string;
   version: string;
+  onUpdated?: (ctx: ChartUpdateContext) => Promise<void>;
 }
 
 export type RemoteChartConfig =
