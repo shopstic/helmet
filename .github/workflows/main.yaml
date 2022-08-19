@@ -9,35 +9,38 @@ defaults:
 jobs:
   build:
     name: Build
-    runs-on: [self-hosted, nix]
+    runs-on: [self-hosted, nix, "${{ matrix.arch.runner }}"]
     strategy:
       matrix:
         arch:
-          - x86_64-linux
-          - aarch64-linux
-          - aarch64-darwin
+          - nix: x86_64-linux
+            runner: amd64-linux
+          - nix: aarch64-linux
+            runner: arm64-linux
+          - nix: aarch64-darwin
+            runner: arm64-linux
     steps:
-      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
+      - uses: actions/checkout@v3
 
       - name: Build dev env
-        run: nix build -L -v --no-link '.#packages.${{ matrix.arch }}.devEnv'
+        run: nix build -L -v --no-link '.#packages.${{ matrix.arch.nix }}.devEnv'
 
       - name: Check
         run: nix develop -v -c ./cli.sh code_quality
 
       - name: Build
-        run: nix build -L -v --no-link '.#defaultPackage.${{ matrix.arch }}'
+        run: nix build -L -v --no-link '.#defaultPackage.${{ matrix.arch.nix }}'
 
       - name: Cache dev env
         env: 
-          NIX_OUTPUT: .#packages.${{ matrix.arch }}.devEnv
+          NIX_OUTPUT: .#packages.${{ matrix.arch.nix }}.devEnv
         run: |
           nix store sign "${NIX_OUTPUT}" -v -r -k ~/.secrets/nix-cache-private-key
           nix copy -v "${NIX_OUTPUT}" --to s3://nixed/cache
 
       - name: Cache helmet
         env: 
-          NIX_OUTPUT: .#defaultPackage.${{ matrix.arch }}
+          NIX_OUTPUT: .#defaultPackage.${{ matrix.arch.nix }}
         run: |
           nix store sign "${NIX_OUTPUT}" -v -r -k ~/.secrets/nix-cache-private-key
           nix copy -v "${NIX_OUTPUT}" --to s3://nixed/cache
