@@ -32,6 +32,7 @@ async function helmInstall(
     timeout,
     force,
     createNamespace,
+    debug,
   }: {
     name: string;
     namespace: string;
@@ -42,6 +43,7 @@ async function helmInstall(
     timeout?: string;
     force: boolean;
     createNamespace: boolean;
+    debug: boolean;
   },
 ) {
   const helmLsResultRaw = JSON.parse(
@@ -83,6 +85,7 @@ async function helmInstall(
       ...(atomic ? ["--atomic"] : []),
       ...(timeout ? [`--timeout=${timeout}`] : []),
       ...(createNamespace ? ["--create-namespace"] : []),
+      ...(debug ? ["--debug"] : []),
       name,
       chartPath,
     ];
@@ -148,6 +151,12 @@ export const ParamsSchema = Type.Object({
     default: false,
     examples: [false],
   })),
+  debug: Type.Optional(Type.Boolean({
+    description:
+      "Whether to pass --debug to the underlying `helm upgrade ...` process",
+    default: false,
+    examples: [false],
+  })),
 });
 
 export async function install(
@@ -160,6 +169,7 @@ export async function install(
     cleanupOnFail = false,
     force = false,
     createNamespace = false,
+    debug = false,
     timeout,
   }: Static<typeof ParamsSchema>,
 ) {
@@ -206,6 +216,7 @@ export async function install(
     force,
     timeout,
     createNamespace,
+    debug,
   });
 
   /* await inheritExec({
@@ -228,6 +239,7 @@ export async function install(
     force,
     timeout,
     createNamespace,
+    debug,
   });
 }
 
