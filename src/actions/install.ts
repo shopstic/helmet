@@ -73,6 +73,7 @@ async function helmInstall(
       ...(timeout ? [`--timeout=${timeout}`] : []),
       ...(force ? ["--force"] : []),
       ...(createNamespace ? ["--create-namespace"] : []),
+      ...(debug ? ["--debug"] : []),
       name,
       chartPath,
     ]
