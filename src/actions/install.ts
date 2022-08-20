@@ -10,6 +10,7 @@ import { joinPath, resolvePath } from "../deps/std_path.ts";
 import { expandGlobSync } from "../deps/std_fs.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { cyan, gray } from "../deps/std_fmt_colors.ts";
+import { readLines } from "../deps/std_io.ts";
 
 const HelmLsResultSchema = Type.Array(Type.Object({
   name: Type.String(),
@@ -94,13 +95,24 @@ async function helmInstall(
   console.log(`Executing:`, cyan(helmUpgradeCmd.join(" ")));
 
   const tag = gray(`[$ ${helmUpgradeCmd.slice(0, 2).join(" ")} ...]`);
+  let redactingOutput = false;
   await inheritExec({
     cmd: helmUpgradeCmd,
+    stdout: {
+      async read(reader) {
+        for await (const line of readLines(reader)) {
+          if (!redactingOutput || line.startsWith("USER-SUPPLIED VALUES:")) {
+            redactingOutput = true;
+          }
+
+          if (!redactingOutput) {
+            console.error(`${tag} ${line}`);
+          }
+        }
+      },
+    },
     stderr: {
       read: printErrLines((line) => `${tag} ${line}`),
-    },
-    stdout: {
-      read: printOutLines((line) => `${tag} ${line}`),
     },
   });
 }
