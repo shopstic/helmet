@@ -101,7 +101,10 @@ async function helmInstall(
     stdout: {
       async read(reader) {
         for await (const line of readLines(reader)) {
-          if (!redactingOutput && line.startsWith("USER-SUPPLIED VALUES:")) {
+          if (
+            debug && !redactingOutput &&
+            line.startsWith("USER-SUPPLIED VALUES:")
+          ) {
             redactingOutput = true;
           }
 
