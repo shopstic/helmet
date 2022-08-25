@@ -19,7 +19,7 @@ jobs:
           - nix: aarch64-linux
             runner: arm64-linux
           - nix: aarch64-darwin
-            runner: arm64-linux
+            runner: arm64-darwin
     steps:
       - uses: actions/checkout@v3
 
