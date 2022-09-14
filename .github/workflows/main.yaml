@@ -1,10 +1,16 @@
 name: Build
 
-on: [push]
+on: 
+  push:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version"
+        required: true
 
 defaults:
   run:
-    shell: bash
+    shell: nix develop -v -c bash {0}
 
 jobs:
   build:
@@ -23,16 +29,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build dev env
+      - name: Set version
+        if: github.event.inputs.version
+        run: ./cli.sh set_version "${{ github.event.inputs.version }}"
+
+      - name: Build Dev Env
         run: nix build -L -v --no-link '.#packages.${{ matrix.arch.nix }}.devEnv'
 
       - name: Check
-        run: nix develop -v -c ./cli.sh code_quality
+        run: ./cli.sh code_quality
 
       - name: Build
         run: nix build -L -v --no-link '.#defaultPackage.${{ matrix.arch.nix }}'
 
-      - name: Cache dev env
+      - name: Cache Dev Env
         env:
           NIX_OUTPUT: .#packages.${{ matrix.arch.nix }}.devEnv
         run: |
@@ -45,3 +55,10 @@ jobs:
         run: |
           nix store sign "${NIX_OUTPUT}" -v -r -k ~/.secrets/nix-cache-private-key
           nix copy -v "${NIX_OUTPUT}" --to s3://nixed/cache
+      
+      - name: Release
+        if: github.event.inputs.version
+        run: |
+          ./cli.sh create_release "${{ github.event.inputs.version }}"
+
+      

@@ -12,7 +12,6 @@
   };
 
   outputs = { self, nixpkgs, flakeUtils, hotPot, npmlock2nix }:
-    let version = if (self ? rev) then self.rev else "latest"; in
     flakeUtils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ]
       (system:
         let
@@ -75,7 +74,12 @@
         in
         rec {
           devShell = pkgs.mkShellNoCC {
-            buildInputs = runtimeInputs;
+            buildInputs = runtimeInputs ++ builtins.attrValues
+            {
+              inherit (pkgs)
+                gh
+                ;
+            };
             shellHook = ''
               mkdir -p ./.vscode
               cat ${vscodeSettings} > ./.vscode/settings.json

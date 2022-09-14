@@ -17,6 +17,26 @@ auto_fmt() {
   deno fmt ./src
 }
 
+set_version() {
+  local VERSION=${1:-"latest"}
+  printf "%s\n" "export default \"${VERSION}\";" > ./src/version.ts
+}
+
+create_release() {
+  local RELEASE_VERSION=${1:?"Release version is required"}
+  local RELEASE_BRANCH="releases/${RELEASE_VERSION}"
+
+  git config --global user.email "ci-runner@shopstic.com"
+  git config --global user.name "CI Runner"
+  git checkout -b "${RELEASE_BRANCH}"
+
+  git add ./src/version.ts
+  git commit -m "Release ${RELEASE_VERSION}"
+  git push origin "${RELEASE_BRANCH}"
+
+  gh release create "${RELEASE_VERSION}" --title "Release ${RELEASE_VERSION}" --notes "" --target "${RELEASE_BRANCH}"
+}
+
 build() {
   local VERSION=${1:-"latest"}
   local OUTPUT=${2:-$(mktemp -d)}
