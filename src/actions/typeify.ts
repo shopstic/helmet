@@ -86,6 +86,12 @@ export const labelsType: TypeDef = {
   imports: [],
 };
 
+export const podSecurityContextType: TypeDef = {
+  expectation: (value) => value === null || classifyType(value) === "object",
+  type: `K8s["core.v1.PodSecurityContext"]`,
+  imports,
+};
+
 export const securityContextType: TypeDef = {
   expectation: (value) => value === null || classifyType(value) === "object",
   type: `K8s["core.v1.SecurityContext"]`,
@@ -128,15 +134,42 @@ export const probeType: TypeDef = {
   imports,
 };
 
+export const volumesType: TypeDef = {
+  expectation: (value) => value === null || classifyType(value) === "array",
+  type: `Array<K8s["core.v1.Volume"]>`,
+  imports,
+};
+
+export const volumeMountsType: TypeDef = {
+  expectation: (value) => value === null || classifyType(value) === "array",
+  type: `Array<K8s["core.v1.VolumeMount"]>`,
+  imports,
+};
+
+export const dnsConfigType: TypeDef = {
+  expectation: (value) => value === null || classifyType(value) === "object",
+  type: `K8s["core.v1.PodDNSConfig"]`,
+  imports,
+};
+
+export const containersType: TypeDef = {
+  expectation: (value) => value === null || classifyType(value) === "array",
+  type: `Array<K8s["core.v1.Container"]>`,
+  imports,
+};
+
 const propToTypeMap = {
   imagePullSecrets: localObjectReferencesType,
   pullPolicy: pullPolicyType,
   imagePullPolicy: pullPolicyType,
   labels: labelsType,
+  podLabels: labelsType,
+  extraLabels: labelsType,
   annotations: annotationsType,
   podAnnotations: annotationsType,
-  podSecurityContext: securityContextType,
+  podSecurityContext: podSecurityContextType,
   securityContext: securityContextType,
+  containerSecurityContext: securityContextType,
   nodeSelector: nodeSelectorType,
   tolerations: tolerationsType,
   affinity: affinityType,
@@ -144,6 +177,13 @@ const propToTypeMap = {
   env: envType,
   livenessProbe: probeType,
   readinessProbe: probeType,
+  volumes: volumesType,
+  extraVolumes: volumesType,
+  volumeMounts: volumeMountsType,
+  extraVolumeMounts: volumeMountsType,
+  extraHostVolumeMounts: volumeMountsType,
+  dnsConfig: dnsConfigType,
+  extraContainers: containersType,
 };
 
 type KnownKey = keyof typeof propToTypeMap;
@@ -195,6 +235,20 @@ function generateTypeForUnknownKey(value: unknown): GeneratedType {
         return {
           output: `Array<${param.output}>`,
           imports: param.imports,
+        };
+      } else if (
+        arrayValue.length > 1 && arrayValue.every((v) => typeof v === "string")
+      ) {
+        return {
+          output: `string[] ${toCommentBlock(arrayValue)}`,
+          imports: [],
+        };
+      } else if (
+        arrayValue.length > 1 && arrayValue.every((v) => typeof v === "number")
+      ) {
+        return {
+          output: `number[] ${toCommentBlock(arrayValue)}`,
+          imports: [],
         };
       } else {
         return {
