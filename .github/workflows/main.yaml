@@ -1,6 +1,6 @@
 name: Build
 
-on: 
+on:
   push:
   workflow_dispatch:
     inputs:
@@ -55,10 +55,10 @@ jobs:
         run: |
           nix store sign "${NIX_OUTPUT}" -v -r -k ~/.secrets/nix-cache-private-key
           nix copy -v "${NIX_OUTPUT}" --to s3://nixed/cache
-      
+
       - name: Release
         if: github.event.inputs.version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./cli.sh create_release "${{ github.event.inputs.version }}"
-
-      
