@@ -57,7 +57,7 @@ jobs:
           nix copy -v "${NIX_OUTPUT}" --to s3://nixed/cache
 
   release:
-    name: Release ${{ github.event.inputs.version }}
+    name: Release
     if: github.event.inputs.version
     needs: [build]
     runs-on: [self-hosted, nix, general, arm64-linux, small]
