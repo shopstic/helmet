@@ -56,9 +56,20 @@ jobs:
           nix store sign "${NIX_OUTPUT}" -v -r -k ~/.secrets/nix-cache-private-key
           nix copy -v "${NIX_OUTPUT}" --to s3://nixed/cache
 
-      - name: Release
+  release:
+    name: Release ${{ github.event.inputs.version }}
+    if: github.event.inputs.version
+    needs: [build]
+    runs-on: [self-hosted, nix, general, arm64-linux, small]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set version
         if: github.event.inputs.version
+        run: ./cli.sh set_version "${{ github.event.inputs.version }}"
+
+      - name: Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          ./cli.sh create_release "${{ github.event.inputs.version }}"
+        run: ./cli.sh create_release "${{ github.event.inputs.version }}"
+          
