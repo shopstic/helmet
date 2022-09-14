@@ -50,127 +50,77 @@ interface TypeDef {
   imports: ImportDef[];
 }
 
-const k8sModelImportRoot = "https://deno.land/x/k8s@1.22/models/";
+const imports = [
+  {
+    props: ["K8s"],
+    from: "../deps/helmet.ts",
+  },
+];
 
 export const localObjectReferencesType: TypeDef = {
   expectation: (value) => value === null || classifyType(value) === "array",
-  type: "Array<IoK8sApiCoreV1LocalObjectReference>",
-  imports: [
-    {
-      props: ["IoK8sApiCoreV1LocalObjectReference"],
-      from: `${k8sModelImportRoot}IoK8sApiCoreV1LocalObjectReference.ts`,
-    },
-  ],
+  type: `Array<K8s["core.v1.LocalObjectReference"]>`,
+  imports,
 };
 
 export const pullPolicyType: TypeDef = {
   expectation: (value) => classifyType(value) === "string",
   type: "K8sImagePullPolicy",
-  imports: [
-    {
-      props: ["K8sImagePullPolicy"],
-      from: `../deps/helmet.ts`,
-    },
-  ],
+  imports,
 };
 
 export const annotationsType: TypeDef = {
   expectation: (value) => value === null || classifyType(value) === "object",
-  type: `IoK8sApimachineryPkgApisMetaV1ObjectMeta['annotations']`,
-  imports: [
-    {
-      props: ["IoK8sApimachineryPkgApisMetaV1ObjectMeta"],
-      from: `${k8sModelImportRoot}IoK8sApimachineryPkgApisMetaV1ObjectMeta.ts`,
-    },
-  ],
+  type: "Record<string, string>",
+  imports: [],
 };
 
 export const labelsType: TypeDef = {
   expectation: (value) => value === null || classifyType(value) === "object",
-  type: `IoK8sApimachineryPkgApisMetaV1ObjectMeta['labels']`,
-  imports: [
-    {
-      props: ["IoK8sApimachineryPkgApisMetaV1ObjectMeta"],
-      from: `${k8sModelImportRoot}IoK8sApimachineryPkgApisMetaV1ObjectMeta.ts`,
-    },
-  ],
+  type: "Record<string, string>",
+  imports: [],
 };
 
 export const securityContextType: TypeDef = {
   expectation: (value) => value === null || classifyType(value) === "object",
-  type: `IoK8sApiCoreV1SecurityContext`,
-  imports: [
-    {
-      props: ["IoK8sApiCoreV1SecurityContext"],
-      from: `${k8sModelImportRoot}IoK8sApiCoreV1SecurityContext.ts`,
-    },
-  ],
-};
-
-export const resources: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "object",
-  type: `IoK8sApiCoreV1ResourceRequirements`,
-  imports: [
-    {
-      props: ["IoK8sApiCoreV1ResourceRequirements"],
-      from: `${k8sModelImportRoot}IoK8sApiCoreV1ResourceRequirements.ts`,
-    },
-  ],
+  type: `K8s["core.v1.SecurityContext"]`,
+  imports,
 };
 
 export const nodeSelectorType: TypeDef = {
   expectation: (value) => value === null || classifyType(value) === "object",
-  type: `IoK8sApiCoreV1PodSpec['nodeSelector']`,
-  imports: [
-    {
-      props: ["IoK8sApiCoreV1PodSpec"],
-      from: `${k8sModelImportRoot}IoK8sApiCoreV1PodSpec.ts`,
-    },
-  ],
+  type: "Record<string, string>",
+  imports: [],
 };
 
 export const tolerationsType: TypeDef = {
   expectation: (value) => value === null || classifyType(value) === "array",
-  type: `IoK8sApiCoreV1PodSpec['tolerations']`,
-  imports: [
-    {
-      props: ["IoK8sApiCoreV1PodSpec"],
-      from: `${k8sModelImportRoot}IoK8sApiCoreV1PodSpec.ts`,
-    },
-  ],
+  type: `Array<K8s["core.v1.Toleration"]>`,
+  imports,
 };
 
 export const resourcesType: TypeDef = {
   expectation: (value) => value === null || classifyType(value) === "object",
-  type: `IoK8sApiCoreV1ResourceRequirements`,
-  imports: [
-    {
-      props: ["IoK8sApiCoreV1ResourceRequirements"],
-      from: `${k8sModelImportRoot}IoK8sApiCoreV1ResourceRequirements.ts`,
-    },
-  ],
+  type: `K8s["core.v1.ResourceRequirements"]`,
+  imports,
 };
 
 export const affinityType: TypeDef = {
   expectation: (value) => value === null || classifyType(value) === "object",
-  type: `IoK8sApiCoreV1PodSpec['affinity']`,
-  imports: [
-    {
-      props: ["IoK8sApiCoreV1PodSpec"],
-      from: `${k8sModelImportRoot}IoK8sApiCoreV1PodSpec.ts`,
-    },
-  ],
+  type: `K8s["core.v1.Affinity"]`,
+  imports,
 };
 
 export const envType: TypeDef = {
   expectation: (value) => value === null || classifyType(value) === "array",
-  type: `IoK8sApiCoreV1Container['env']`,
-  imports: [
-    {
-      props: ["IoK8sApiCoreV1Container"],
-      from: `${k8sModelImportRoot}IoK8sApiCoreV1Container.ts`,
-    },
-  ],
+  type: `Array<K8s["core.v1.EnvVar"]>`,
+  imports,
+};
+
+export const probeType: TypeDef = {
+  expectation: (value) => value === null || classifyType(value) === "object",
+  type: `K8s["core.v1.Probe"]`,
+  imports,
 };
 
 const propToTypeMap = {
@@ -187,6 +137,8 @@ const propToTypeMap = {
   affinity: affinityType,
   resources: resourcesType,
   env: envType,
+  livenessProbe: probeType,
+  readinessProbe: probeType,
 };
 
 type KnownKey = keyof typeof propToTypeMap;
