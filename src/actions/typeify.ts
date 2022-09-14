@@ -66,7 +66,12 @@ export const localObjectReferencesType: TypeDef = {
 export const pullPolicyType: TypeDef = {
   expectation: (value) => classifyType(value) === "string",
   type: "K8sImagePullPolicy",
-  imports,
+  imports: [
+    {
+      props: ["K8sImagePullPolicy"],
+      from: "../deps/helmet.ts",
+    },
+  ],
 };
 
 export const annotationsType: TypeDef = {
