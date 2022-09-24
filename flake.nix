@@ -69,17 +69,20 @@
               "nix.enableLanguageServer" = true;
               "nix.formatterPath" = pkgs.nixpkgs-fmt + "/bin/nixpkgs-fmt";
               "nix.serverPath" = pkgs.rnix-lsp + "/bin/rnix-lsp";
+              "[nix]" = {
+                "editor.defaultFormatter" = "jnoortheen.nix-ide";
+              };
             };
           };
         in
         rec {
           devShell = pkgs.mkShellNoCC {
             buildInputs = runtimeInputs ++ builtins.attrValues
-            {
-              inherit (pkgs)
-                gh
-                ;
-            };
+              {
+                inherit (pkgs)
+                  gh
+                  ;
+              };
             shellHook = ''
               mkdir -p ./.vscode
               cat ${vscodeSettings} > ./.vscode/settings.json
