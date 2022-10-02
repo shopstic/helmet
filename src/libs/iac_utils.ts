@@ -173,9 +173,29 @@ export async function readChartCrds(chartPath: string): Promise<K8sCrd[]> {
 
 const validateK8sResource = createValidator(K8sResourceSchema);
 
+const memoizedAllApiVersions = memoizePromise(async () => {
+  console.error("Fetching all API versions");
+  const { out } = (await captureExec({
+    cmd: [
+      "kubectl",
+      "api-resources",
+      "--no-headers",
+    ],
+  }));
+
+  return Array.from(
+    new Set(
+      out.split("\n").filter((l) => l.length > 0).map((line) =>
+        line.split(new RegExp("\\s+"))[2]
+      ),
+    ),
+  );
+});
+
 export async function helmTemplate(
   chartInstance: ChartInstanceConfig<unknown>,
 ): Promise<K8sResource[]> {
+  const allApiVersions = await memoizedAllApiVersions();
   const helmTemplateCmd = [
     "helm",
     "template",
@@ -183,6 +203,7 @@ export async function helmTemplate(
     chartInstance.namespace,
     "-f",
     "-",
+    ...(allApiVersions.flatMap((v) => ["--api-versions", v])),
     chartInstance.name,
     chartInstance.path,
   ];
@@ -196,7 +217,7 @@ export async function helmTemplate(
           read: printErrLines((line) => `${tag} ${line}`),
         },
         stdin: {
-          pipe: await stringifyYamlRelaxed(
+          pipe: stringifyYamlRelaxed(
             chartInstance.values as Record<string, unknown>,
           ),
         },
@@ -206,7 +227,7 @@ export async function helmTemplate(
         "INPUT -------------------------------------------------------------",
       );
       console.error(
-        await stringifyYamlRelaxed(
+        stringifyYamlRelaxed(
           chartInstance.values as Record<string, unknown>,
         ),
       );
@@ -248,10 +269,21 @@ ${JSON.stringify(docResult.errors, null, 2)}
 
 const validateK8sCrd = createValidator(K8sCrdSchema);
 
+export const HelmLsResultSchema = Type.Array(Type.Object({
+  name: Type.String(),
+  namespace: Type.String(),
+  revision: Type.String(),
+  updated: Type.String(),
+  status: Type.String(),
+  chart: Type.String(),
+  app_version: Type.String(),
+}));
+
 export async function compileChartInstance(
   instance: ChartInstanceConfig<unknown>,
 ): Promise<HelmetChartInstance> {
   const meta = await readChartMeta(instance.path);
+
   const resources = await helmTemplate(instance);
 
   const resourcesWithoutCrds = resources.filter((r) => r.kind !== K8sCrdKind);

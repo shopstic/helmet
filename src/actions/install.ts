@@ -11,16 +11,7 @@ import { expandGlobSync } from "../deps/std_fs.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { cyan, gray } from "../deps/std_fmt_colors.ts";
 import { readLines } from "../deps/std_io.ts";
-
-const HelmLsResultSchema = Type.Array(Type.Object({
-  name: Type.String(),
-  namespace: Type.String(),
-  revision: Type.String(),
-  updated: Type.String(),
-  status: Type.String(),
-  chart: Type.String(),
-  app_version: Type.String(),
-}));
+import { HelmLsResultSchema } from "../libs/iac_utils.ts";
 
 async function helmInstall(
   {
