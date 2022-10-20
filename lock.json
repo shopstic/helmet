@@ -136,7 +136,6 @@
   "https://deno.land/x/case@v2.1.0/vendor/camelCaseRegexp.ts": "7d9ff02aad4ab6429eeab7c7353f7bcdd6cc5909a8bd3dda97918c8bbb7621ae",
   "https://deno.land/x/case@v2.1.0/vendor/camelCaseUpperRegexp.ts": "292de54a698370f90adcdf95727993d09888b7f33d17f72f8e54ba75f7791787",
   "https://deno.land/x/case@v2.1.0/vendor/nonWordRegexp.ts": "c1a052629a694144b48c66b0175a22a83f4d61cb40f4e45293fc5d6b123f927e",
-  "https://deno.land/x/k8s@1.22/models/IoK8sApiCoreV1ConfigMapKeySelector.ts": "9e7d2d2d1e94893fb3b52004c27894e531a60414d36668737c30b6e1d7062db7",
   "https://deno.land/x/k8s@1.23.10/deps.ts": "092a697fa06c251d066b0b253586313d41727d7b54637f12d6162c87c77f2a2f",
   "https://deno.land/x/k8s@1.23.10/index.ts": "1c09f53edaf8fa34bb0c945010c3c5c74a12f03a206155167a094794ca773b43",
   "https://deno.land/x/k8s@1.23.10/openapi.ts": "0913b668ab560d181b54a4c53c785512c98fcc9601e7bf48addebbd29acc766c",

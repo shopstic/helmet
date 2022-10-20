@@ -91,7 +91,7 @@
           packages = {
             inherit json2ts;
             devEnv = devShell.inputDerivation;
-            helmet = pkgs.runCommandNoCC "helmet-wrapped"
+            helmet = pkgs.runCommandLocal "helmet-wrapped"
               {
                 buildInputs = [ pkgs.makeWrapper ];
               }
