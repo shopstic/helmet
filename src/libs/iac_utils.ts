@@ -22,6 +22,8 @@ import {
   HelmetBundle,
   HelmetChartInstance,
   K8sCrd,
+  KubectlClientVersionCmdOutputSchema,
+  KubectlServerVersionCmdOutputSchema,
 } from "./types.ts";
 import { memoizePromise } from "../deps/async_utils.ts";
 import { parseMultiDocumentsYaml, stringifyYamlRelaxed } from "./yaml_utils.ts";
@@ -174,28 +176,97 @@ export async function readChartCrds(chartPath: string): Promise<K8sCrd[]> {
 const validateK8sResource = createValidator(K8sResourceSchema);
 
 const memoizedAllApiVersions = memoizePromise(async () => {
-  console.error("Fetching all API versions");
+  const disableCache = Boolean(Deno.env.get(
+    "HELMET_KUBECTL_API_VERSIONS_DISABLE_CACHE",
+  ));
+
+  console.error(
+    `Fetching all API versions (${disableCache ? "non-cached" : "cached"})`,
+  );
   const { out } = (await captureExec({
     cmd: [
       "kubectl",
       "api-resources",
-      "--no-headers",
+      ...(!disableCache ? ["--cached=true"] : []),
     ],
   }));
 
+  const lines = out.split("\n").filter((l) => l.length > 0);
+  const header = lines.shift();
+
+  if (!header) {
+    throw new Error("'kubectl api-resources' command did not output a header");
+  }
+
+  const headerMatch = header.match(/^(NAME(?:\s+)SHORTNAMES(?:\s+))APIVERSION/);
+
+  if (!headerMatch) {
+    throw new Error(
+      "'kubectl api-resources' output header did not match the expected pattern",
+    );
+  }
+
+  const apiVersionColumnPosition = headerMatch[1].length;
+
   return Array.from(
-    new Set(
-      out.split("\n").filter((l) => l.length > 0).map((line) =>
-        line.split(new RegExp("\\s+"))[2]
-      ),
-    ),
+    new Set(lines.map((line) => {
+      const lineMatch = line.slice(apiVersionColumnPosition).match(/^[^\s]+/);
+      if (!lineMatch) {
+        throw new Error(
+          `An 'kubectl api-resources' output line did not match the expected pattern: [LINE_START]${line}[LINE_END]`,
+        );
+      }
+
+      return lineMatch[0];
+    })),
   );
+});
+
+const memoizedKubeVersion = memoizePromise(async () => {
+  const useServerVersion = Boolean(
+    Deno.env.get("HELMET_KUBECTL_USE_SERVER_VERSION"),
+  );
+
+  if (useServerVersion) {
+    console.error("Fetching the server-side kube version");
+  }
+
+  const cmd = [
+    "kubectl",
+    "version",
+    "-o=json",
+    ...(!useServerVersion ? ["--client=true"] : []),
+  ];
+  const { out } = (await captureExec({
+    cmd,
+  }));
+
+  const json = JSON.parse(out);
+
+  if (useServerVersion) {
+    const validation = validate(KubectlServerVersionCmdOutputSchema, json);
+    if (!validation.isSuccess) {
+      throw new Error(`Got invalid output for command: ${cmd.join(" ")}`);
+    }
+    return validation.value.serverVersion.gitVersion;
+  }
+
+  const validation = validate(KubectlClientVersionCmdOutputSchema, json);
+  if (!validation.isSuccess) {
+    throw new Error(`Got invalid output for command: ${cmd.join(" ")}`);
+  }
+  return validation.value.clientVersion.gitVersion;
 });
 
 export async function helmTemplate(
   chartInstance: ChartInstanceConfig<unknown>,
 ): Promise<K8sResource[]> {
-  const allApiVersions = await memoizedAllApiVersions();
+  const allApiVersionsPromise = memoizedAllApiVersions();
+  const kubeVersionPromise = memoizedKubeVersion();
+
+  const allApiVersions = await allApiVersionsPromise;
+  const kubeVersion = await kubeVersionPromise;
+
   const helmTemplateCmd = [
     "helm",
     "template",
@@ -203,6 +274,8 @@ export async function helmTemplate(
     chartInstance.namespace,
     "-f",
     "-",
+    "--kube-version",
+    kubeVersion,
     ...(allApiVersions.flatMap((v) => ["--api-versions", v])),
     chartInstance.name,
     chartInstance.path,

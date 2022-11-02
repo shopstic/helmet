@@ -111,3 +111,15 @@ export interface HelmetBundle {
   releaseNamespace: string;
   create: () => Promise<HelmetChartInstance[]>;
 }
+
+export const KubectlClientVersionCmdOutputSchema = Type.PartialObject({
+  clientVersion: Type.PartialObject({
+    gitVersion: Type.String({ minLength: 1 }),
+  }),
+});
+
+export const KubectlServerVersionCmdOutputSchema = Type.PartialObject({
+  serverVersion: Type.PartialObject({
+    gitVersion: Type.String({ minLength: 1 }),
+  }),
+});

@@ -52,11 +52,11 @@
     },
     "flakeUtils_2": {
       "locked": {
-        "lastModified": 1659877975,
-        "narHash": "sha256-zllb8aq3YO3h8B/U0/J1WBgAL8EX5yWf5pMj3G0NAmc=",
+        "lastModified": 1667077288,
+        "narHash": "sha256-bdC8sFNDpT0HK74u9fUkpbf1MEzVYJ+ka7NXCdgBoaA=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "c0e246b9b83f637f4681389ecabcb2681b4f3af0",
+        "rev": "6ee9ebb6b1ee695d2cacc4faa053a7b9baa76817",
         "type": "github"
       },
       "original": {
@@ -74,11 +74,11 @@
         "npmlock2nixPkg": "npmlock2nixPkg"
       },
       "locked": {
-        "lastModified": 1666194098,
-        "narHash": "sha256-8A9XDCK/Z7p58JbW2x9gcev/u87nXjnkLcoVJYkg+YY=",
+        "lastModified": 1667181934,
+        "narHash": "sha256-xoWR5MojtjE1/k0aRQgjpGzMfP97HDIrmDKc5V+umbo=",
         "owner": "shopstic",
         "repo": "nix-hot-pot",
-        "rev": "9c96ee325b5c4d45edec5072eb300f6a43c0edbe",
+        "rev": "0491dafe65ac34a2398792a957a23ea259ed7749",
         "type": "github"
       },
       "original": {
@@ -96,17 +96,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1664048188,
-        "narHash": "sha256-gTEXSYUSNuidgo2XoxF001bR0f5/e3g1oWSDKsZFET8=",
+        "lastModified": 1665039323,
+        "narHash": "sha256-SAh3ZjFGsaCI8FRzXQyp56qcGdAqgKEfJWPCQ0Sr7tQ=",
         "owner": "nlewo",
         "repo": "nix2container",
-        "rev": "06330064b676bd9197f420ece482257f413b0166",
+        "rev": "b008fe329ffb59b67bf9e7b08ede6ee792f2741a",
         "type": "github"
       },
       "original": {
         "owner": "nlewo",
         "repo": "nix2container",
-        "rev": "06330064b676bd9197f420ece482257f413b0166",
         "type": "github"
       }
     },
@@ -145,11 +144,11 @@
     "npmlock2nix": {
       "flake": false,
       "locked": {
-        "lastModified": 1654775747,
-        "narHash": "sha256-9pXHDpIjmsK5390wmpGHu9aA4QOPpegPBvThHeBlef4=",
+        "lastModified": 1666460237,
+        "narHash": "sha256-HME6rnysvCwUVtH+BDWDGahmweMaLgD2wqHeRuGp6QI=",
         "owner": "nix-community",
         "repo": "npmlock2nix",
-        "rev": "5c4f247688fc91d665df65f71c81e0726621aaa8",
+        "rev": "eeed152290ec2425f96c5e74e469c40b621e1468",
         "type": "github"
       },
       "original": {
