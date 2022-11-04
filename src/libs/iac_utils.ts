@@ -176,6 +176,12 @@ export async function readChartCrds(chartPath: string): Promise<K8sCrd[]> {
 const validateK8sResource = createValidator(K8sResourceSchema);
 
 const memoizedAllApiVersions = memoizePromise(async () => {
+  const apiVersionsFromEnv = Deno.env.get("HELMET_KUBECTL_API_VERSIONS");
+
+  if (typeof apiVersionsFromEnv === "string") {
+    return apiVersionsFromEnv.split(" ");
+  }
+
   const disableCache = Boolean(Deno.env.get(
     "HELMET_KUBECTL_API_VERSIONS_DISABLE_CACHE",
   ));
