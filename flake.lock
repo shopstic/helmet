@@ -74,11 +74,11 @@
         "npmlock2nixPkg": "npmlock2nixPkg"
       },
       "locked": {
-        "lastModified": 1667534808,
-        "narHash": "sha256-XbOY7sXwSszrAnbBlT6/wH0fALgXw3RFDz7Pc0GVRN8=",
+        "lastModified": 1669950500,
+        "narHash": "sha256-9xFrRKabTmngljQR9m1dg8H5DA22IdNCIMUPTm24DZA=",
         "owner": "shopstic",
         "repo": "nix-hot-pot",
-        "rev": "6e8b3777613f025d6272e6cfa1f372d829f510a2",
+        "rev": "8a0f4ba45fcde42062c29b0eea647763e9b71443",
         "type": "github"
       },
       "original": {
@@ -96,11 +96,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1665039323,
-        "narHash": "sha256-SAh3ZjFGsaCI8FRzXQyp56qcGdAqgKEfJWPCQ0Sr7tQ=",
+        "lastModified": 1668413124,
+        "narHash": "sha256-k0hGnuVjn6pFXmy4yYxpNuRXh/zR1KXB4l1EcAlQMzI=",
         "owner": "nlewo",
         "repo": "nix2container",
-        "rev": "b008fe329ffb59b67bf9e7b08ede6ee792f2741a",
+        "rev": "f128a164fed3aa97ae8cf15cd7cb15709178dda4",
         "type": "github"
       },
       "original": {
@@ -127,28 +127,28 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1664924682,
-        "narHash": "sha256-XrHmMHQQrUx/lszWYq7pPgkhKgqt6RwIDN+EcBnsA20=",
+        "lastModified": 1669833724,
+        "narHash": "sha256-/HEZNyGbnQecrgJnfE8d0WC5c1xuPSD2LUpB6YXlg4c=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "878ccf08c5bbba3bf06e48379a3887adfc54927f",
+        "rev": "4d2b37a84fad1091b9de401eb450aae66f1a741e",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
+        "ref": "22.11",
         "repo": "nixpkgs",
-        "rev": "878ccf08c5bbba3bf06e48379a3887adfc54927f",
         "type": "github"
       }
     },
     "npmlock2nix": {
       "flake": false,
       "locked": {
-        "lastModified": 1666460237,
-        "narHash": "sha256-HME6rnysvCwUVtH+BDWDGahmweMaLgD2wqHeRuGp6QI=",
+        "lastModified": 1668989938,
+        "narHash": "sha256-/IxdS0AiqSN0/VEOLnnfHyi4nP17yPrkhGf6KlXVwrc=",
         "owner": "nix-community",
         "repo": "npmlock2nix",
-        "rev": "eeed152290ec2425f96c5e74e469c40b621e1468",
+        "rev": "0ba0746d62974403daf717cded3f24c617622bc7",
         "type": "github"
       },
       "original": {
