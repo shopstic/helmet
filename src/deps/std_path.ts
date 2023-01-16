@@ -5,4 +5,4 @@ export {
   fromFileUrl,
   join as joinPath,
   resolve as resolvePath,
-} from "https://deno.land/std@0.155.0/path/mod.ts";
+} from "https://deno.land/std@0.172.0/path/mod.ts";

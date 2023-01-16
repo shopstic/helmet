@@ -42,7 +42,7 @@ build() {
   local OUTPUT=${2:-$(mktemp -d)}
 
   printf "%s\n" "export default \"${VERSION}\";" > ./src/version.ts
-  deno bundle --lock ./lock.json "${ENTRY_FILE}" "${OUTPUT}/helmet.js"
+  deno bundle --lock ./deno.lock "${ENTRY_FILE}" "${OUTPUT}/helmet.js"
 }
 
 install() {
@@ -54,16 +54,15 @@ install() {
 }
 
 update_cache() {
-  deno cache --lock=lock.json "${ENTRY_FILE}" "${MOD_FILE}" 
+  deno cache "${ENTRY_FILE}" "${MOD_FILE}" 
 }
 
 update_lock() {
-  deno cache --reload "${ENTRY_FILE}" "${MOD_FILE}"
-  deno cache "${ENTRY_FILE}" "${MOD_FILE}"  --lock ./lock.json --lock-write
+  deno cache --reload --lock=deno.lock --lock-write "${ENTRY_FILE}" "${MOD_FILE}"
 }
 
 run() {
-  deno run --lock ./lock.json --cached-only -A --check --unstable "${ENTRY_FILE}" "$@"
+  deno run --lock ./deno.lock --cached-only -A --check --unstable "${ENTRY_FILE}" "$@"
 }
 
 "$@"
