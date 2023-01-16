@@ -189,13 +189,13 @@ const memoizedAllApiVersions = memoizePromise(async () => {
   console.error(
     `Fetching all API versions (${disableCache ? "non-cached" : "cached"})`,
   );
-  const { out } = (await captureExec({
+  const { out } = await captureExec({
     cmd: [
       "kubectl",
       "api-resources",
       ...(!disableCache ? ["--cached=true"] : []),
     ],
-  }));
+  });
 
   const lines = out.split("\n").filter((l) => l.length > 0);
   const header = lines.shift();
@@ -243,9 +243,9 @@ const memoizedKubeVersion = memoizePromise(async () => {
     "-o=json",
     ...(!useServerVersion ? ["--client=true"] : []),
   ];
-  const { out } = (await captureExec({
+  const { out } = await captureExec({
     cmd,
-  }));
+  });
 
   const json = JSON.parse(out);
 

@@ -18,7 +18,7 @@
           pkgs = import nixpkgs { inherit system; };
           hotPotPkgs = hotPot.packages.${system};
           json2ts = pkgs.callPackage ./nix/json2ts {
-            npmlock2nix = import npmlock2nix { inherit pkgs; };
+            npmlock2nix = (import npmlock2nix { inherit pkgs; }).v1;
           };
           deno = hotPotPkgs.deno;
           runtimeInputs = builtins.attrValues
@@ -61,6 +61,7 @@
               "[typescript]" = {
                 "editor.defaultFormatter" = "denoland.vscode-deno";
                 "editor.formatOnSave" = true;
+                "editor.inlayHints.enabled" = "offUnlessPressed";
               };
               "yaml.schemaStore.enable" = true;
               "yaml.schemas" = {
