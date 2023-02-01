@@ -24,11 +24,12 @@
           runtimeInputs = builtins.attrValues
             {
               inherit json2ts deno;
+              inherit (hotPotPkgs)
+                kubernetes-helm;
               inherit (pkgs)
                 kubectl
                 yq-go
                 sops
-                kubernetes-helm
                 ;
             };
           helmet = pkgs.callPackage hotPot.lib.denoAppBuild
