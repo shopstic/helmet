@@ -158,6 +158,14 @@ export const containersType: TypeDef = {
   imports,
 };
 
+export const podDisruptionBudgetType: TypeDef = {
+  expectation: (value) =>
+    value === null ||
+    (classifyType(value) === "object" && Object.keys(value!).length === 0),
+  type: `K8s["policy.v1.PodDisruptionBudgetSpec"]`,
+  imports,
+};
+
 const propToTypeMap = {
   imagePullSecrets: localObjectReferencesType,
   pullPolicy: pullPolicyType,
@@ -184,6 +192,7 @@ const propToTypeMap = {
   extraHostVolumeMounts: volumeMountsType,
   dnsConfig: dnsConfigType,
   extraContainers: containersType,
+  podDisruptionBudget: podDisruptionBudgetType,
 };
 
 type KnownKey = keyof typeof propToTypeMap;
