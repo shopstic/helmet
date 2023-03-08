@@ -215,7 +215,7 @@ const memoizedAllApiVersions = memoizePromise(async () => {
   const apiVersionColumnPosition = headerMatch[1].length;
 
   return Array.from(
-    new Set(lines.map((line) => {
+    new Set(lines.flatMap((line) => {
       const lineMatch = line.slice(apiVersionColumnPosition).match(
         /^([^\s]+)(?:[\s]+)(?:true|false)(?:[\s]+)([^\s]+)/,
       );
@@ -225,7 +225,7 @@ const memoizedAllApiVersions = memoizePromise(async () => {
         );
       }
 
-      return `${lineMatch[1]}/${lineMatch[2]}`;
+      return [lineMatch[1], `${lineMatch[1]}/${lineMatch[2]}`];
     })),
   );
 });
