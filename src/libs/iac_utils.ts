@@ -216,14 +216,16 @@ const memoizedAllApiVersions = memoizePromise(async () => {
 
   return Array.from(
     new Set(lines.map((line) => {
-      const lineMatch = line.slice(apiVersionColumnPosition).match(/^[^\s]+/);
+      const lineMatch = line.slice(apiVersionColumnPosition).match(
+        /^([^\s]+)(?:[\s]+)(?:true|false)(?:[\s]+)([^\s]+)/,
+      );
       if (!lineMatch) {
         throw new Error(
           `An 'kubectl api-resources' output line did not match the expected pattern: [LINE_START]${line}[LINE_END]`,
         );
       }
 
-      return lineMatch[0];
+      return `${lineMatch[1]}/${lineMatch[2]}`;
     })),
   );
 });
