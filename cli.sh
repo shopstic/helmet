@@ -58,6 +58,7 @@ update_cache() {
 }
 
 update_lock() {
+  rm -f deno.lock
   deno cache --reload --lock=deno.lock --lock-write "${ENTRY_FILE}" "${MOD_FILE}"
 }
 
