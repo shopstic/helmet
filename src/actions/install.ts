@@ -1,9 +1,4 @@
-import {
-  captureExec,
-  inheritExec,
-  printErrLines,
-  printOutLines,
-} from "../deps/exec_utils.ts";
+import { captureExec, inheritExec, printErrLines, printOutLines } from "../deps/exec_utils.ts";
 import { validate } from "../deps/validation_utils.ts";
 import { Static, Type } from "../deps/typebox.ts";
 import { joinPath, resolvePath } from "../deps/std_path.ts";
@@ -12,6 +7,7 @@ import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { cyan, gray } from "../deps/std_fmt_colors.ts";
 import { readLines } from "../deps/std_io.ts";
 import { HelmLsResultSchema } from "../libs/iac_utils.ts";
+import { readerFromStreamReader } from "https://deno.land/std@0.186.0/streams/reader_from_stream_reader.ts";
 
 async function helmInstall(
   {
@@ -90,18 +86,28 @@ async function helmInstall(
   await inheritExec({
     cmd: helmUpgradeCmd,
     stdout: {
-      async read(reader) {
-        for await (const line of readLines(reader)) {
-          if (
-            debug && !redactingOutput &&
-            line.startsWith("USER-SUPPLIED VALUES:")
+      async read(readable) {
+        const reader = readable.getReader();
+        try {
+          for await (
+            const line of readLines(
+              readerFromStreamReader(reader),
+            )
           ) {
-            redactingOutput = true;
-          }
+            if (
+              debug && !redactingOutput &&
+              line.startsWith("USER-SUPPLIED VALUES:")
+            ) {
+              redactingOutput = true;
+            }
 
-          if (!redactingOutput) {
-            console.error(`${tag} ${line}`);
+            if (!redactingOutput) {
+              console.error(`${tag} ${line}`);
+            }
           }
+        } finally {
+          reader.releaseLock();
+          await readable.cancel();
         }
       },
     },
@@ -120,30 +126,25 @@ export const ParamsSchema = Type.Object({
     description: "The namespace where the Secrets for Helm releases are stored",
   }),
   source: Type.String({
-    description:
-      "Path to the compiled instance generated from `helmet compile ...`",
+    description: "Path to the compiled instance generated from `helmet compile ...`",
   }),
   wait: Type.Optional(Type.Boolean({
-    description:
-      "Whether to pass --wait to the underlying `helm upgrade ...` process",
+    description: "Whether to pass --wait to the underlying `helm upgrade ...` process",
     default: false,
     examples: [false],
   })),
   atomic: Type.Optional(Type.Boolean({
-    description:
-      "Whether to pass --atomic to the underlying `helm upgrade ...` process",
+    description: "Whether to pass --atomic to the underlying `helm upgrade ...` process",
     default: false,
     examples: [false],
   })),
   cleanupOnFail: Type.Optional(Type.Boolean({
-    description:
-      "Whether to pass --cleanup-on-fail to the underlying `helm upgrade ...` process",
+    description: "Whether to pass --cleanup-on-fail to the underlying `helm upgrade ...` process",
     default: false,
     examples: [false],
   })),
   force: Type.Optional(Type.Boolean({
-    description:
-      "Whether to pass --force to the underlying `helm upgrade ...` process",
+    description: "Whether to pass --force to the underlying `helm upgrade ...` process",
     default: false,
     examples: [false],
   })),
@@ -153,14 +154,12 @@ export const ParamsSchema = Type.Object({
     examples: ["5m0s"],
   })),
   createNamespace: Type.Optional(Type.Boolean({
-    description:
-      "Whether to pass --create-namespace to the underlying `helm upgrade ...` process",
+    description: "Whether to pass --create-namespace to the underlying `helm upgrade ...` process",
     default: false,
     examples: [false],
   })),
   debug: Type.Optional(Type.Boolean({
-    description:
-      "Whether to pass --debug to the underlying `helm upgrade ...` process",
+    description: "Whether to pass --debug to the underlying `helm upgrade ...` process",
     default: false,
     examples: [false],
   })),

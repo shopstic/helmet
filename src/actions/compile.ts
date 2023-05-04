@@ -14,9 +14,7 @@ async function generateChildChart(
     instance: HelmetChartInstance;
   },
 ): Promise<void> {
-  const resourcesWithoutNamespaces = instance.resources.filter((r) =>
-    r.kind !== "Namespace"
-  );
+  const resourcesWithoutNamespaces = instance.resources.filter((r) => r.kind !== "Namespace");
   const namespaces = instance
     .resources
     .filter((r) => r.kind === "Namespace")
@@ -35,9 +33,7 @@ async function generateChildChart(
 
   const combinedResourcesYaml = (await Promise.all(resourcesWithoutNamespaces
     .map((doc) => {
-      const namespace = (doc.metadata.namespace !== undefined)
-        ? doc.metadata.namespace
-        : instance.namespace;
+      const namespace = (doc.metadata.namespace !== undefined) ? doc.metadata.namespace : instance.namespace;
 
       return stringifyYamlRelaxed({
         ...doc,

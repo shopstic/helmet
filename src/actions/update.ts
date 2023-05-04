@@ -168,9 +168,7 @@ async function updateRemoteArchiveChart({
       await inheritExec({
         cmd: ["bash"],
         stdin: {
-          pipe: `curl -Ls ${quoteShellCmd([archiveUrl])} | tar -xz -C ${
-            quoteShellCmd([joinPath(tempDir, "out")])
-          }`,
+          pipe: `curl -Ls ${quoteShellCmd([archiveUrl])} | tar -xz -C ${quoteShellCmd([joinPath(tempDir, "out")])}`,
         },
       });
     } else {
@@ -341,9 +339,7 @@ async function updateHelmRepoChart({
     };
   }
 
-  const filteredEntries = (remote.apiVersion)
-    ? entries.filter((e) => e.apiVersion === remote.apiVersion)
-    : entries;
+  const filteredEntries = (remote.apiVersion) ? entries.filter((e) => e.apiVersion === remote.apiVersion) : entries;
 
   const allVersionsMap = filteredEntries.reduce((map, entry) => {
     const maybeSemver = coerceSemver(entry.version);
@@ -365,10 +361,9 @@ async function updateHelmRepoChart({
   if (maxSatisfyingVersion === null) {
     return {
       isSuccess: false,
-      reason:
-        `No release satisfies version "${remote.version}". All available releases: ${
-          allVersions.map((v) => v.version).join(", ")
-        }`,
+      reason: `No release satisfies version "${remote.version}". All available releases: ${
+        allVersions.map((v) => v.version).join(", ")
+      }`,
     };
   }
 
@@ -389,8 +384,7 @@ async function updateHelmRepoChart({
       };
     }
 
-    const resolvedRemoteReleaseUrl =
-      (new URL(remoteReleaseUrl, remoteRepoUrl)).href;
+    const resolvedRemoteReleaseUrl = (new URL(remoteReleaseUrl, remoteRepoUrl)).href;
 
     const tempDir = await Deno.makeTempDir();
 
@@ -398,9 +392,9 @@ async function updateHelmRepoChart({
       await inheritExec({
         cmd: ["bash"],
         stdin: {
-          pipe: `curl -Ls ${
-            quoteShellCmd([resolvedRemoteReleaseUrl])
-          } | tar -xz --strip-components 1 -C ${quoteShellCmd([tempDir])}`,
+          pipe: `curl -Ls ${quoteShellCmd([resolvedRemoteReleaseUrl])} | tar -xz --strip-components 1 -C ${
+            quoteShellCmd([tempDir])
+          }`,
         },
       });
 
@@ -448,13 +442,11 @@ export default createCliAction(
       examples: ["./charts"],
     }),
     types: Type.String({
-      description:
-        "Path to the destination directory where types will be generated into",
+      description: "Path to the destination directory where types will be generated into",
       examples: ["./types"],
     }),
     only: Type.Optional(Type.String({
-      description:
-        "Optional filter which partially matches the name of only a certain chart to update",
+      description: "Optional filter which partially matches the name of only a certain chart to update",
     })),
   }),
   async ({ manifest, charts: chartsPath, types: typesPath, only }) => {

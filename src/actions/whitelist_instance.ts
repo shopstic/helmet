@@ -1,8 +1,4 @@
-import {
-  inheritExec,
-  printErrLines,
-  printOutLines,
-} from "../deps/exec_utils.ts";
+import { inheritExec, printErrLines, printOutLines } from "../deps/exec_utils.ts";
 import { createK8sConfigMap } from "../deps/k8s_utils.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { Type } from "../deps/typebox.ts";
@@ -14,8 +10,8 @@ export const CONFIG_MAP_NAME = "helmet-whitelist";
 export const CONFIG_MAP_NAMESPACE = "default";
 
 export async function fetchCurrentWhitelist(): Promise<Set<string>> {
-  const child = Deno.run({
-    cmd: [
+  const output = await new Deno.Command("kubectl", {
+    args: [
       "kubectl",
       "get",
       `configmap/${CONFIG_MAP_NAME}`,
@@ -25,18 +21,17 @@ export async function fetchCurrentWhitelist(): Promise<Set<string>> {
     ],
     stdout: "piped",
     stderr: "piped",
-  });
+  }).output();
 
-  const stdout = new TextDecoder().decode(await child.output());
-  const stderr = new TextDecoder().decode(await child.stderrOutput());
-  const { code } = await child.status();
-
-  if (code !== 0) {
+  if (output.code !== 0) {
+    const stderr = new TextDecoder().decode(output.stderr);
     if (stderr.indexOf("not found") === -1) {
       throw new Error(stderr);
     }
     return new Set<string>();
   }
+
+  const stdout = new TextDecoder().decode(output.stdout);
 
   if (stdout.length === 0) {
     return new Set<string>();

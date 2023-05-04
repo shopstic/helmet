@@ -9,8 +9,7 @@ export default createCliAction(
       examples: ["iac-my-stack"],
     }),
     namespace: Type.String({
-      description:
-        "The namespace where corresponding Helm releases of this instance were installed to",
+      description: "The namespace where corresponding Helm releases of this instance were installed to",
       examples: ["iac-my-stack"],
     }),
   }),

@@ -284,11 +284,10 @@ function generateTypeForUnknownKey(value: unknown): GeneratedType {
 }
 
 function generateTypeForObject(obj: Record<string, unknown>): GeneratedType {
-  const seed: { pairs: Array<{ k: string; v: string }>; imports: ImportDef[] } =
-    {
-      pairs: [],
-      imports: [],
-    };
+  const seed: { pairs: Array<{ k: string; v: string }>; imports: ImportDef[] } = {
+    pairs: [],
+    imports: [],
+  };
 
   const result = Object.entries(obj).reduce((acc, [key, value]) => {
     if (Object.prototype.hasOwnProperty.call(propToTypeMap, key)) {
@@ -401,9 +400,7 @@ function adaptCrdSchemaToJsonSchema(maybeSchema: unknown): unknown {
           .map(([key, value]) => [key, value.type]),
       );
 
-      const newOneOf = oneOf.map((item) =>
-        adaptCrdSchemaOneOfItemToJsonSchema(item, propertyTypes)
-      );
+      const newOneOf = oneOf.map((item) => adaptCrdSchemaOneOfItemToJsonSchema(item, propertyTypes));
 
       return {
         ...rest,
@@ -483,9 +480,7 @@ async function readChartValues(
     }
   })();
 
-  const values = (typeof parsed === "object" && parsed !== null)
-    ? parsed as Record<string, unknown>
-    : {};
+  const values = (typeof parsed === "object" && parsed !== null) ? parsed as Record<string, unknown> : {};
 
   return deepMerge(baseValues, values);
 }
@@ -611,11 +606,9 @@ export async function typeifyChart(chartPath: string, typesPath: string) {
     console.log(cyan(`[${chartName}]`), "Applying patch", patchPath);
   }
 
-  const patch = (hasPatch)
-    ? (await import(patchPath)).default as TypeifyPatch
-    : {
-      patch: (v: Record<string, unknown>) => v,
-    };
+  const patch = (hasPatch) ? (await import(patchPath)).default as TypeifyPatch : {
+    patch: (v: Record<string, unknown>) => v,
+  };
 
   const patchedValues = patch.patch(values);
 
@@ -696,13 +689,11 @@ ${crdInterfaces}
 export default createCliAction(
   Type.Object({
     charts: Type.String({
-      description:
-        "Glob pattern to match directories of Helm charts, for which types will be generated",
+      description: "Glob pattern to match directories of Helm charts, for which types will be generated",
       examples: ["./charts/*"],
     }),
     types: Type.String({
-      description:
-        "Path to the destination directory where types will be generated into",
+      description: "Path to the destination directory where types will be generated into",
       examples: ["./types"],
     }),
   }),
