@@ -12,7 +12,6 @@ export const CONFIG_MAP_NAMESPACE = "default";
 export async function fetchCurrentWhitelist(): Promise<Set<string>> {
   const output = await new Deno.Command("kubectl", {
     args: [
-      "kubectl",
       "get",
       `configmap/${CONFIG_MAP_NAME}`,
       "-n",
