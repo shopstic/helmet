@@ -606,7 +606,7 @@ export async function typeifyChart(chartPath: string, typesPath: string) {
     console.log(cyan(`[${chartName}]`), "Applying patch", patchPath);
   }
 
-  const patch = (hasPatch) ? (await import(patchPath)).default as TypeifyPatch : {
+  const patch = hasPatch ? (await import(patchPath)).default as TypeifyPatch : {
     patch: (v: Record<string, unknown>) => v,
   };
 

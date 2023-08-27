@@ -7,7 +7,7 @@ import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { cyan, gray } from "../deps/std_fmt_colors.ts";
 import { readLines } from "../deps/std_io.ts";
 import { HelmLsResultSchema } from "../libs/iac_utils.ts";
-import { readerFromStreamReader } from "https://deno.land/std@0.186.0/streams/reader_from_stream_reader.ts";
+import { readerFromStreamReader } from "https://deno.land/std@0.200.0/streams/reader_from_stream_reader.ts";
 
 async function helmInstall(
   {
@@ -48,7 +48,7 @@ async function helmInstall(
 
   const currentRelease = helmLsResult.value.find((i) => i.name === name);
 
-  const helmUpgradeCmd = (currentRelease)
+  const helmUpgradeCmd = currentRelease
     ? [
       "helm",
       "upgrade",

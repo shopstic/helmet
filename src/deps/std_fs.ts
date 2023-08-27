@@ -1,2 +1,2 @@
-export { expandGlob, expandGlobSync } from "https://deno.land/std@0.186.0/fs/expand_glob.ts";
-export { exists as fsExists } from "https://deno.land/std@0.186.0/fs/exists.ts";
+export { expandGlob, expandGlobSync } from "https://deno.land/std@0.200.0/fs/expand_glob.ts";
+export { exists as fsExists } from "https://deno.land/std@0.200.0/fs/exists.ts";

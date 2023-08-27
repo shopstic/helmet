@@ -414,7 +414,7 @@ async function updateHelmRepoChart({
       return {
         isSuccess: true,
         isUpdated: true,
-        fromVersion: (currentChartMeta) ? currentChartMeta.version : undefined,
+        fromVersion: currentChartMeta ? currentChartMeta.version : undefined,
         toVersion: maxSatisfyingRelease.version,
       };
     } finally {
@@ -425,7 +425,7 @@ async function updateHelmRepoChart({
     return {
       isSuccess: true,
       isUpdated: false,
-      fromVersion: (currentChartMeta) ? currentChartMeta.version : undefined,
+      fromVersion: currentChartMeta ? currentChartMeta.version : undefined,
       toVersion: maxSatisfyingRelease.version,
     };
   }
