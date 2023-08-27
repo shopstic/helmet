@@ -19,7 +19,7 @@
             {
               inherit system;
               config.permittedInsecurePackages = [
-                "nodejs-16.20.1"
+                "nodejs-16.20.2"
               ];
             };
           hotPotPkgs = hotPot.packages.${system};
