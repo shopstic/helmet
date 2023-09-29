@@ -1,8 +1,8 @@
 import { K8sCrdSchema, K8sResource } from "../deps/k8s_utils.ts";
 import { SemverRange } from "../deps/semver.ts";
-import { Static, Type } from "../deps/typebox.ts";
+import { FlexObject, Static, Type } from "../deps/typebox.ts";
 
-export const ChartRepoReleaseSchema = Type.PartialObject({
+export const ChartRepoReleaseSchema = FlexObject({
   apiVersion: Type.Optional(Type.String()),
   version: Type.String(),
   name: Type.String(),
@@ -11,7 +11,7 @@ export const ChartRepoReleaseSchema = Type.PartialObject({
 
 export type ChartRepoRelease = Static<typeof ChartRepoReleaseSchema>;
 
-export const ChartRepoIndexSchema = Type.PartialObject({
+export const ChartRepoIndexSchema = FlexObject({
   apiVersion: Type.String(),
   entries: Type.Record(
     Type.String(),
@@ -68,7 +68,7 @@ export type RemoteChartConfigMap = {
   [name: string]: RemoteChartConfig;
 };
 
-export const ChartMetadataSchema = Type.PartialObject({
+export const ChartMetadataSchema = FlexObject({
   apiVersion: Type.String(),
   name: Type.String(),
   version: Type.String(),
@@ -112,14 +112,14 @@ export interface HelmetBundle {
   create: () => Promise<HelmetChartInstance[]>;
 }
 
-export const KubectlClientVersionCmdOutputSchema = Type.PartialObject({
-  clientVersion: Type.PartialObject({
+export const KubectlClientVersionCmdOutputSchema = FlexObject({
+  clientVersion: FlexObject({
     gitVersion: Type.String({ minLength: 1 }),
   }),
 });
 
-export const KubectlServerVersionCmdOutputSchema = Type.PartialObject({
-  serverVersion: Type.PartialObject({
+export const KubectlServerVersionCmdOutputSchema = FlexObject({
+  serverVersion: FlexObject({
     gitVersion: Type.String({ minLength: 1 }),
   }),
 });
