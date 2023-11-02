@@ -47,14 +47,14 @@ jobs:
           NIX_OUTPUT: .#packages.${{ matrix.arch.nix }}.devEnv
         run: |
           nix store sign "${NIX_OUTPUT}" -v -r -k ~/.secrets/nix-cache-private-key
-          nix copy -v "${NIX_OUTPUT}" --to s3://nixed/cache
+          nix copy -v "${NIX_OUTPUT}" --to 's3://nixed/cache?compression=zstd&parallel-compression=true'
 
       - name: Cache helmet
         env:
           NIX_OUTPUT: .#defaultPackage.${{ matrix.arch.nix }}
         run: |
           nix store sign "${NIX_OUTPUT}" -v -r -k ~/.secrets/nix-cache-private-key
-          nix copy -v "${NIX_OUTPUT}" --to s3://nixed/cache
+          nix copy -v "${NIX_OUTPUT}" --to 's3://nixed/cache?compression=zstd&parallel-compression=true'
 
   release:
     name: Release
