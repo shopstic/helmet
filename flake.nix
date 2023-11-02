@@ -18,13 +18,11 @@
           pkgs = import nixpkgs
             {
               inherit system;
-              config.permittedInsecurePackages = [
-                "nodejs-16.20.2"
-              ];
             };
           hotPotPkgs = hotPot.packages.${system};
           json2ts = pkgs.callPackage ./nix/json2ts {
             npmlock2nix = (import npmlock2nix { inherit pkgs; }).v2;
+            nodejs = pkgs.nodejs_20;
           };
           deno = hotPotPkgs.deno;
           runtimeInputs = builtins.attrValues
@@ -36,6 +34,7 @@
                 kubectl
                 yq-go
                 sops
+                nodejs_20
                 ;
             };
           helmet = pkgs.callPackage hotPot.lib.denoAppBuild

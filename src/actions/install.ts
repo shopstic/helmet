@@ -7,7 +7,7 @@ import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { cyan, gray } from "../deps/std_fmt_colors.ts";
 import { readLines } from "../deps/std_io.ts";
 import { HelmLsResultSchema } from "../libs/iac_utils.ts";
-import { readerFromStreamReader } from "https://deno.land/std@0.202.0/streams/reader_from_stream_reader.ts";
+import { readerFromStreamReader } from "https://deno.land/std@0.205.0/streams/reader_from_stream_reader.ts";
 
 async function helmInstall(
   {
