@@ -27,7 +27,7 @@ jobs:
           - nix: aarch64-darwin
             runner: arm64-darwin
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set version
         if: github.event.inputs.version
@@ -62,7 +62,7 @@ jobs:
     needs: [build]
     runs-on: [self-hosted, nix, general, arm64-linux, small]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set version
         if: github.event.inputs.version
