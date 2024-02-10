@@ -461,26 +461,24 @@ async function readChartValues(
 
   const valuesPath = joinPath(chartPath, "values.yaml");
 
-  if (!await fsExists(valuesPath)) {
-    throw new Error(
-      `Expected a 'values.yaml' file inside the Helm chart directory but none is found at ${valuesPath}`,
-    );
+  let values: Record<string, unknown> = {};
+
+  if (await fsExists(valuesPath)) {
+    const raw = await Deno.readTextFile(valuesPath);
+
+    const parsed = (() => {
+      try {
+        return parseYaml(raw);
+      } catch (e) {
+        console.warn(
+          `Failed parsing ${valuesPath}, going types ignore it. Reason: ${e.message}`,
+        );
+        return {};
+      }
+    })();
+
+    values = (typeof parsed === "object" && parsed !== null) ? parsed as Record<string, unknown> : {};
   }
-
-  const raw = await Deno.readTextFile(valuesPath);
-
-  const parsed = (() => {
-    try {
-      return parseYaml(raw);
-    } catch (e) {
-      console.warn(
-        `Failed parsing ${valuesPath}, going types ignore it. Reason: ${e.message}`,
-      );
-      return {};
-    }
-  })();
-
-  const values = (typeof parsed === "object" && parsed !== null) ? parsed as Record<string, unknown> : {};
 
   return deepMerge(baseValues, values);
 }
