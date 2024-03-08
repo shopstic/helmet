@@ -5,6 +5,7 @@ import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { Type } from "../deps/typebox.ts";
 import { cyan } from "../deps/std_fmt_colors.ts";
 import { importBundleModule } from "../libs/iac_utils.ts";
+import { K8sKind } from "../deps/k8s_utils.ts";
 
 async function generateChildChart(
   { crdsPath, resourcesPath, namespacesPath, instance }: {
@@ -192,14 +193,37 @@ export async function compile(
     return map;
   }, new Map<string, number>());
 
-  const resourceDuplicateDetectionMap = chartInstances.flatMap(({ crds, resources }) => [...crds, ...resources]).reduce(
+  const resourceDuplicateDetectionMap = chartInstances.flatMap((
+    { namespace, crds, resources },
+  ) => [
+    ...crds,
+    ...resources.map((r) =>
+      r.kind !== K8sKind.Namespace && r.metadata.namespace === undefined
+        ? ({
+          ...r,
+          metadata: {
+            ...r.metadata,
+            namespace,
+          },
+        })
+        : r
+    ),
+  ]).reduce(
     (map, resource) => {
+      const namespace = resource.metadata.namespace as string | undefined ?? "";
       const kind = `${resource.kind}/${resource.apiVersion}`;
-      let byNameMap = map.get(kind);
+      let byNamespaceMap = map.get(kind);
+
+      if (!byNamespaceMap) {
+        byNamespaceMap = new Map<string, Map<string, number>>();
+        map.set(kind, byNamespaceMap);
+      }
+
+      let byNameMap = byNamespaceMap.get(namespace);
 
       if (!byNameMap) {
         byNameMap = new Map<string, number>();
-        map.set(kind, byNameMap);
+        byNamespaceMap.set(namespace, byNameMap);
       }
 
       const name = resource.metadata.name;
@@ -207,7 +231,7 @@ export async function compile(
       byNameMap.set(name, count + 1);
       return map;
     },
-    new Map<string, Map<string, number>>(),
+    new Map<string, Map<string, Map<string, number>>>(),
   );
 
   for (const [name, count] of chartInstanceDuplicateDetectionMap) {
@@ -216,10 +240,16 @@ export async function compile(
     }
   }
 
-  for (const [kind, group] of resourceDuplicateDetectionMap) {
-    for (const [name, count] of group) {
-      if (count > 1) {
-        throw new Error(`There are ${count} resources with the same name of '${name}' and kind of '${kind}'`);
+  for (const [kind, byNamespaceMap] of resourceDuplicateDetectionMap) {
+    for (const [namespace, byNameMap] of byNamespaceMap) {
+      for (const [name, count] of byNameMap) {
+        if (count > 1) {
+          throw new Error(
+            `There are ${count} resources with the same name of '${name}' and kind of '${kind}'${
+              namespace.length > 0 ? ` in namespace '${namespace}'` : ""
+            }`,
+          );
+        }
       }
     }
   }

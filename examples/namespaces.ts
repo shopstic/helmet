@@ -14,18 +14,13 @@ export default defineBundle({
     return Promise.all([
       Promise.resolve({
         name,
-        namespace: "default",
+        namespace: "foo",
         version: "1.0.0",
         labels: {
           ...seedLabels,
           "app.kubernetes.io/managed-by": "Helm",
         },
         resources: [
-          createK8sNamespace({
-            metadata: {
-              name,
-            },
-          }),
           createK8sNamespace({
             metadata: {
               name,
