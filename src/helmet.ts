@@ -24,7 +24,7 @@ const program = new CliProgram()
 try {
   await program.run(Deno.args);
 } catch (e) {
-  console.error(bold(red("[Error]")), JSON.stringify(e, null, 2));
+  console.error(bold(red("[Error]")), e.message);
 
   if (Deno.env.get("HELMET_ENABLE_STACKTRACE") !== "0") {
     throw e;

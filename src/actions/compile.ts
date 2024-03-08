@@ -186,20 +186,43 @@ export async function compile(
     );
   }
 
-  const duplicateDetectionMap = chartInstances.reduce((map, { name }) => {
+  const chartInstanceDuplicateDetectionMap = chartInstances.reduce((map, { name }) => {
     const count = map.get(name) ?? 0;
     map.set(name, count + 1);
     return map;
   }, new Map<string, number>());
 
-  Array
-    .from(duplicateDetectionMap.entries())
-    .filter(([_, count]) => count > 1)
-    .forEach(([name, count]) => {
-      throw new Error(
-        `There are ${count} instances with the same name of '${name}'`,
-      );
-    });
+  const resourceDuplicateDetectionMap = chartInstances.flatMap(({ crds, resources }) => [...crds, ...resources]).reduce(
+    (map, resource) => {
+      const kind = `${resource.kind}/${resource.apiVersion}`;
+      let byNameMap = map.get(kind);
+
+      if (!byNameMap) {
+        byNameMap = new Map<string, number>();
+        map.set(kind, byNameMap);
+      }
+
+      const name = resource.metadata.name;
+      const count = byNameMap.get(name) ?? 0;
+      byNameMap.set(name, count + 1);
+      return map;
+    },
+    new Map<string, Map<string, number>>(),
+  );
+
+  for (const [name, count] of chartInstanceDuplicateDetectionMap) {
+    if (count > 1) {
+      throw new Error(`There are ${count} instances with the same name of '${name}'`);
+    }
+  }
+
+  for (const [kind, group] of resourceDuplicateDetectionMap) {
+    for (const [name, count] of group) {
+      if (count > 1) {
+        throw new Error(`There are ${count} resources with the same name of '${name}' and kind of '${kind}'`);
+      }
+    }
+  }
 
   console.error("Compiling", source, "to", destination);
 

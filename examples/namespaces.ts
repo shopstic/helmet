@@ -26,6 +26,11 @@ export default defineBundle({
               name,
             },
           }),
+          createK8sNamespace({
+            metadata: {
+              name,
+            },
+          }),
         ],
         crds: [],
       }),

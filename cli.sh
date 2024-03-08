@@ -50,7 +50,7 @@ install() {
   local OUTPUT=${2:-$(mktemp -d)}
 
   "$0" build "${VERSION}" "${OUTPUT}"
-  deno install --unstable -A -f "${OUTPUT}/helmet.js"
+  deno install -A -f "${OUTPUT}/helmet.js"
 }
 
 update_cache() {
@@ -63,7 +63,7 @@ update_lock() {
 }
 
 run() {
-  deno run --lock ./deno.lock --cached-only -A --check --unstable "${ENTRY_FILE}" "$@"
+  deno run --lock ./deno.lock --cached-only -A --check "${ENTRY_FILE}" "$@"
 }
 
 "$@"

@@ -24,7 +24,7 @@
             npmlock2nix = (import npmlock2nix { inherit pkgs; }).v2;
             nodejs = pkgs.nodejs_20;
           };
-          deno = hotPotPkgs.deno;
+          deno = hotPotPkgs.deno_1_41_x;
           runtimeInputs = builtins.attrValues
             {
               inherit json2ts deno;
