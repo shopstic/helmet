@@ -197,17 +197,19 @@ export async function compile(
     { namespace, crds, resources },
   ) => [
     ...crds,
-    ...resources.map((r) =>
-      r.kind !== K8sKind.Namespace && r.metadata.namespace === undefined
+    ...resources.map((r) => {
+      const { kind, apiVersion, metadata } = r;
+      return kind !== K8sKind.Namespace && metadata.namespace === undefined
         ? ({
-          ...r,
+          kind,
+          apiVersion,
           metadata: {
-            ...r.metadata,
+            name: metadata.name,
             namespace,
           },
         })
-        : r
-    ),
+        : r;
+    }),
   ]).reduce(
     (map, resource) => {
       const namespace = resource.metadata.namespace as string | undefined ?? "";
