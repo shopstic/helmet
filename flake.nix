@@ -75,7 +75,6 @@
               };
               "nix.enableLanguageServer" = true;
               "nix.formatterPath" = pkgs.nixpkgs-fmt + "/bin/nixpkgs-fmt";
-              "nix.serverPath" = pkgs.rnix-lsp + "/bin/rnix-lsp";
               "[nix]" = {
                 "editor.defaultFormatter" = "jnoortheen.nix-ide";
               };
