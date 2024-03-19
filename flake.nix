@@ -78,6 +78,14 @@
               "[nix]" = {
                 "editor.defaultFormatter" = "jnoortheen.nix-ide";
               };
+              "nix.serverSettings" = {
+                "nil" = {
+                  "formatting" = {
+                    "command" = [ "nixpkgs-fmt" ];
+                  };
+                };
+              };
+              "nix.serverPath" = pkgs.nil + "/bin/nil";
             };
           };
         in
