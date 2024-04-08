@@ -4,22 +4,23 @@ import { dirname, joinPath, resolvePath } from "../deps/std_path.ts";
 import { parseYaml } from "../deps/std_yaml.ts";
 import { Type } from "../deps/typebox.ts";
 import { validate } from "../deps/validation_utils.ts";
-import { coerceSemver, maxSatisfyingSemver, SemVer } from "../deps/semver.ts";
-import { quoteShellCmd } from "../deps/quote_shell.ts";
+import { maxSatisfyingSemver, type SemVer, semverFormat, semverParseRange, semverTryParse } from "../deps/semver.ts";
+import { quoteShell } from "../deps/quote_shell.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import {
-  ChartMetadata,
+  type ChartMetadata,
   ChartMetadataSchema,
   ChartRepoIndexSchema,
-  ChartRepoRelease,
-  ChartUpdateContext,
-  HelmRepoChartConfig,
-  OciRegistryChartConfig,
-  RemoteArchiveChartConfig,
+  type ChartRepoRelease,
+  type ChartUpdateContext,
+  type HelmRepoChartConfig,
+  type OciRegistryChartConfig,
+  type RemoteArchiveChartConfig,
   RemoteChartSource,
 } from "../libs/types.ts";
 import { typeifyChart } from "./typeify.ts";
 import { bold, gray, green, red } from "../deps/std_fmt_colors.ts";
+import { checkAndImport } from "../mod.ts";
 
 interface ChartUpdateFailure {
   isSuccess: false;
@@ -50,10 +51,7 @@ async function getCurrentChartMetadata(
     if (!currentChartMetaResult.isSuccess) {
       throw new Error(
         `Failed validating "Chart.yaml" from ${chartPath}. Errors:\n${
-          currentChartMetaResult.errorsToString({
-            separator: "\n",
-            dataVar: "  -",
-          })
+          currentChartMetaResult.errors.map((e) => `  - at path ${JSON.stringify(e.path)}: ${e.message}`).join("\n")
         }`,
       );
     }
@@ -168,7 +166,7 @@ async function updateRemoteArchiveChart({
       await inheritExec({
         cmd: ["bash"],
         stdin: {
-          pipe: `curl -Ls ${quoteShellCmd([archiveUrl])} | tar -xz -C ${quoteShellCmd([joinPath(tempDir, "out")])}`,
+          pipe: `curl -Ls ${quoteShell([archiveUrl])} | tar -xz -C ${quoteShell([joinPath(tempDir, "out")])}`,
         },
       });
     } else {
@@ -321,10 +319,7 @@ async function updateHelmRepoChart({
   if (!remoteRepoIndexResult.isSuccess) {
     throw new Error(
       `Failed validating "index.yaml" for "${chartName}" repo at "${remoteRepoUrl}". Errors:\n${
-        remoteRepoIndexResult.errorsToString({
-          separator: "\n",
-          dataVar: "  -",
-        })
+        remoteRepoIndexResult.errors.map((e) => `  - at path ${JSON.stringify(e.path)}: ${e.message}`).join("\n")
       }`,
     );
   }
@@ -342,9 +337,9 @@ async function updateHelmRepoChart({
   const filteredEntries = (remote.apiVersion) ? entries.filter((e) => e.apiVersion === remote.apiVersion) : entries;
 
   const allVersionsMap = filteredEntries.reduce((map, entry) => {
-    const maybeSemver = coerceSemver(entry.version);
+    const maybeSemver = semverTryParse(entry.version);
 
-    if (maybeSemver !== null) {
+    if (maybeSemver !== undefined) {
       return map.set(maybeSemver, entry);
     }
 
@@ -352,17 +347,18 @@ async function updateHelmRepoChart({
   }, new Map<SemVer, ChartRepoRelease>());
 
   const allVersions = Array.from(allVersionsMap.keys());
+  const range = typeof remote.version === "string" ? semverParseRange(remote.version) : remote.version;
 
   const maxSatisfyingVersion = maxSatisfyingSemver(
     allVersions,
-    remote.version,
+    range,
   );
 
-  if (maxSatisfyingVersion === null) {
+  if (maxSatisfyingVersion === undefined) {
     return {
       isSuccess: false,
       reason: `No release satisfies version "${remote.version}". All available releases: ${
-        allVersions.map((v) => v.version).join(", ")
+        allVersions.map((v) => semverFormat(v)).join(", ")
       }`,
     };
   }
@@ -392,8 +388,8 @@ async function updateHelmRepoChart({
       await inheritExec({
         cmd: ["bash"],
         stdin: {
-          pipe: `curl -Ls ${quoteShellCmd([resolvedRemoteReleaseUrl])} | tar -xz --strip-components 1 -C ${
-            quoteShellCmd([tempDir])
+          pipe: `curl -Ls ${quoteShell([resolvedRemoteReleaseUrl])} | tar -xz --strip-components 1 -C ${
+            quoteShell([tempDir])
           }`,
         },
       });
@@ -468,7 +464,7 @@ export default createCliAction(
       return ExitCode.One;
     }
 
-    const manifestModule = await import(resolvedManifest);
+    const manifestModule = await checkAndImport(resolvedManifest);
 
     if (!manifestModule.default) {
       console.error(

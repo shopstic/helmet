@@ -1,16 +1,44 @@
 {
+  "name": "@wok/helmet",
+  "version": "1.29.0",
+  "exports": {
+    ".": "./src/mod.ts",
+    "./deps/typebox": "./src/deps/typebox.ts"
+  },
+  "publish": {
+    "include": ["./src", "./deno.json", "./README.md", "./LICENSE"]
+  },
   "tasks": {
     "check_all": "deno check **/*.ts"
   },
   "fmt": {
     "lineWidth": 120,
     "include": [
-      "./src"
+      "src",
+      "examples",
+      "nix/helmet/build.ts"
     ]
   },
   "lint": {
     "include": [
-      "./src"
-    ]
+      "src",
+      "examples",
+      "nix/helmet/build.ts"
+    ],
+    "rules": {
+      "exclude": ["no-slow-types"]
+    }
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^0.221.0",
+    "@std/fmt": "jsr:@std/fmt@^0.221.0",
+    "@std/fs": "jsr:@std/fs@^0.221.0",
+    "@std/io": "jsr:@std/io@^0.221.0",
+    "@std/path": "jsr:@std/path@^0.221.0",
+    "@std/semver": "jsr:@std/semver@^0.221.0",
+    "@std/streams": "jsr:@std/streams@^0.221.0",
+    "@std/yaml": "jsr:@std/yaml@^0.221.0",
+    "@wok/case": "jsr:@wok/case@~1.0.1",
+    "@wok/utils": "jsr:@wok/utils@~1.1.5"
   }
 }

@@ -1,4 +1,4 @@
-import { stringifyYaml, YAMLError } from "../deps/std_yaml.ts";
+import { stringifyYaml } from "../deps/std_yaml.ts";
 import { captureExec } from "../deps/exec_utils.ts";
 
 export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
@@ -6,7 +6,7 @@ export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
     return stringifyYaml(value);
   } catch (e) {
     if (
-      e instanceof YAMLError &&
+      e.name === "YAMLError" &&
       e.message.indexOf("unacceptable kind of an object to dump") !== -1
     ) {
       return stringifyYaml(JSON.parse(JSON.stringify(value)));

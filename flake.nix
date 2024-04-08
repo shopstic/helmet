@@ -24,7 +24,7 @@
             npmlock2nix = (import npmlock2nix { inherit pkgs; }).v2;
             nodejs = pkgs.nodejs_20;
           };
-          deno = hotPotPkgs.deno_1_41_x;
+          deno = hotPotPkgs.deno_1_42_x;
           runtimeInputs = builtins.attrValues
             {
               inherit json2ts deno;
@@ -37,10 +37,9 @@
                 nodejs_20
                 ;
             };
-          helmet = pkgs.callPackage hotPot.lib.denoAppBuild
+          helmet = pkgs.callPackage ./nix/helmet
             {
-              inherit (hotPotPkgs) deno;
-              denoRunFlags = "-A --check --no-lock";
+              inherit deno;
               name = "helmet";
               src = builtins.path
                 {
@@ -48,10 +47,10 @@
                   name = "helmet-src";
                   filter = with pkgs.lib; (path: /* type */_:
                     hasInfix "/src" path ||
-                    hasSuffix "/lock.json" path
+                    hasSuffix "/deno.json" path ||
+                    hasSuffix "/deno.lock" path
                   );
                 };
-              appSrcPath = "./src/helmet.ts";
             };
           vscodeSettings = pkgs.writeTextFile {
             name = "vscode-settings.json";
@@ -92,11 +91,7 @@
         rec {
           devShell = pkgs.mkShellNoCC {
             buildInputs = runtimeInputs ++ builtins.attrValues
-              {
-                inherit (pkgs)
-                  gh
-                  ;
-              };
+              {};
             shellHook = ''
               mkdir -p ./.vscode
               cat ${vscodeSettings} > ./.vscode/settings.json

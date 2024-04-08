@@ -1,18 +1,16 @@
-import { captureExec, printErrLines } from "../deps/exec_utils.ts";
-import { K8sCrdKind, K8sCrdSchema, K8sResource, K8sResourceSchema } from "../deps/k8s_utils.ts";
+import { captureExec, inheritExec, NonZeroExitError, printErrLines } from "../deps/exec_utils.ts";
+import { type K8sCrd, K8sCrdKind, K8sCrdSchema, type K8sResource, K8sResourceSchema } from "../deps/k8s_utils.ts";
 import { expandGlob } from "../deps/std_fs.ts";
 import { basename, dirname, fromFileUrl, joinPath } from "../deps/std_path.ts";
 import { parseYaml } from "../deps/std_yaml.ts";
-import { Static, TObject, Type } from "../deps/typebox.ts";
-import { TProperties } from "../deps/typebox.ts";
-import { createValidator, validate, ValidationResult } from "../deps/validation_utils.ts";
+import { type Static, type TObject, type TProperties, Type } from "../deps/typebox.ts";
+import { createValidator, validate, type ValidationResult } from "../deps/validation_utils.ts";
 import {
-  ChartInstanceConfig,
-  ChartMetadata,
+  type ChartInstanceConfig,
+  type ChartMetadata,
   ChartMetadataSchema,
-  HelmetBundle,
-  HelmetChartInstance,
-  K8sCrd,
+  type HelmetBundle,
+  type HelmetChartInstance,
   KubectlClientVersionCmdOutputSchema,
   KubectlServerVersionCmdOutputSchema,
 } from "./types.ts";
@@ -106,7 +104,7 @@ export async function readChartMeta(chartPath: string): Promise<ChartMetadata> {
 
 const validateCrds = createValidator(Type.Array(K8sCrdSchema));
 
-export async function collectCrdFiles(chartPath: string) {
+export async function collectCrdFiles(chartPath: string): Promise<string[]> {
   const crdsPath = joinPath(chartPath, "crds");
   const subChartsPath = joinPath(chartPath, "charts");
   const crdFiles: string[] = [];
@@ -393,10 +391,25 @@ export function defineBundle(
   return instance;
 }
 
+export async function checkAndImport(path: string) {
+  try {
+    await inheritExec({
+      cmd: ["deno", "check", path],
+    });
+  } catch (e) {
+    if (e instanceof NonZeroExitError) {
+      throw new Error(`${path} is invalid`);
+    }
+    throw e;
+  }
+
+  return await import(path);
+}
+
 export async function importBundleModule(
   path: string,
 ): Promise<HelmetBundle> {
-  const bundleModule = await import(path);
+  const bundleModule = await checkAndImport(path);
 
   if (typeof bundleModule.default !== "object") {
     throw new Error(

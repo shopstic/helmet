@@ -1,6 +1,6 @@
-import { K8sCrdSchema, K8sResource } from "../deps/k8s_utils.ts";
-import { SemverRange } from "../deps/semver.ts";
-import { FlexObject, Static, Type } from "../deps/typebox.ts";
+import type { K8sCrd, K8sResource } from "../deps/k8s_utils.ts";
+import type { SemverRange } from "../deps/semver.ts";
+import { FlexObject, type Static, Type } from "../deps/typebox.ts";
 
 export const ChartRepoReleaseSchema = FlexObject({
   apiVersion: Type.Optional(Type.String()),
@@ -94,8 +94,6 @@ export interface ChartInstanceConfig<V> {
   path: string;
   values: V;
 }
-
-export type K8sCrd = Static<typeof K8sCrdSchema>;
 
 export interface HelmetChartInstance {
   name: string;

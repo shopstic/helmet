@@ -1,5 +1,5 @@
 import { stringifyYamlRelaxed } from "../libs/yaml_utils.ts";
-import { HelmetChartInstance } from "../libs/types.ts";
+import type { HelmetChartInstance } from "../libs/types.ts";
 import { joinPath, resolvePath } from "../deps/std_path.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { Type } from "../deps/typebox.ts";

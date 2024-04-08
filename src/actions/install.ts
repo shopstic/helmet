@@ -1,6 +1,6 @@
 import { captureExec, inheritExec, printErrLines, printOutLines } from "../deps/exec_utils.ts";
 import { validate } from "../deps/validation_utils.ts";
-import { Static, Type } from "../deps/typebox.ts";
+import { type Static, Type } from "../deps/typebox.ts";
 import { joinPath, resolvePath } from "../deps/std_path.ts";
 import { expandGlobSync } from "../deps/std_fs.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";

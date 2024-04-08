@@ -1,10 +1,10 @@
 import { deepMerge } from "../libs/patch_utils.ts";
 
-import { ImportDef, readChartCrds, TypeifyPatch } from "../libs/iac_utils.ts";
+import { checkAndImport, type ImportDef, readChartCrds, type TypeifyPatch } from "../libs/iac_utils.ts";
 import { basename, joinPath, resolvePath } from "../deps/std_path.ts";
 import { expandGlobSync, fsExists } from "../deps/std_fs.ts";
 import { parseYaml } from "../deps/std_yaml.ts";
-import { toPascalCase } from "../deps/case.ts";
+import { pascalCase } from "../deps/case.ts";
 import { captureExec, inheritExec, printErrLines } from "../deps/exec_utils.ts";
 import { K8sCrdApiVersionV1beta1 } from "../deps/k8s_utils.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
@@ -491,7 +491,7 @@ async function generateCrdInterface(
     schema: unknown;
   },
 ): Promise<string> {
-  const fullName = `${toPascalCase(kind)}${toPascalCase(version)}`;
+  const fullName = `${pascalCase(kind)}${pascalCase(version)}`;
   const tempDir = await Deno.makeTempDir();
 
   try {
@@ -604,7 +604,7 @@ export async function typeifyChart(chartPath: string, typesPath: string) {
     console.log(cyan(`[${chartName}]`), "Applying patch", patchPath);
   }
 
-  const patch = hasPatch ? (await import(patchPath)).default as TypeifyPatch : {
+  const patch = hasPatch ? (await checkAndImport(patchPath)).default as TypeifyPatch : {
     patch: (v: Record<string, unknown>) => v,
   };
 
@@ -632,7 +632,7 @@ export async function typeifyChart(chartPath: string, typesPath: string) {
     })
     .join("\n");
 
-  const pascalCaseChartName = toPascalCase(chartName);
+  const pascalCaseChartName = pascalCase(chartName);
 
   const output = `
 // deno-lint-ignore-file
