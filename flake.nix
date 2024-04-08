@@ -89,14 +89,17 @@
           };
         in
         rec {
-          devShell = pkgs.mkShellNoCC {
-            buildInputs = runtimeInputs ++ builtins.attrValues
-              {};
-            shellHook = ''
-              mkdir -p ./.vscode
-              cat ${vscodeSettings} > ./.vscode/settings.json
-            '';
-          };
+          devShell = pkgs.mkShellNoCC
+            {
+              buildInputs = runtimeInputs ++ builtins.attrValues
+                {
+                  inherit (pkgs) gh;
+                };
+              shellHook = ''
+                mkdir -p ./.vscode
+                cat ${ vscodeSettings} > ./.vscode/settings.json
+              '';
+            };
           packages = {
             inherit json2ts;
             devEnv = devShell.inputDerivation;
