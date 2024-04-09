@@ -15,15 +15,13 @@
     "lineWidth": 120,
     "include": [
       "src",
-      "examples",
-      "nix/helmet/build.ts"
+      "examples"
     ]
   },
   "lint": {
     "include": [
       "src",
-      "examples",
-      "nix/helmet/build.ts"
+      "examples"
     ],
     "rules": {
       "exclude": ["no-slow-types"]

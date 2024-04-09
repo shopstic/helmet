@@ -37,9 +37,10 @@
                 nodejs_20
                 ;
             };
-          helmet = pkgs.callPackage ./nix/helmet
+          helmet = pkgs.callPackage hotPot.lib.denoAppBuild
             {
               inherit deno;
+              inherit (hotPotPkgs) deno-app-build;
               name = "helmet";
               src = builtins.path
                 {
@@ -51,6 +52,8 @@
                     hasSuffix "/deno.lock" path
                   );
                 };
+              appSrcPath = "./src/helmet.ts";
+              denoRunFlags = "-A";
             };
           vscodeSettings = pkgs.writeTextFile {
             name = "vscode-settings.json";
