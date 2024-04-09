@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": false,
+    "inlineSourceMap": false,
+    "isolatedModules": true,
+    "lib": ["ESNext", "DOM"],
+    "module": "esnext",
+    "moduleDetection": "force",
+    "strict": true,
+    "target": "esnext",
+    "useDefineForClassFields": true
+  }
+}

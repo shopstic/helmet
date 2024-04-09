@@ -9,8 +9,8 @@ code_quality() {
   deno fmt --check ./src
   echo "Linting..."
   deno lint ./src
-  # echo "Runnning tests..."
-  # deno test -A
+  echo "Running eslint..."
+  eslint .
 }
 
 auto_fmt() {

@@ -96,7 +96,12 @@
             {
               buildInputs = runtimeInputs ++ builtins.attrValues
                 {
-                  inherit (pkgs) gh;
+                  inherit (pkgs)
+                    gh
+                    ;
+                  inherit (hotPotPkgs)
+                    typescript-eslint
+                    ;
                 };
               shellHook = ''
                 mkdir -p ./.vscode

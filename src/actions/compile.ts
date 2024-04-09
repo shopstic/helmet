@@ -92,7 +92,7 @@ async function generateChart(
 
   await Deno.writeTextFile(
     joinPath(chartPath, "Chart.yaml"),
-    await stringifyYamlRelaxed({
+    stringifyYamlRelaxed({
       apiVersion: "v2",
       type: "application",
       name: name,

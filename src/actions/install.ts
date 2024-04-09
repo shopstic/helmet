@@ -5,9 +5,8 @@ import { joinPath, resolvePath } from "../deps/std_path.ts";
 import { expandGlobSync } from "../deps/std_fs.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
 import { cyan, gray } from "../deps/std_fmt_colors.ts";
-import { readLines } from "../deps/std_io.ts";
+import { readerFromStreamReader, readLines } from "../deps/std_io.ts";
 import { HelmLsResultSchema } from "../libs/iac_utils.ts";
-import { readerFromStreamReader } from "../deps/std_streams.ts";
 
 async function helmInstall(
   {

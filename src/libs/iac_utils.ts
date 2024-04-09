@@ -309,26 +309,24 @@ export async function helmTemplate(
 
   const docs = await parseMultiDocumentsYaml(rawYaml);
 
-  const transformedDocs: K8sResource[] = await Promise.all(
-    docs
-      .filter((doc) => Boolean(doc))
-      .map(async (rawDoc) => {
-        const docResult = validateK8sResource(rawDoc);
+  const transformedDocs: K8sResource[] = docs
+    .filter((doc) => Boolean(doc))
+    .map((rawDoc) => {
+      const docResult = validateK8sResource(rawDoc);
 
-        if (!docResult.isSuccess) {
-          throw new Error(
-            `Invalid K8s resource:
-${await stringifyYamlRelaxed(rawDoc)}
+      if (!docResult.isSuccess) {
+        throw new Error(
+          `Invalid K8s resource:
+${stringifyYamlRelaxed(rawDoc)}
 --------------------------------
 Reasons:
 ${JSON.stringify(docResult.errors, null, 2)}
 `,
-          );
-        }
+        );
+      }
 
-        return docResult.value;
-      }),
-  );
+      return docResult.value;
+    });
 
   return transformedDocs;
 }
