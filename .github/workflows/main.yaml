@@ -57,7 +57,7 @@ jobs:
           nix copy -v --to "s3://${NIX_CACHE_BUCKET_NAME}/cache?region=${NIX_CACHE_BUCKET_REGION}&compression=zstd&parallel-compression=true" "${NIX_OUTPUT}"
 
   release:
-    name: Release
+    name: Release ${{ github.event.inputs.version }}
     if: github.event.inputs.version
     needs: [build]
     runs-on: [self-hosted, nix, general, arm64-linux, small]
@@ -70,7 +70,6 @@ jobs:
       - name: Set version
         if: github.event.inputs.version
         run: ./cli.sh set_version "${{ github.event.inputs.version }}"
-
 
       - name: Publish to JSR
         if: github.event.inputs.version
