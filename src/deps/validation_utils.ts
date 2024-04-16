@@ -1,1 +1,1 @@
-export * from "@wok/utils/validation";
+export * from "jsr:@wok/utils@~1.1.5/validation";

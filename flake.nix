@@ -36,24 +36,40 @@
                 sops
                 ;
             };
-          helmet = pkgs.callPackage hotPot.lib.denoAppBuild
-            {
-              inherit deno;
-              inherit (hotPotPkgs) deno-app-build;
+          helmet =
+            let
               name = "helmet";
               src = builtins.path
                 {
                   path = ./.;
-                  name = "helmet-src";
+                  name = "${name}-src";
                   filter = with pkgs.lib; (path: /* type */_:
                     hasInfix "/src" path ||
-                    hasSuffix "/deno.json" path ||
                     hasSuffix "/deno.lock" path
                   );
                 };
-              appSrcPath = "./src/helmet.ts";
-              denoRunFlags = "-A";
-            };
+              deno-cache = pkgs.callPackage hotPot.lib.denoAppCache {
+                inherit name src deno;
+                cacheArgs = "./src/**/*.ts";
+              };
+              built = pkgs.callPackage hotPot.lib.denoAppBuild
+                {
+                  inherit name deno deno-cache src;
+                  inherit (hotPotPkgs) deno-app-build;
+                  appSrcPath = "./src/helmet.ts";
+                  denoRunFlags = "-A";
+                };
+              denoJson = builtins.fromJSON (builtins.readFile ./deno.json);
+            in
+            pkgs.runCommandLocal "${name}-wrapped"
+              {
+                buildInputs = [ pkgs.makeWrapper ];
+              }
+              ''
+                makeWrapper ${built}/bin/helmet $out/bin/helmet \
+                  --set HELMET_VERSION "${denoJson.version}" \
+                  --prefix PATH : "${pkgs.lib.makeBinPath runtimeInputs}"
+              '';
           vscodeSettings = pkgs.writeTextFile {
             name = "vscode-settings.json";
             text = builtins.toJSON {
@@ -111,15 +127,8 @@
               '';
             };
           packages = {
-            inherit json2ts;
+            inherit json2ts helmet;
             devEnv = devShell.inputDerivation;
-            helmet = pkgs.runCommandLocal "helmet-wrapped"
-              {
-                buildInputs = [ pkgs.makeWrapper ];
-              }
-              ''
-                makeWrapper ${helmet}/bin/helmet $out/bin/helmet --prefix PATH : "${pkgs.lib.makeBinPath runtimeInputs}"
-              '';
           };
           defaultPackage = packages.helmet;
         }

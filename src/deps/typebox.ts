@@ -1,1 +1,1 @@
-export * from "@wok/utils/typebox";
+export * from "jsr:@wok/utils@~1.1.5/typebox";

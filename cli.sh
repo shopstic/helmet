@@ -18,7 +18,7 @@ auto_fmt() {
 }
 
 set_version() {
-  local VERSION=${1:-"latest"}
+  local VERSION=${1:-"dev"}
   local JSR_JSON
   JSR_JSON=$(jq -e --arg VERSION "${VERSION}" '.version=$VERSION' ./deno.json)
   echo "${JSR_JSON}" >./deno.json
@@ -41,14 +41,6 @@ create_release() {
   git push origin "${RELEASE_BRANCH}"
 
   gh release create "${RELEASE_VERSION}" --title "Release ${RELEASE_VERSION}" --notes "" --target "${RELEASE_BRANCH}"
-}
-
-install() {
-  local VERSION=${1:-"latest"}
-  local OUTPUT=${2:-$(mktemp -d)}
-
-  "$0" build "${VERSION}" "${OUTPUT}"
-  deno install -A -f "${OUTPUT}/helmet.js"
 }
 
 update_cache() {

@@ -1,1 +1,1 @@
-export * from "@wok/utils/async";
+export * from "jsr:@wok/utils@~1.1.5/async";

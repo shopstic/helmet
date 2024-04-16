@@ -1,1 +1,1 @@
-export { quoteShell } from "@wok/utils/quote-shell";
+export { quoteShell } from "jsr:@wok/utils@~1.1.5/quote-shell";
