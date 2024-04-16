@@ -19,7 +19,15 @@ auto_fmt() {
 
 set_version() {
   local VERSION=${1:-"latest"}
-  printf "%s\n" "export default \"${VERSION}\";" > ./src/version.ts
+  printf "%s\n" "export default \"${VERSION}\";" >./src/version.ts
+
+  local JSR_JSON
+  JSR_JSON=$(jq -e --arg VERSION "${VERSION}" '.version=$VERSION' ./deno.json)
+  echo "${JSR_JSON}" >./deno.json
+}
+
+jsr_publish() {
+  deno publish --config ./deno.json --allow-slow-types --allow-dirty
 }
 
 create_release() {
@@ -30,7 +38,7 @@ create_release() {
   git config --global user.name "CI Runner"
   git checkout -b "${RELEASE_BRANCH}"
 
-  git add ./src/version.ts
+  git add ./src/version.ts ./deno.json
   git commit -m "Release ${RELEASE_VERSION}"
   git push origin "${RELEASE_BRANCH}"
 
@@ -41,7 +49,7 @@ build() {
   local VERSION=${1:-"latest"}
   local OUTPUT=${2:-$(mktemp -d)}
 
-  printf "%s\n" "export default \"${VERSION}\";" > ./src/version.ts
+  printf "%s\n" "export default \"${VERSION}\";" >./src/version.ts
   deno bundle --lock ./deno.lock "${ENTRY_FILE}" "${OUTPUT}/helmet.js"
 }
 
@@ -54,7 +62,7 @@ install() {
 }
 
 update_cache() {
-  deno cache "${ENTRY_FILE}" "${MOD_FILE}" 
+  deno cache "${ENTRY_FILE}" "${MOD_FILE}"
 }
 
 update_lock() {

@@ -99,6 +99,7 @@
                   inherit (pkgs)
                     gh
                     nodejs_20
+                    jq
                     ;
                   inherit (hotPotPkgs)
                     typescript-eslint
