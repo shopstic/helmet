@@ -564,9 +564,9 @@ export async function typeifyChart(chartPath: string, typesPath: string) {
               schema: adaptCrdSchemaToJsonSchema(schema),
             },
           );
-        } else {
-          Promise.resolve("");
         }
+
+        return Promise.resolve("");
       });
     } else {
       return crd.spec.versions.map((version) => {
@@ -583,9 +583,9 @@ export async function typeifyChart(chartPath: string, typesPath: string) {
               schema,
             },
           );
-        } else {
-          Promise.resolve("");
         }
+
+        return Promise.resolve("");
       });
     }
   });
