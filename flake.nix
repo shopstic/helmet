@@ -27,14 +27,13 @@
           deno = hotPotPkgs.deno_1_42_x;
           runtimeInputs = builtins.attrValues
             {
-              inherit json2ts deno;
+              inherit json2ts;
               inherit (hotPotPkgs)
                 kubernetes-helm;
               inherit (pkgs)
                 kubectl
                 yq-go
                 sops
-                nodejs_20
                 ;
             };
           helmet = pkgs.callPackage hotPot.lib.denoAppBuild
@@ -96,8 +95,10 @@
             {
               buildInputs = runtimeInputs ++ builtins.attrValues
                 {
+                  inherit deno;
                   inherit (pkgs)
                     gh
+                    nodejs_20
                     ;
                   inherit (hotPotPkgs)
                     typescript-eslint
