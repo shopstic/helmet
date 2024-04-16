@@ -1,6 +1,6 @@
 {
   "name": "@wok/helmet",
-  "version": "1.29.1",
+  "version": "1.29.2",
   "exports": {
     ".": "./src/mod.ts",
     "./deps/typebox": "./src/deps/typebox.ts"
