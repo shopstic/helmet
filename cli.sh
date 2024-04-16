@@ -19,8 +19,6 @@ auto_fmt() {
 
 set_version() {
   local VERSION=${1:-"latest"}
-  printf "%s\n" "export default \"${VERSION}\";" >./src/version.ts
-
   local JSR_JSON
   JSR_JSON=$(jq -e --arg VERSION "${VERSION}" '.version=$VERSION' ./deno.json)
   echo "${JSR_JSON}" >./deno.json
@@ -38,19 +36,11 @@ create_release() {
   git config --global user.name "CI Runner"
   git checkout -b "${RELEASE_BRANCH}"
 
-  git add ./src/version.ts ./deno.json
+  git add ./deno.json
   git commit -m "Release ${RELEASE_VERSION}"
   git push origin "${RELEASE_BRANCH}"
 
   gh release create "${RELEASE_VERSION}" --title "Release ${RELEASE_VERSION}" --notes "" --target "${RELEASE_BRANCH}"
-}
-
-build() {
-  local VERSION=${1:-"latest"}
-  local OUTPUT=${2:-$(mktemp -d)}
-
-  printf "%s\n" "export default \"${VERSION}\";" >./src/version.ts
-  deno bundle --lock ./deno.lock "${ENTRY_FILE}" "${OUTPUT}/helmet.js"
 }
 
 install() {
