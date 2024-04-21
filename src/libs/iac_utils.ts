@@ -1,6 +1,6 @@
 import { captureExec, inheritExec, NonZeroExitError, printErrLines } from "../deps/exec_utils.ts";
 import { type K8sCrd, K8sCrdKind, K8sCrdSchema, type K8sResource, K8sResourceSchema } from "../deps/k8s_utils.ts";
-import { expandGlob } from "../deps/std_fs.ts";
+import { expandGlob, fsExists } from "../deps/std_fs.ts";
 import { basename, dirname, fromFileUrl, joinPath } from "../deps/std_path.ts";
 import { parseYaml } from "../deps/std_yaml.ts";
 import { type Static, type TObject, type TProperties, Type } from "../deps/typebox.ts";
@@ -390,9 +390,11 @@ export function defineBundle(
 }
 
 export async function checkAndImport(path: string) {
+  const lockExists = await fsExists(joinPath(Deno.cwd(), "deno.lock"));
+
   try {
     await inheritExec({
-      cmd: ["deno", "check", path],
+      cmd: ["deno", "check", ...(!lockExists ? ["--no-lock"] : []), path],
     });
   } catch (e) {
     if (e instanceof NonZeroExitError) {
