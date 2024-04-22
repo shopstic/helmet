@@ -57,7 +57,7 @@
                   inherit name deno deno-cache src;
                   inherit (hotPotPkgs) deno-app-build;
                   appSrcPath = "./src/helmet.ts";
-                  denoRunFlags = "-A";
+                  denoRunFlags = "-A --no-lock";
                 };
               denoJson = builtins.fromJSON (builtins.readFile ./deno.json);
             in
