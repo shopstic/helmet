@@ -51,6 +51,7 @@ async function helmInstall(
     ? [
       "helm",
       "upgrade",
+      "--disable-openapi-validation",
       "-n",
       namespace,
       "--history-max=2",
@@ -67,6 +68,7 @@ async function helmInstall(
     : [
       "helm",
       "install",
+      "--disable-openapi-validation",
       "-n",
       namespace,
       ...(wait ? ["--wait"] : []),

@@ -263,11 +263,11 @@ export async function helmTemplate(
   const helmTemplateCmd = [
     "helm",
     "template",
+    "--disable-openapi-validation",
     "-n",
     chartInstance.namespace,
     "-f",
     "-",
-    "--disable-openapi-validation",
     "--kube-version",
     kubeVersion,
     ...(allApiVersions.flatMap((v) => ["--api-versions", v])),
