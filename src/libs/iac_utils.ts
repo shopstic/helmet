@@ -267,6 +267,7 @@ export async function helmTemplate(
     chartInstance.namespace,
     "-f",
     "-",
+    "--disable-openapi-validation",
     "--kube-version",
     kubeVersion,
     ...(allApiVersions.flatMap((v) => ["--api-versions", v])),
