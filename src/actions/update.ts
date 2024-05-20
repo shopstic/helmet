@@ -428,7 +428,7 @@ async function updateHelmRepoChart({
 }
 
 export default createCliAction(
-  Type.Object({
+  {
     manifest: Type.String({
       description: "Path to the manifest module",
       examples: ["./manifest.ts"],
@@ -444,7 +444,7 @@ export default createCliAction(
     only: Type.Optional(Type.String({
       description: "Optional filter which partially matches the name of only a certain chart to update",
     })),
-  }),
+  },
   async ({ manifest, charts: chartsPath, types: typesPath, only }) => {
     const resolvedManifest = resolvePath(manifest);
     const resolvedChartsPath = resolvePath(chartsPath);

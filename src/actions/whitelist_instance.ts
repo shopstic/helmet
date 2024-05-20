@@ -71,12 +71,12 @@ export async function updateWhitelist(
 }
 
 export default createCliAction(
-  Type.Object({
+  {
     path: Type.String({
       description: "Path to the instance module",
       examples: ["./instances/prod.ts"],
     }),
-  }),
+  },
   async ({ path }) => {
     const source = resolvePath(path);
 

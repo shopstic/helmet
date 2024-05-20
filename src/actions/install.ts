@@ -1,6 +1,6 @@
 import { captureExec, inheritExec, printErrLines, printOutLines } from "../deps/exec_utils.ts";
 import { validate } from "../deps/validation_utils.ts";
-import { type Static, Type } from "../deps/typebox.ts";
+import { type Static, type TObject, Type } from "../deps/typebox.ts";
 import { joinPath, resolvePath } from "../deps/std_path.ts";
 import { expandGlobSync } from "../deps/std_fs.ts";
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
@@ -118,7 +118,7 @@ async function helmInstall(
   });
 }
 
-export const ParamsSchema = Type.Object({
+export const ParamsSchema = {
   name: Type.String({
     description:
       "Helm release base name. This will be used as the prefx of the different sub-releases (*-crds, *-namespaces and *-resources)",
@@ -164,7 +164,7 @@ export const ParamsSchema = Type.Object({
     default: false,
     examples: [false],
   })),
-});
+};
 
 export async function install(
   {
@@ -178,7 +178,7 @@ export async function install(
     createNamespace = false,
     debug = false,
     timeout,
-  }: Static<typeof ParamsSchema>,
+  }: Static<TObject<typeof ParamsSchema>>,
 ) {
   const resolvedSource = resolvePath(source);
 

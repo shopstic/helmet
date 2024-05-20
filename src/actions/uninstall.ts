@@ -3,7 +3,7 @@ import { inheritExec } from "../deps/exec_utils.ts";
 import { Type } from "../deps/typebox.ts";
 
 export default createCliAction(
-  Type.Object({
+  {
     name: Type.String({
       description: "Instance name to uninstall",
       examples: ["iac-my-stack"],
@@ -12,7 +12,7 @@ export default createCliAction(
       description: "The namespace where corresponding Helm releases of this instance were installed to",
       examples: ["iac-my-stack"],
     }),
-  }),
+  },
   async ({ name, namespace }) => {
     await inheritExec({
       cmd: ["helm", "uninstall", "-n", namespace, `${name}-resources`],

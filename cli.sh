@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+shopt -s globstar
 
 ENTRY_FILE="./src/helmet.ts"
 MOD_FILE="./src/mod.ts"
@@ -7,6 +8,8 @@ MOD_FILE="./src/mod.ts"
 code_quality() {
   echo "Checking formatting..."
   deno fmt --check ./src
+  echo "Checking..."
+  deno check ./src/**/*.ts
   echo "Linting..."
   deno lint ./src
   echo "Running eslint..."

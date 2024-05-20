@@ -1,8 +1,7 @@
 import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
-import { Type } from "../deps/typebox.ts";
 
 export default createCliAction(
-  Type.Object({}),
+  {},
   () => {
     console.log(JSON.stringify(
       {

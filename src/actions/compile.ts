@@ -268,28 +268,25 @@ export async function compile(
   );
 }
 
-export default createCliAction(
-  Type.Object({
-    version: Type.String({
-      description: "Version to write to the generated Chart.yaml",
-      examples: ["1.0.0"],
-    }),
-    source: Type.String({
-      description: "Path to the instance module's source",
-      examples: ["./instances/prod.ts"],
-    }),
-    destination: Type.String({
-      description: "Destination path to generate the Helm chart to",
-      examples: ["/path/to/compiled-prod-chart"],
-    }),
+export default createCliAction({
+  version: Type.String({
+    description: "Version to write to the generated Chart.yaml",
+    examples: ["1.0.0"],
   }),
-  async ({ version, source, destination }) => {
-    await compile({
-      version,
-      source,
-      destination,
-    });
+  source: Type.String({
+    description: "Path to the instance module's source",
+    examples: ["./instances/prod.ts"],
+  }),
+  destination: Type.String({
+    description: "Destination path to generate the Helm chart to",
+    examples: ["/path/to/compiled-prod-chart"],
+  }),
+}, async ({ version, source, destination }) => {
+  await compile({
+    version,
+    source,
+    destination,
+  });
 
-    return ExitCode.Zero;
-  },
-);
+  return ExitCode.Zero;
+});

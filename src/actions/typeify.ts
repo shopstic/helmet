@@ -685,7 +685,7 @@ ${crdInterfaces}
 }
 
 export default createCliAction(
-  Type.Object({
+  {
     charts: Type.String({
       description: "Glob pattern to match directories of Helm charts, for which types will be generated",
       examples: ["./charts/*"],
@@ -694,7 +694,7 @@ export default createCliAction(
       description: "Path to the destination directory where types will be generated into",
       examples: ["./types"],
     }),
-  }),
+  },
   async ({ charts, types }) => {
     const resolvedTypesPath = resolvePath(types);
 

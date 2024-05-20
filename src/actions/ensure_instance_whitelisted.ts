@@ -7,12 +7,12 @@ import { importBundleModule } from "../libs/iac_utils.ts";
 import { fetchCurrentWhitelist } from "./whitelist_instance.ts";
 
 export default createCliAction(
-  Type.Object({
+  {
     path: Type.String({
       description: "Path to the instance module",
       examples: ["./instances/prod.ts"],
     }),
-  }),
+  },
   async ({ path }) => {
     const source = resolvePath(path);
 

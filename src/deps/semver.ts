@@ -5,4 +5,4 @@ export {
   type Range as SemverRange,
   type SemVer,
   tryParse as semverTryParse,
-} from "jsr:@std/semver@^0.221.0";
+} from "jsr:@std/semver@0.224.0";
