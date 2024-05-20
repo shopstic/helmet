@@ -1,1 +1,1 @@
-export * from "jsr:@wok/utils@1.3.1/k8s";
+export * from "jsr:@wok/utils@1.3.2/k8s";

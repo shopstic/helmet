@@ -19,7 +19,7 @@
       "jsr:@wok/k8s@1.30.1+1": "jsr:@wok/k8s@1.30.1+1",
       "jsr:@wok/openapi-client@1.0.1": "jsr:@wok/openapi-client@1.0.1",
       "jsr:@wok/typebox@0.32.30+1": "jsr:@wok/typebox@0.32.30+1",
-      "jsr:@wok/utils@1.3.1": "jsr:@wok/utils@1.3.1"
+      "jsr:@wok/utils@1.3.2": "jsr:@wok/utils@1.3.2"
     },
     "jsr": {
       "@std/assert@0.224.0": {
@@ -88,11 +88,12 @@
       "@wok/typebox@0.32.30+1": {
         "integrity": "da8949d6702f140b3b02c052e636adc35711e67a321be825fe5f43f85038e80b"
       },
-      "@wok/utils@1.3.1": {
-        "integrity": "b77697352043cb9d1dcc17cca52b0b2b30691ae77d8ad45112a75f090e1eff66",
+      "@wok/utils@1.3.2": {
+        "integrity": "34fea8257436378edda23621c9c1da7d7672e96e8f4e51f8baedf98d394238ab",
         "dependencies": [
           "jsr:@std/async@0.224.0",
           "jsr:@std/cli@0.224.0",
+          "jsr:@std/fmt@0.224.0",
           "jsr:@std/streams@0.224.0",
           "jsr:@wok/case@1.0.1",
           "jsr:@wok/k8s@1.30.1+1",
