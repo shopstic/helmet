@@ -1,12 +1,17 @@
 {
   "name": "@wok/helmet",
-  "version": "dev",
+  "version": "1.30.0",
   "exports": {
     ".": "./src/mod.ts",
     "./deps/typebox": "./src/deps/typebox.ts"
   },
   "publish": {
-    "include": ["./src", "./deno.json", "./README.md", "./LICENSE"]
+    "include": [
+      "./src",
+      "./deno.json",
+      "./README.md",
+      "./LICENSE"
+    ]
   },
   "tasks": {
     "check_all": "deno check **/*.ts"
@@ -24,7 +29,9 @@
       "examples"
     ],
     "rules": {
-      "exclude": ["no-slow-types"]
+      "exclude": [
+        "no-slow-types"
+      ]
     }
   }
 }
