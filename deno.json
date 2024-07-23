@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "exports": {
     ".": "./src/mod.ts",
-    "./deps/typebox": "./src/deps/typebox.ts"
+    "./deps/typebox": "./src/deps/typebox.ts",
+    "./deps/k8s": "./src/deps/k8s.ts"
   },
   "publish": {
     "include": ["./src", "./deno.json", "./README.md", "./LICENSE"]
