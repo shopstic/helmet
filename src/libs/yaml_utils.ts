@@ -1,5 +1,5 @@
-import { stringifyYaml } from "../deps/std_yaml.ts";
-import { captureExec } from "../deps/exec_utils.ts";
+import { stringify as stringifyYaml } from "@std/yaml";
+import { captureExec } from "@wok/utils/exec";
 
 export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
   try {

@@ -1,15 +1,15 @@
 import { deepMerge } from "../libs/patch_utils.ts";
 
 import { checkAndImport, type ImportDef, readChartCrds, type TypeifyPatch } from "../libs/iac_utils.ts";
-import { basename, joinPath, resolvePath } from "../deps/std_path.ts";
-import { expandGlobSync, fsExists } from "../deps/std_fs.ts";
-import { parseYaml } from "../deps/std_yaml.ts";
-import { pascalCase } from "../deps/case.ts";
-import { captureExec, inheritExec, printErrLines } from "../deps/exec_utils.ts";
-import { K8sCrdApiVersionV1beta1 } from "../deps/k8s_utils.ts";
-import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
-import { Type } from "../deps/typebox.ts";
-import { cyan, gray } from "../deps/std_fmt_colors.ts";
+import { basename, join as joinPath, resolve as resolvePath } from "@std/path";
+import { exists as fsExists, expandGlobSync } from "@std/fs";
+import { parse as parseYaml } from "@std/yaml";
+import { pascalCase } from "@wok/case";
+import { captureExec, inheritExec, printErrLines } from "@wok/utils/exec";
+import { K8sCrdApiVersionV1beta1 } from "@wok/utils/k8s";
+import { createCliAction, ExitCode } from "@wok/utils/cli";
+import { Type } from "@wok/utils/typebox";
+import { cyan, gray } from "@std/fmt/colors";
 
 export type ClassifiedType =
   | "array"

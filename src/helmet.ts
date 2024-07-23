@@ -6,9 +6,9 @@ import update from "./actions/update.ts";
 import whitelistInstance from "./actions/whitelist_instance.ts";
 import blacklistInstance from "./actions/blacklist_instance.ts";
 import ensureInstanceWhitelisted from "./actions/ensure_instance_whitelisted.ts";
-import { CliProgram } from "./deps/cli_utils.ts";
+import { CliProgram } from "@wok/utils/cli";
 import showVersion from "./actions/show_version.ts";
-import { bold, red } from "./deps/std_fmt_colors.ts";
+import { bold, red } from "@std/fmt/colors";
 
 const program = new CliProgram()
   .addAction("compile", compile)

@@ -1,4 +1,4 @@
-import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
+import { createCliAction, ExitCode } from "@wok/utils/cli";
 
 export default createCliAction(
   {},

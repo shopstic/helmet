@@ -1,9 +1,9 @@
-import { inheritExec, printErrLines, printOutLines } from "../deps/exec_utils.ts";
-import { createK8sConfigMap } from "../deps/k8s_utils.ts";
-import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
-import { Type } from "../deps/typebox.ts";
-import { resolvePath } from "../deps/std_path.ts";
-import { gray } from "../deps/std_fmt_colors.ts";
+import { inheritExec, printErrLines, printOutLines } from "@wok/utils/exec";
+import { createK8sConfigMap } from "@wok/utils/k8s";
+import { createCliAction, ExitCode } from "@wok/utils/cli";
+import { Type } from "@wok/utils/typebox";
+import { resolve as resolvePath } from "@std/path";
+import { gray } from "@std/fmt/colors";
 import { importBundleModule } from "../libs/iac_utils.ts";
 
 export const CONFIG_MAP_NAME = "helmet-whitelist";

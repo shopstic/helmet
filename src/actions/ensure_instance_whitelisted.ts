@@ -1,8 +1,8 @@
-import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
-import { captureExec } from "../deps/exec_utils.ts";
-import { bold, cyan, red } from "../deps/std_fmt_colors.ts";
-import { resolvePath } from "../deps/std_path.ts";
-import { Type } from "../deps/typebox.ts";
+import { createCliAction, ExitCode } from "@wok/utils/cli";
+import { captureExec } from "@wok/utils/exec";
+import { bold, cyan, red } from "@std/fmt/colors";
+import { resolve as resolvePath } from "@std/path";
+import { Type } from "@wok/utils/typebox";
 import { importBundleModule } from "../libs/iac_utils.ts";
 import { fetchCurrentWhitelist } from "./whitelist_instance.ts";
 

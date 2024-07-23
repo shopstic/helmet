@@ -1,12 +1,18 @@
-import { inheritExec } from "../deps/exec_utils.ts";
-import { expandGlobSync, fsExists } from "../deps/std_fs.ts";
-import { dirname, joinPath, resolvePath } from "../deps/std_path.ts";
-import { parseYaml } from "../deps/std_yaml.ts";
-import { Type } from "../deps/typebox.ts";
-import { validate } from "../deps/validation_utils.ts";
-import { maxSatisfyingSemver, type SemVer, semverFormat, semverParseRange, semverTryParse } from "../deps/semver.ts";
-import { quoteShell } from "../deps/quote_shell.ts";
-import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
+import { inheritExec } from "@wok/utils/exec";
+import { exists as fsExists, expandGlobSync } from "@std/fs";
+import { dirname, join as joinPath, resolve as resolvePath } from "@std/path";
+import { parse as parseYaml } from "@std/yaml";
+import { Type } from "@wok/utils/typebox";
+import { validate } from "@wok/utils/validation";
+import {
+  format as semverFormat,
+  maxSatisfying as maxSatisfyingSemver,
+  parseRange as semverParseRange,
+  type SemVer,
+  tryParse as semverTryParse,
+} from "@std/semver";
+import { quoteShell } from "@wok/utils/quote-shell";
+import { createCliAction, ExitCode } from "@wok/utils/cli";
 import {
   type ChartMetadata,
   ChartMetadataSchema,
@@ -19,7 +25,7 @@ import {
   RemoteChartSource,
 } from "../libs/types.ts";
 import { typeifyChart } from "./typeify.ts";
-import { bold, gray, green, red } from "../deps/std_fmt_colors.ts";
+import { bold, gray, green, red } from "@std/fmt/colors";
 import { checkAndImport } from "../mod.ts";
 
 interface ChartUpdateFailure {

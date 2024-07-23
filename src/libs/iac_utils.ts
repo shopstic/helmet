@@ -1,10 +1,10 @@
-import { captureExec, inheritExec, NonZeroExitError, printErrLines } from "../deps/exec_utils.ts";
-import { type K8sCrd, K8sCrdKind, K8sCrdSchema, type K8sResource, K8sResourceSchema } from "../deps/k8s_utils.ts";
-import { expandGlob, fsExists } from "../deps/std_fs.ts";
-import { basename, dirname, fromFileUrl, joinPath } from "../deps/std_path.ts";
-import { parseYaml } from "../deps/std_yaml.ts";
-import { type Static, type TObject, type TProperties, Type } from "../deps/typebox.ts";
-import { createValidator, validate, type ValidationResult } from "../deps/validation_utils.ts";
+import { captureExec, inheritExec, NonZeroExitError, printErrLines } from "@wok/utils/exec";
+import { type K8sCrd, K8sCrdKind, K8sCrdSchema, type K8sResource, K8sResourceSchema } from "@wok/utils/k8s";
+import { exists as fsExists, expandGlob } from "@std/fs";
+import { basename, dirname, fromFileUrl, join as joinPath } from "@std/path";
+import { parse as parseYaml } from "@std/yaml";
+import { type Static, type TObject, type TProperties, Type } from "@wok/utils/typebox";
+import { createValidator, validate, type ValidationResult } from "@wok/utils/validation";
 import {
   type ChartInstanceConfig,
   type ChartMetadata,
@@ -14,9 +14,9 @@ import {
   KubectlClientVersionCmdOutputSchema,
   KubectlServerVersionCmdOutputSchema,
 } from "./types.ts";
-import { memoizePromise } from "../deps/async_utils.ts";
+import { memoizePromise } from "@wok/utils/async";
 import { parseMultiDocumentsYaml, stringifyYamlRelaxed } from "./yaml_utils.ts";
-import { gray } from "../deps/std_fmt_colors.ts";
+import { gray } from "@std/fmt/colors";
 
 export interface ImportDef {
   props: string[];

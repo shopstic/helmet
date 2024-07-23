@@ -1,6 +1,6 @@
-import type { K8sCrd, K8sResource } from "../deps/k8s_utils.ts";
-import type { SemverRange } from "../deps/semver.ts";
-import { FlexObject, type Static, Type } from "../deps/typebox.ts";
+import type { K8sCrd, K8sResource } from "@wok/utils/k8s";
+import type { Range as SemverRange } from "@std/semver";
+import { FlexObject, type Static, Type } from "@wok/utils/typebox";
 
 export const ChartRepoReleaseSchema = FlexObject({
   apiVersion: Type.Optional(Type.String()),

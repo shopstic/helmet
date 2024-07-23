@@ -1,11 +1,11 @@
-import { captureExec, inheritExec, printErrLines, printOutLines } from "../deps/exec_utils.ts";
-import { validate } from "../deps/validation_utils.ts";
-import { type Static, type TObject, Type } from "../deps/typebox.ts";
-import { joinPath, resolvePath } from "../deps/std_path.ts";
-import { expandGlobSync } from "../deps/std_fs.ts";
-import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
-import { cyan, gray } from "../deps/std_fmt_colors.ts";
-import { readerFromStreamReader, readLines } from "../deps/std_io.ts";
+import { captureExec, inheritExec, printErrLines, printOutLines } from "@wok/utils/exec";
+import { validate } from "@wok/utils/validation";
+import { type Static, type TObject, Type } from "@wok/utils/typebox";
+import { join as joinPath, resolve as resolvePath } from "@std/path";
+import { expandGlobSync } from "@std/fs";
+import { createCliAction, ExitCode } from "@wok/utils/cli";
+import { cyan, gray } from "@std/fmt/colors";
+import { readerFromStreamReader, readLines } from "@std/io";
 import { HelmLsResultSchema } from "../libs/iac_utils.ts";
 
 async function helmInstall(

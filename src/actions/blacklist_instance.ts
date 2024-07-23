@@ -1,8 +1,8 @@
-import { Type } from "../deps/typebox.ts";
-import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
+import { Type } from "@wok/utils/typebox";
+import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { fetchCurrentWhitelist, updateWhitelist } from "./whitelist_instance.ts";
-import { resolvePath } from "../deps/std_path.ts";
-import { bold, red } from "../deps/std_fmt_colors.ts";
+import { resolve as resolvePath } from "@std/path";
+import { bold, red } from "@std/fmt/colors";
 import { importBundleModule } from "../libs/iac_utils.ts";
 
 export default createCliAction(

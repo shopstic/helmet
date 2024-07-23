@@ -1,11 +1,11 @@
 import { stringifyYamlRelaxed } from "../libs/yaml_utils.ts";
 import type { HelmetChartInstance } from "../libs/types.ts";
-import { joinPath, resolvePath } from "../deps/std_path.ts";
-import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
-import { Type } from "../deps/typebox.ts";
-import { cyan } from "../deps/std_fmt_colors.ts";
+import { join as joinPath, resolve as resolvePath } from "@std/path";
+import { createCliAction, ExitCode } from "@wok/utils/cli";
+import { Type } from "@wok/utils/typebox";
+import { cyan } from "@std/fmt/colors";
 import { importBundleModule } from "../libs/iac_utils.ts";
-import { K8sKind } from "../deps/k8s_utils.ts";
+import { K8sKind } from "@wok/utils/k8s";
 
 async function generateChildChart(
   { crdsPath, resourcesPath, namespacesPath, instance }: {

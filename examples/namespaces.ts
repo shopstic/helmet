@@ -1,5 +1,4 @@
-import { createK8sNamespace } from "../src/deps/k8s_utils.ts";
-import { defineBundle } from "../src/libs/iac_utils.ts";
+import { createK8sNamespace, defineBundle } from "../src/mod.ts";
 
 export default defineBundle({
   releaseId: "examples-namespaces",

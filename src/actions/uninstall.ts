@@ -1,6 +1,6 @@
-import { createCliAction, ExitCode } from "../deps/cli_utils.ts";
-import { inheritExec } from "../deps/exec_utils.ts";
-import { Type } from "../deps/typebox.ts";
+import { createCliAction, ExitCode } from "@wok/utils/cli";
+import { inheritExec } from "@wok/utils/exec";
+import { Type } from "@wok/utils/typebox";
 
 export default createCliAction(
   {
