@@ -5,6 +5,11 @@ shopt -s globstar
 ENTRY_FILE="./src/helmet.ts"
 MOD_FILE="./src/mod.ts"
 
+update_deps() {
+  # shellcheck disable=SC2046
+  deno add $(jq -r '.imports | keys[]' < deno.json)
+}
+
 code_quality() {
   echo "Checking formatting..."
   deno fmt --check ./src
@@ -52,7 +57,7 @@ update_cache() {
 
 update_lock() {
   rm -f deno.lock
-  deno cache --reload --lock=deno.lock --lock-write "${ENTRY_FILE}" "${MOD_FILE}"
+  deno cache --reload --lock=deno.lock --frozen=false "${ENTRY_FILE}" "${MOD_FILE}"
 }
 
 run() {
