@@ -6,7 +6,7 @@ export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
     return stringifyYaml(value);
   } catch (e) {
     if (
-      e.name === "YAMLError" &&
+      e.name === "TypeError" &&
       e.message.indexOf("unacceptable kind of an object to dump") !== -1
     ) {
       return stringifyYaml(JSON.parse(JSON.stringify(value)));
