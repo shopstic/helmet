@@ -1,22 +1,26 @@
 import type { K8sCrd, K8sResource } from "@wok/utils/k8s";
 import type { Range as SemverRange } from "@std/semver";
-import { FlexObject, type Static, Type } from "@wok/utils/typebox";
+import { type Static, Type } from "@wok/typebox";
 
-export const ChartRepoReleaseSchema = FlexObject({
+export const ChartRepoReleaseSchema = Type.Object({
   apiVersion: Type.Optional(Type.String()),
   version: Type.String(),
   name: Type.String(),
   urls: Type.Array(Type.String()),
+}, {
+  additionalProperties: true,
 });
 
 export type ChartRepoRelease = Static<typeof ChartRepoReleaseSchema>;
 
-export const ChartRepoIndexSchema = FlexObject({
+export const ChartRepoIndexSchema = Type.Object({
   apiVersion: Type.String(),
   entries: Type.Record(
     Type.String(),
     Type.Array(ChartRepoReleaseSchema),
   ),
+}, {
+  additionalProperties: true,
 });
 
 export type ChartRepoIndex = Static<typeof ChartRepoIndexSchema>;
@@ -68,7 +72,7 @@ export type RemoteChartConfigMap = {
   [name: string]: RemoteChartConfig;
 };
 
-export const ChartMetadataSchema = FlexObject({
+export const ChartMetadataSchema = Type.Object({
   apiVersion: Type.String(),
   name: Type.String(),
   version: Type.String(),
@@ -84,6 +88,8 @@ export const ChartMetadataSchema = FlexObject({
   appVersion: Type.Optional(Type.String()), // The version of the app that this contains (optional). This needn't be SemVer.
   deprecated: Type.Optional(Type.Boolean()), // Whether this chart is deprecated (optional, boolean)
   annotations: Type.Optional(Type.Any()),
+}, {
+  additionalProperties: true,
 });
 
 export type ChartMetadata = Static<typeof ChartMetadataSchema>;
@@ -110,14 +116,22 @@ export interface HelmetBundle {
   create: () => Promise<HelmetChartInstance[]>;
 }
 
-export const KubectlClientVersionCmdOutputSchema = FlexObject({
-  clientVersion: FlexObject({
+export const KubectlClientVersionCmdOutputSchema = Type.Object({
+  clientVersion: Type.Object({
     gitVersion: Type.String({ minLength: 1 }),
+  }, {
+    additionalProperties: true,
   }),
+}, {
+  additionalProperties: true,
 });
 
-export const KubectlServerVersionCmdOutputSchema = FlexObject({
-  serverVersion: FlexObject({
+export const KubectlServerVersionCmdOutputSchema = Type.Object({
+  serverVersion: Type.Object({
     gitVersion: Type.String({ minLength: 1 }),
+  }, {
+    additionalProperties: true,
   }),
+}, {
+  additionalProperties: true,
 });

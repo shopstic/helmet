@@ -1,4 +1,4 @@
-import { Type } from "@wok/utils/typebox";
+import { Type } from "@wok/typebox";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { fetchCurrentWhitelist, updateWhitelist } from "./whitelist_instance.ts";
 import { resolve as resolvePath } from "@std/path";

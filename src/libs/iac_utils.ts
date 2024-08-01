@@ -3,7 +3,7 @@ import { type K8sCrd, K8sCrdKind, K8sCrdSchema, type K8sResource, K8sResourceSch
 import { exists as fsExists, expandGlob } from "@std/fs";
 import { basename, dirname, fromFileUrl, join as joinPath } from "@std/path";
 import { parse as parseYaml } from "@std/yaml";
-import { type Static, type TObject, type TProperties, Type } from "@wok/utils/typebox";
+import { type Static, type TObject, type TProperties, Type } from "@wok/typebox";
 import { createValidator, validate, type ValidationResult } from "@wok/utils/validation";
 import {
   type ChartInstanceConfig,

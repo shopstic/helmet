@@ -2,7 +2,7 @@ import { inheritExec } from "@wok/utils/exec";
 import { exists as fsExists, expandGlobSync } from "@std/fs";
 import { dirname, join as joinPath, resolve as resolvePath } from "@std/path";
 import { parse as parseYaml } from "@std/yaml";
-import { Type } from "@wok/utils/typebox";
+import { Type } from "@wok/typebox";
 import { validate } from "@wok/utils/validation";
 import {
   format as semverFormat,

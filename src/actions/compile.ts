@@ -2,7 +2,7 @@ import { stringifyYamlRelaxed } from "../libs/yaml_utils.ts";
 import type { HelmetChartInstance } from "../libs/types.ts";
 import { join as joinPath, resolve as resolvePath } from "@std/path";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
-import { Type } from "@wok/utils/typebox";
+import { Type } from "@wok/typebox";
 import { cyan } from "@std/fmt/colors";
 import { importBundleModule } from "../libs/iac_utils.ts";
 import { K8sKind } from "@wok/utils/k8s";

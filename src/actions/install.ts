@@ -1,6 +1,6 @@
 import { captureExec, inheritExec, printErrLines, printOutLines } from "@wok/utils/exec";
 import { validate } from "@wok/utils/validation";
-import { type Static, type TObject, Type } from "@wok/utils/typebox";
+import { type Static, type TObject, Type } from "@wok/typebox";
 import { join as joinPath, resolve as resolvePath } from "@std/path";
 import { expandGlobSync } from "@std/fs";
 import { createCliAction, ExitCode } from "@wok/utils/cli";

@@ -8,7 +8,7 @@ import { pascalCase } from "@wok/case";
 import { captureExec, inheritExec, printErrLines } from "@wok/utils/exec";
 import { K8sCrdApiVersionV1beta1 } from "@wok/utils/k8s";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
-import { Type } from "@wok/utils/typebox";
+import { Type } from "@wok/typebox";
 import { cyan, gray } from "@std/fmt/colors";
 
 export type ClassifiedType =

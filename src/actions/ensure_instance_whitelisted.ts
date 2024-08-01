@@ -2,7 +2,7 @@ import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { captureExec } from "@wok/utils/exec";
 import { bold, cyan, red } from "@std/fmt/colors";
 import { resolve as resolvePath } from "@std/path";
-import { Type } from "@wok/utils/typebox";
+import { Type } from "@wok/typebox";
 import { importBundleModule } from "../libs/iac_utils.ts";
 import { fetchCurrentWhitelist } from "./whitelist_instance.ts";
 

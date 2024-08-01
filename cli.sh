@@ -6,8 +6,7 @@ ENTRY_FILE="./src/helmet.ts"
 MOD_FILE="./src/mod.ts"
 
 update_deps() {
-  # shellcheck disable=SC2046
-  deno add $(jq -r '.imports | keys[]' < deno.json)
+  deno run -A jsr:@wok/deup@1.0.3
 }
 
 code_quality() {

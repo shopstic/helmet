@@ -1,6 +1,6 @@
 import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { inheritExec } from "@wok/utils/exec";
-import { Type } from "@wok/utils/typebox";
+import { Type } from "@wok/typebox";
 
 export default createCliAction(
   {

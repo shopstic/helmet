@@ -20,8 +20,8 @@
       "jsr:@wok/case@^1.0.1": "jsr:@wok/case@1.0.1",
       "jsr:@wok/k8s@^1.30.3": "jsr:@wok/k8s@1.30.3",
       "jsr:@wok/openapi-client@^1.0.1": "jsr:@wok/openapi-client@1.0.1",
-      "jsr:@wok/typebox@^0.32.35": "jsr:@wok/typebox@0.32.35",
-      "jsr:@wok/utils@^1.3.6": "jsr:@wok/utils@1.3.6"
+      "jsr:@wok/typebox@^0.32.36": "jsr:@wok/typebox@0.32.36",
+      "jsr:@wok/utils@^1.4.0": "jsr:@wok/utils@1.4.0"
     },
     "jsr": {
       "@std/assert@1.0.1": {
@@ -92,11 +92,11 @@
       "@wok/openapi-client@1.0.1": {
         "integrity": "267fb8a139d1b6719b1ad0ffbefbd190df8e95d32d53bd010d78694d81a777ba"
       },
-      "@wok/typebox@0.32.35": {
-        "integrity": "39697de76b4a599dd9a8fcc69b4aef662a7c8f28a52eca1d5429d40748880a89"
+      "@wok/typebox@0.32.36": {
+        "integrity": "4c751fb09bfa5149a82e40be2f2b8fcd120763407fe1be5b3afea4db7106b219"
       },
-      "@wok/utils@1.3.6": {
-        "integrity": "a1e3394f8b52a6d1036ca73ffcc3b564083ee5e4126791af5ee94964fbe37c9d",
+      "@wok/utils@1.4.0": {
+        "integrity": "f2b00ea832685b39ae079373db468fcede76e533cc51d01adc6fa6ad8aaecca3",
         "dependencies": [
           "jsr:@std/async@^1.0.1",
           "jsr:@std/cli@^1.0.1",
@@ -104,7 +104,7 @@
           "jsr:@std/streams@^1.0.0",
           "jsr:@wok/case@^1.0.1",
           "jsr:@wok/k8s@^1.30.3",
-          "jsr:@wok/typebox@^0.32.35"
+          "jsr:@wok/typebox@^0.32.36"
         ]
       }
     }
@@ -120,7 +120,8 @@
       "jsr:@std/semver@^0.224.3",
       "jsr:@std/yaml@^1.0.0",
       "jsr:@wok/case@^1.0.1",
-      "jsr:@wok/utils@^1.3.6"
+      "jsr:@wok/typebox@^0.32.36",
+      "jsr:@wok/utils@^1.4.0"
     ]
   }
 }

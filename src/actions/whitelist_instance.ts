@@ -1,7 +1,7 @@
 import { inheritExec, printErrLines, printOutLines } from "@wok/utils/exec";
 import { createK8sConfigMap } from "@wok/utils/k8s";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
-import { Type } from "@wok/utils/typebox";
+import { Type } from "@wok/typebox";
 import { resolve as resolvePath } from "@std/path";
 import { gray } from "@std/fmt/colors";
 import { importBundleModule } from "../libs/iac_utils.ts";
