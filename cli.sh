@@ -6,7 +6,7 @@ ENTRY_FILE="./src/helmet.ts"
 MOD_FILE="./src/mod.ts"
 
 update_deps() {
-  deno run -A jsr:@wok/deup@1.0.3
+  deno run -A jsr:@wok/deup@1.2.0 update
 }
 
 code_quality() {

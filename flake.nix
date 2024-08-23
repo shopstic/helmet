@@ -70,6 +70,7 @@
                       DENO_RUN_FLAGS+=("--config=deno.jsonc")
                     fi
                   '';
+                  allowNpmSpecifiers = true;
                 };
               denoJson = builtins.fromJSON (builtins.readFile ./deno.json);
             in
