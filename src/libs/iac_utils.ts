@@ -14,7 +14,7 @@ import {
   KubectlClientVersionCmdOutputSchema,
   KubectlServerVersionCmdOutputSchema,
 } from "./types.ts";
-import { memoizePromise } from "@wok/utils/async";
+import { memoize } from "@wok/utils/memoize";
 import { parseMultiDocumentsYaml, stringifyYamlRelaxed } from "./yaml_utils.ts";
 import { gray } from "@std/fmt/colors";
 
@@ -64,7 +64,7 @@ export function createK8sSecretsDecryptor<T extends TProperties>(
   const path = dirname(filePath);
   const secretsFilePath = joinPath(path, `${name}.yaml`);
 
-  return memoizePromise(async () => {
+  return memoize(async () => {
     const result = await decryptAndValidateSecrets(
       schema,
       secretsFilePath,
@@ -160,7 +160,7 @@ export async function readChartCrds(chartPath: string): Promise<K8sCrd[]> {
 
 const validateK8sResource = createValidator(K8sResourceSchema);
 
-const memoizedAllApiVersions = memoizePromise(async () => {
+const memoizedAllApiVersions = memoize(async () => {
   const apiVersionsFromEnv = Deno.env.get("HELMET_KUBECTL_API_VERSIONS");
 
   if (typeof apiVersionsFromEnv === "string") {
@@ -215,7 +215,7 @@ const memoizedAllApiVersions = memoizePromise(async () => {
   );
 });
 
-const memoizedKubeVersion = memoizePromise(async () => {
+const memoizedKubeVersion = memoize(async () => {
   const useServerVersion = Boolean(
     Deno.env.get("HELMET_KUBECTL_USE_SERVER_VERSION"),
   );

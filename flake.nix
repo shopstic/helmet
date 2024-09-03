@@ -49,9 +49,11 @@
                     hasSuffix "/deno.lock" path
                   );
                 };
-              deno-cache = pkgs.callPackage hotPot.lib.denoAppCache {
+              deno-cache = pkgs.callPackage hotPot.lib.denoAppCache2 {
                 inherit name src deno;
-                cacheArgs = "./src/**/*.ts";
+                lock-file = ./deno.lock;
+                config-file = ./deno.json;
+                deno-gen-cache-entry = hotPotPkgs.deno-gen-cache-entry;
               };
               built = pkgs.callPackage hotPot.lib.denoAppBuild
                 {
