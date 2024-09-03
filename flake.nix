@@ -20,6 +20,7 @@
               inherit system;
             };
           hotPotPkgs = hotPot.packages.${system};
+          hotPotLib = hotPot.lib.${system};
           json2ts = pkgs.callPackage ./nix/json2ts {
             npmlock2nix = (import npmlock2nix { inherit pkgs; }).v2;
             nodejs = pkgs.nodejs_20;
@@ -49,16 +50,14 @@
                     hasSuffix "/deno.lock" path
                   );
                 };
-              deno-cache = pkgs.callPackage hotPot.lib.denoAppCache2 {
-                inherit name src deno;
+              deno-cache = pkgs.callPackage hotPotLib.denoAppCache2 {
+                inherit name src;
                 lock-file = ./deno.lock;
                 config-file = ./deno.json;
-                deno-gen-cache-entry = hotPotPkgs.deno-gen-cache-entry;
               };
-              built = pkgs.callPackage hotPot.lib.denoAppBuild
+              built = pkgs.callPackage hotPotLib.denoAppBuild
                 {
-                  inherit name deno deno-cache src;
-                  inherit (hotPotPkgs) deno-app-build;
+                  inherit name deno-cache src;
                   appSrcPath = "./src/helmet.ts";
                   denoRunFlags = ''"''${DENO_RUN_FLAGS[@]}"'';
                   preExec = ''
