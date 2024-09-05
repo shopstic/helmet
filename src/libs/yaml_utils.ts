@@ -4,14 +4,16 @@ import { captureExec } from "@wok/utils/exec";
 export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
   try {
     return stringifyYaml(value);
-  } catch (e) {
-    if (
-      e.name === "TypeError" &&
-      e.message.indexOf("unacceptable kind of an object to dump") !== -1
-    ) {
-      return stringifyYaml(JSON.parse(JSON.stringify(value)));
+  } catch (cause) {
+    if (cause instanceof TypeError) {
+      try {
+        return stringifyYaml(JSON.parse(JSON.stringify(value)));
+      } catch {
+        // Throw with the original cause
+        throw new Error("Failed to stringify YAML", { cause });
+      }
     } else {
-      throw e;
+      throw cause;
     }
   }
 }
