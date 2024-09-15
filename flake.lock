@@ -85,15 +85,15 @@
       "locked": {
         "lastModified": 1726433229,
         "narHash": "sha256-XkRE84OVXdB6jz/cj5+DmYrC4A0LCgNIaY6Vqy6rO4I=",
-        "ref": "refs/heads/main",
+        "owner": "shopstic",
+        "repo": "nix-hot-pot",
         "rev": "a1576e05be5af131899bfbec3df3acbdd9f1a509",
-        "revCount": 555,
-        "type": "git",
-        "url": "file:/Users/nktpro/Dev/shopstic/nix-hot-pot"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "file:/Users/nktpro/Dev/shopstic/nix-hot-pot"
+        "owner": "shopstic",
+        "repo": "nix-hot-pot",
+        "type": "github"
       }
     },
     "nix2containerPkg": {

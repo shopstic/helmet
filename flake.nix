@@ -2,8 +2,7 @@
   description = "Type-safe Helm";
 
   inputs = {
-    # hotPot.url = "github:shopstic/nix-hot-pot";
-    hotPot.url = "git+file:/Users/nktpro/Dev/shopstic/nix-hot-pot";
+    hotPot.url = "github:shopstic/nix-hot-pot";
     nixpkgs.follows = "hotPot/nixpkgs";
     flakeUtils.follows = "hotPot/flakeUtils";
     npmlock2nix = {
