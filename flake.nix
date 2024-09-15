@@ -2,7 +2,8 @@
   description = "Type-safe Helm";
 
   inputs = {
-    hotPot.url = "github:shopstic/nix-hot-pot";
+    # hotPot.url = "github:shopstic/nix-hot-pot";
+    hotPot.url = "git+file:/Users/nktpro/Dev/shopstic/nix-hot-pot";
     nixpkgs.follows = "hotPot/nixpkgs";
     flakeUtils.follows = "hotPot/flakeUtils";
     npmlock2nix = {
@@ -50,14 +51,14 @@
                     hasSuffix "/deno.lock" path
                   );
                 };
-              deno-cache = pkgs.callPackage hotPotLib.denoAppCache2 {
+              deno-cache-dir = pkgs.callPackage hotPotLib.denoAppCache2 {
                 inherit name src;
                 lock-file = ./deno.lock;
                 config-file = ./deno.json;
               };
-              built = pkgs.callPackage hotPotLib.denoAppBuild
+              transpiled = pkgs.callPackage hotPotLib.denoAppTranspile
                 {
-                  inherit name deno-cache src;
+                  inherit name deno-cache-dir src;
                   appSrcPath = "./src/helmet.ts";
                   denoRunFlags = ''"''${DENO_RUN_FLAGS[@]}"'';
                   preExec = ''
@@ -80,7 +81,7 @@
                 buildInputs = [ pkgs.makeWrapper ];
               }
               ''
-                makeWrapper ${built}/bin/helmet $out/bin/helmet \
+                makeWrapper ${transpiled}/bin/helmet $out/bin/helmet \
                   --set HELMET_VERSION "${denoJson.version}" \
                   --prefix PATH : "${pkgs.lib.makeBinPath runtimeInputs}"
               '';

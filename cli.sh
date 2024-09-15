@@ -6,14 +6,19 @@ ENTRY_FILE="./src/helmet.ts"
 MOD_FILE="./src/mod.ts"
 
 update_deps() {
-  deno run -A jsr:@wok/deup@1.3.0 update "$@"
+  deno run -A jsr:@wok/deup@1.3.1 update "$@"
+  "$0" update_lock
+}
+
+check_all() {
+  deno check ./**/*.ts
 }
 
 code_quality() {
   echo "Checking formatting..."
   deno fmt --check ./src
   echo "Checking..."
-  deno check ./src/**/*.ts
+  "$0" check_all
   echo "Linting..."
   deno lint ./src
   echo "Running eslint..."
