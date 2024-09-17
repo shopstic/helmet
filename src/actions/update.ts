@@ -57,7 +57,9 @@ async function getCurrentChartMetadata(
     if (!currentChartMetaResult.isSuccess) {
       throw new Error(
         `Failed validating "Chart.yaml" from ${chartPath}. Errors:\n${
-          currentChartMetaResult.errors.map((e) => `  - at path ${JSON.stringify(e.path)}: ${e.message}`).join("\n")
+          [...currentChartMetaResult.errors].map((e) => `  - at path ${JSON.stringify(e.path)}: ${e.message}`).join(
+            "\n",
+          )
         }`,
       );
     }
@@ -325,7 +327,7 @@ async function updateHelmRepoChart({
   if (!remoteRepoIndexResult.isSuccess) {
     throw new Error(
       `Failed validating "index.yaml" for "${chartName}" repo at "${remoteRepoUrl}". Errors:\n${
-        remoteRepoIndexResult.errors.map((e) => `  - at path ${JSON.stringify(e.path)}: ${e.message}`).join("\n")
+        [...remoteRepoIndexResult.errors].map((e) => `  - at path ${JSON.stringify(e.path)}: ${e.message}`).join("\n")
       }`,
     );
   }

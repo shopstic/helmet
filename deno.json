@@ -35,7 +35,7 @@
     "@std/semver": "jsr:@std/semver@^1.0.3",
     "@std/yaml": "jsr:@std/yaml@^1.0.5",
     "@wok/case": "jsr:@wok/case@^1.0.1",
-    "@wok/typebox": "jsr:@wok/typebox@^0.33.10",
-    "@wok/utils": "jsr:@wok/utils@^2.1.6"
+    "@wok/typebox": "jsr:@wok/typebox@^0.33.13",
+    "@wok/utils": "jsr:@wok/utils@^3.0.0"
   }
 }

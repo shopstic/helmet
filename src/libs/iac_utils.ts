@@ -71,9 +71,10 @@ export function createK8sSecretsDecryptor<T extends TProperties>(
     );
 
     if (!result.isSuccess) {
-      console.error(result.errors);
+      const errors = Array.from(result.errors);
+      console.error(errors);
       throw new Error(
-        `Decrypted secrets failed schema validation with ${result.errors.length} error(s).`,
+        `Decrypted secrets failed schema validation with ${errors.length} error(s).`,
       );
     }
 

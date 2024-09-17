@@ -2,20 +2,9 @@ import { stringify as stringifyYaml } from "@std/yaml";
 import { captureExec } from "@wok/utils/exec";
 
 export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
-  try {
-    return stringifyYaml(value);
-  } catch (cause) {
-    if (cause instanceof TypeError) {
-      try {
-        return stringifyYaml(JSON.parse(JSON.stringify(value)));
-      } catch {
-        // Throw with the original cause
-        throw new Error("Failed to stringify YAML", { cause });
-      }
-    } else {
-      throw cause;
-    }
-  }
+  return stringifyYaml(value, {
+    skipInvalid: true,
+  });
 }
 
 export async function parseMultiDocumentsYaml(
