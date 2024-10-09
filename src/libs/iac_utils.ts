@@ -17,6 +17,7 @@ import {
 import { memoize } from "@wok/utils/memoize";
 import { parseMultiDocumentsYaml, stringifyYamlRelaxed } from "./yaml_utils.ts";
 import { gray } from "@std/fmt/colors";
+import { toFileUrl } from "@std/path/to-file-url";
 
 export interface ImportDef {
   props: string[];
@@ -407,7 +408,7 @@ export async function checkAndImport(path: string) {
     throw e;
   }
 
-  return await import(path);
+  return await import(toFileUrl(path).toString());
 }
 
 export async function importBundleModule(
