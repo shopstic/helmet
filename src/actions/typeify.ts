@@ -471,7 +471,8 @@ async function readChartValues(
         return parseYaml(raw);
       } catch (e) {
         console.warn(
-          `Failed parsing ${valuesPath}, going types ignore it. Reason: ${e.message}`,
+          `Failed parsing ${valuesPath}, going types ignore it`,
+          e,
         );
         return {};
       }

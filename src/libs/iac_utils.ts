@@ -46,7 +46,8 @@ export async function decryptAndValidateSecrets<T extends TProperties>(
       })).out;
     } catch (e) {
       throw new Error(
-        `Failed decrypting file '${encryptedSecretsPath}' with sops, error: ${e.message}`,
+        `Failed decrypting file '${encryptedSecretsPath}' with sops`,
+        { cause: e },
       );
     }
   })();
@@ -304,7 +305,8 @@ export async function helmTemplate(
       );
       console.error(helmTemplateCmd.join(" "));
       throw new Error(
-        `Failed executing helm template for ${chartInstance.name}: ${e.toString()}`,
+        `Failed executing helm template for ${chartInstance.name}`,
+        { cause: e },
       );
     }
   })();

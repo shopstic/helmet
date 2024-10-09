@@ -20,7 +20,6 @@
               inherit system;
             };
           hotPotPkgs = hotPot.packages.${system};
-          hotPotLib = hotPot.lib.${system};
           json2ts = pkgs.callPackage ./nix/json2ts {
             npmlock2nix = (import npmlock2nix { inherit pkgs; }).v2;
             nodejs = pkgs.nodejs_20;
@@ -37,53 +36,31 @@
                 sops
                 ;
             };
-          helmet =
-            let
-              name = "helmet";
-              src = builtins.path
-                {
-                  path = ./.;
-                  name = "${name}-src";
-                  filter = with pkgs.lib; (path: /* type */_:
-                    hasInfix "/src" path ||
-                    hasSuffix "/deno.json" path ||
-                    hasSuffix "/deno.lock" path
-                  );
-                };
-              deno-cache-dir = pkgs.callPackage hotPotLib.denoAppCache2 {
-                inherit name src;
-                lock-file = ./deno.lock;
-                config-file = ./deno.json;
-              };
-              transpiled = pkgs.callPackage hotPotLib.denoAppTranspile
-                {
-                  inherit name deno-cache-dir src;
-                  appSrcPath = "./src/helmet.ts";
-                  denoRunFlags = ''"''${DENO_RUN_FLAGS[@]}"'';
-                  preExec = ''
-                    DENO_RUN_FLAGS=("-A")
-                    if [ ! -f deno.lock ]; then
-                      DENO_RUN_FLAGS+=("--no-lock")
-                    fi
-                    if [ -f deno.json ]; then
-                      DENO_RUN_FLAGS+=("--config=deno.json")
-                    elif [ -f deno.jsonc ]; then
-                      DENO_RUN_FLAGS+=("--config=deno.jsonc")
-                    fi
-                  '';
-                  allowNpmSpecifiers = true;
-                };
-              denoJson = builtins.fromJSON (builtins.readFile ./deno.json);
-            in
-            pkgs.runCommandLocal "${name}-wrapped"
-              {
-                buildInputs = [ pkgs.makeWrapper ];
-              }
-              ''
-                makeWrapper ${transpiled}/bin/helmet $out/bin/helmet \
-                  --set HELMET_VERSION "${denoJson.version}" \
-                  --prefix PATH : "${pkgs.lib.makeBinPath runtimeInputs}"
-              '';
+          denoJson = builtins.fromJSON (builtins.readFile ./deno.json);
+          src = builtins.path
+            {
+              path = ./.;
+              name = "helmet-src";
+              filter = with pkgs.lib; (path: /* type */_:
+                hasInfix "/src" path ||
+                hasSuffix "/deno.lock" path ||
+                hasSuffix "/deno.json" path
+              );
+            };
+          helmet-bin = pkgs.writeShellScript "helmet"
+            (if denoJson.version == "0.0.0" then ''
+              deno run -A --check ${src}/src/cli.ts "$@"
+            '' else ''
+              deno run -A jsr:${denoJson.name}@${denoJson.version} "$@"
+            '');
+          helmet = pkgs.runCommandLocal "helmet"
+            {
+              buildInputs = [ pkgs.makeWrapper ];
+            }
+            ''
+              makeWrapper ${helmet-bin} $out/bin/helmet \
+                --prefix PATH : "${pkgs.lib.makeBinPath runtimeInputs}"
+            '';
           vscodeSettings = pkgs.writeTextFile {
             name = "vscode-settings.json";
             text = builtins.toJSON {

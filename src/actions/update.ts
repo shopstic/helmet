@@ -30,7 +30,7 @@ import { checkAndImport } from "../mod.ts";
 
 interface ChartUpdateFailure {
   isSuccess: false;
-  reason: string;
+  reason: unknown;
 }
 
 interface ChartUpdateSuccess {
@@ -207,7 +207,7 @@ async function updateRemoteArchiveChart({
   } catch (e) {
     return {
       isSuccess: false,
-      reason: e.toString(),
+      reason: e,
     };
   } finally {
     await Deno.remove(tempDir, { recursive: true })
@@ -294,7 +294,7 @@ async function updateOciChart(
   } catch (e) {
     return {
       isSuccess: false,
-      reason: e.toString(),
+      reason: e,
     };
   } finally {
     await Deno.remove(tempDir, { recursive: true })
@@ -527,7 +527,7 @@ export default createCliAction(
             return [
               bold(red(tag)),
               "Failed updating due to an unexpected error:",
-              e.message,
+              String(e),
             ];
           }
         };

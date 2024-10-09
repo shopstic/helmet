@@ -1,11 +1,12 @@
 import { createCliAction, ExitCode } from "@wok/utils/cli";
+import { default as config } from "../../deno.json" with { type: "json" };
 
 export default createCliAction(
   {},
   () => {
     console.log(JSON.stringify(
       {
-        app: Deno.env.get("HELMET_VERSION") ?? "dev",
+        app: config.version === "0.0.0" ? "dev" : config.version,
         ...Deno.version,
       },
       null,

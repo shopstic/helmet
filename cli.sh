@@ -2,12 +2,17 @@
 set -euo pipefail
 shopt -s globstar
 
-ENTRY_FILE="./src/helmet.ts"
+ENTRY_FILE="./src/cli.ts"
 MOD_FILE="./src/mod.ts"
 
 update_deps() {
   deno run -A jsr:@wok/deup@1.3.1 update "$@"
   "$0" update_lock
+}
+
+update_lock() {
+  rm -f deno.lock
+  deno cache --reload --lock=deno.lock --frozen=false "${ENTRY_FILE}" "${MOD_FILE}"
 }
 
 check_all() {
@@ -57,11 +62,6 @@ create_release() {
 
 update_cache() {
   deno cache "${ENTRY_FILE}" "${MOD_FILE}"
-}
-
-update_lock() {
-  rm -f deno.lock
-  deno cache --reload --lock=deno.lock --frozen=false "${ENTRY_FILE}" "${MOD_FILE}"
 }
 
 run() {
