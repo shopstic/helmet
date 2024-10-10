@@ -51,7 +51,16 @@
             (if denoJson.version == "0.0.0" then ''
               deno run -A --check ${src}/src/cli.ts "$@"
             '' else ''
-              deno run -A jsr:${denoJson.name}@${denoJson.version}/cli "$@"
+              DENO_RUN_FLAGS=("-A")
+              if [ ! -f deno.lock ]; then
+                DENO_RUN_FLAGS+=("--no-lock")
+              fi
+              if [ -f deno.json ]; then
+                DENO_RUN_FLAGS+=("--config=deno.json")
+              elif [ -f deno.jsonc ]; then
+                DENO_RUN_FLAGS+=("--config=deno.jsonc")
+              fi
+              deno run "''${DENO_RUN_FLAGS[@]}" jsr:${denoJson.name}@${denoJson.version}/cli "$@"
             '');
           helmet = pkgs.runCommandLocal "helmet"
             {
