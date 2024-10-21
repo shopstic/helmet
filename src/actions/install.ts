@@ -5,8 +5,8 @@ import { join as joinPath, resolve as resolvePath } from "@std/path";
 import { expandGlobSync } from "@std/fs";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { cyan, gray } from "@std/fmt/colors";
-import { readerFromStreamReader, readLines } from "@std/io";
 import { HelmLsResultSchema } from "../libs/iac_utils.ts";
+import { TextLineStream } from "@std/streams/text-line-stream";
 
 async function helmInstall(
   {
@@ -88,27 +88,21 @@ async function helmInstall(
     cmd: helmUpgradeCmd,
     stdout: {
       async read(readable) {
-        const reader = readable.getReader();
-        try {
-          for await (
-            const line of readLines(
-              readerFromStreamReader(reader),
-            )
+        for await (
+          const line of readable
+            .pipeThrough(new TextDecoderStream())
+            .pipeThrough(new TextLineStream())
+        ) {
+          if (
+            debug && !redactingOutput &&
+            line.startsWith("USER-SUPPLIED VALUES:")
           ) {
-            if (
-              debug && !redactingOutput &&
-              line.startsWith("USER-SUPPLIED VALUES:")
-            ) {
-              redactingOutput = true;
-            }
-
-            if (!redactingOutput) {
-              console.error(`${tag} ${line}`);
-            }
+            redactingOutput = true;
           }
-        } finally {
-          reader.releaseLock();
-          await readable.cancel();
+
+          if (!redactingOutput) {
+            console.error(`${tag} ${line}`);
+          }
         }
       },
     },

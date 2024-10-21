@@ -4,29 +4,25 @@
     "jsr:@std/assert@^1.0.6": "1.0.6",
     "jsr:@std/bytes@^1.0.2": "1.0.2",
     "jsr:@std/cli@^1.0.6": "1.0.6",
-    "jsr:@std/collections@^1.0.5": "1.0.7",
+    "jsr:@std/collections@^1.0.5": "1.0.8",
     "jsr:@std/fmt@^1.0.2": "1.0.2",
     "jsr:@std/fs@^1.0.4": "1.0.4",
-    "jsr:@std/internal@^1.0.4": "1.0.4",
-    "jsr:@std/io@~0.224.9": "0.224.9",
     "jsr:@std/path@^1.0.6": "1.0.6",
     "jsr:@std/semver@^1.0.3": "1.0.3",
-    "jsr:@std/streams@^1.0.5": "1.0.6",
+    "jsr:@std/streams@^1.0.6": "1.0.7",
+    "jsr:@std/streams@^1.0.7": "1.0.7",
     "jsr:@std/streams@~0.224.5": "0.224.5",
     "jsr:@std/yaml@^1.0.5": "1.0.5",
     "jsr:@wok/case@^1.0.1": "1.0.1",
     "jsr:@wok/k8s@^1.30.3": "1.30.3",
     "jsr:@wok/openapi-client@^1.0.1": "1.0.1",
     "jsr:@wok/typebox@~0.33.15": "0.33.15",
-    "jsr:@wok/utils@^3.2.0": "3.2.0",
-    "npm:@sinclair/typebox@~0.33.11": "0.33.15"
+    "jsr:@wok/utils@^3.5.2": "3.5.2",
+    "npm:@sinclair/typebox@~0.33.11": "0.33.17"
   },
   "jsr": {
     "@std/assert@1.0.6": {
-      "integrity": "1904c05806a25d94fe791d6d883b685c9e2dcd60e4f9fc30f4fc5cf010c72207",
-      "dependencies": [
-        "jsr:@std/internal"
-      ]
+      "integrity": "1904c05806a25d94fe791d6d883b685c9e2dcd60e4f9fc30f4fc5cf010c72207"
     },
     "@std/bytes@1.0.2": {
       "integrity": "fbdee322bbd8c599a6af186a1603b3355e59a5fb1baa139f8f4c3c9a1b3e3d57"
@@ -34,8 +30,8 @@
     "@std/cli@1.0.6": {
       "integrity": "d22d8b38c66c666d7ad1f2a66c5b122da1704f985d3c47f01129f05abb6c5d3d"
     },
-    "@std/collections@1.0.7": {
-      "integrity": "6cff6949907372564735e25a5c6a7945d67cc31913b1b4d1278d08c2a5a3291d"
+    "@std/collections@1.0.8": {
+      "integrity": "de76692f9121838711b1d2fb5042619c074db26905a87b58cff56cfe1bd6d6d0"
     },
     "@std/fmt@1.0.2": {
       "integrity": "87e9dfcdd3ca7c066e0c3c657c1f987c82888eb8103a3a3baa62684ffeb0f7a7"
@@ -44,15 +40,6 @@
       "integrity": "2907d32d8d1d9e540588fd5fe0ec21ee638134bd51df327ad4e443aaef07123c",
       "dependencies": [
         "jsr:@std/path"
-      ]
-    },
-    "@std/internal@1.0.4": {
-      "integrity": "62e8e4911527e5e4f307741a795c0b0a9e6958d0b3790716ae71ce085f755422"
-    },
-    "@std/io@0.224.9": {
-      "integrity": "4414664b6926f665102e73c969cfda06d2c4c59bd5d0c603fd4f1b1c840d6ee3",
-      "dependencies": [
-        "jsr:@std/bytes"
       ]
     },
     "@std/path@1.0.6": {
@@ -64,8 +51,8 @@
     "@std/streams@0.224.5": {
       "integrity": "bcde7818dd5460d474cdbd674b15f6638b9cd73cd64e52bd852fba2bd4d8ec91"
     },
-    "@std/streams@1.0.6": {
-      "integrity": "022ed94e380d06b4d91c49eb70241b7289ab78b8c2b4c4bbb7eb265e4997c25c",
+    "@std/streams@1.0.7": {
+      "integrity": "1a93917ca0c58c01b2bfb93647189229b1702677f169b6fb61ad6241cd2e499b",
       "dependencies": [
         "jsr:@std/bytes"
       ]
@@ -93,12 +80,13 @@
         "npm:@sinclair/typebox"
       ]
     },
-    "@wok/utils@3.2.0": {
-      "integrity": "852ea898dc154799a621043acced063a0551d88dda40ca378bdce0de94da0398",
+    "@wok/utils@3.5.2": {
+      "integrity": "176b7202e656b60736033f42f7123160aa2d64c6e062e594396f538fcdbbf220",
       "dependencies": [
+        "jsr:@std/assert",
         "jsr:@std/cli",
         "jsr:@std/fmt",
-        "jsr:@std/streams@^1.0.5",
+        "jsr:@std/streams@^1.0.6",
         "jsr:@wok/case",
         "jsr:@wok/k8s",
         "jsr:@wok/typebox"
@@ -106,8 +94,8 @@
     }
   },
   "npm": {
-    "@sinclair/typebox@0.33.15": {
-      "integrity": "sha512-R50kz7xohLjhwgmAiw+6qOAYkeFXsK8i1CbEQB1qJTiHMK5WywpvGIHJenE3n4t7dqj3bas+H1cD5dTZIfrAEw=="
+    "@sinclair/typebox@0.33.17": {
+      "integrity": "sha512-75232GRx3wp3P7NP+yc4nRK3XUAnaQShxTAzapgmQrgs0QvSq0/mOJGoZXRpH15cFCKyys+4laCPbBselqJ5Ag=="
     }
   },
   "workspace": {
@@ -115,13 +103,13 @@
       "jsr:@std/assert@^1.0.6",
       "jsr:@std/fmt@^1.0.2",
       "jsr:@std/fs@^1.0.4",
-      "jsr:@std/io@~0.224.9",
       "jsr:@std/path@^1.0.6",
       "jsr:@std/semver@^1.0.3",
+      "jsr:@std/streams@^1.0.7",
       "jsr:@std/yaml@^1.0.5",
       "jsr:@wok/case@^1.0.1",
       "jsr:@wok/typebox@~0.33.15",
-      "jsr:@wok/utils@^3.2.0"
+      "jsr:@wok/utils@^3.5.2"
     ]
   }
 }
