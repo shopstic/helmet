@@ -28,12 +28,12 @@
     }
   },
   "imports": {
-    "@std/assert": "jsr:@std/assert@^1.0.6",
-    "@std/fmt": "jsr:@std/fmt@^1.0.2",
-    "@std/fs": "jsr:@std/fs@^1.0.4",
-    "@std/path": "jsr:@std/path@^1.0.6",
+    "@std/assert": "jsr:@std/assert@^1.0.8",
+    "@std/fmt": "jsr:@std/fmt@^1.0.3",
+    "@std/fs": "jsr:@std/fs@^1.0.5",
+    "@std/path": "jsr:@std/path@^1.0.8",
     "@std/semver": "jsr:@std/semver@^1.0.3",
-    "@std/streams": "jsr:@std/streams@^1.0.7",
+    "@std/streams": "jsr:@std/streams@^1.0.8",
     "@std/yaml": "jsr:@std/yaml@^1.0.5",
     "@wok/case": "jsr:@wok/case@^1.0.1",
     "@wok/typebox": "jsr:@wok/typebox@^0.33.15",
