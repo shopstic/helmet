@@ -15,10 +15,14 @@
     flakeUtils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ]
       (system:
         let
-          pkgs = import nixpkgs
-            {
-              inherit system;
-            };
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [
+              (self: super: {
+                nodejs-16_x = super.nodejs-18_x;
+              })
+            ];
+          };
           hotPotPkgs = hotPot.packages.${system};
           json2ts = pkgs.callPackage ./nix/json2ts {
             npmlock2nix = (import npmlock2nix { inherit pkgs; }).v2;
