@@ -1,14 +1,14 @@
 import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { inheritExec } from "@wok/utils/exec";
-import { Type } from "@wok/typebox";
+import { Str } from "../deps/schema.ts";
 
 export default createCliAction(
   {
-    name: Type.String({
+    name: Str({
       description: "Instance name to uninstall",
       examples: ["iac-my-stack"],
     }),
-    namespace: Type.String({
+    namespace: Str({
       description: "The namespace where corresponding Helm releases of this instance were installed to",
       examples: ["iac-my-stack"],
     }),

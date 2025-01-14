@@ -2,13 +2,13 @@ import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { captureExec } from "@wok/utils/exec";
 import { bold, cyan, red } from "@std/fmt/colors";
 import { resolve as resolvePath } from "@std/path";
-import { Type } from "@wok/typebox";
 import { importBundleModule } from "../libs/iac_utils.ts";
 import { fetchCurrentWhitelist } from "./whitelist_instance.ts";
+import { Str } from "../deps/schema.ts";
 
 export default createCliAction(
   {
-    path: Type.String({
+    path: Str({
       description: "Path to the instance module",
       examples: ["./instances/prod.ts"],
     }),

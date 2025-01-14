@@ -1,12 +1,11 @@
 import { captureExec, inheritExec, printErrLines, printOutLines } from "@wok/utils/exec";
-import { validate } from "@wok/utils/validation";
-import { type Static, type TObject, Type } from "@wok/typebox";
 import { join as joinPath, resolve as resolvePath } from "@std/path";
 import { expandGlobSync } from "@std/fs";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { cyan, gray } from "@std/fmt/colors";
 import { HelmLsResultSchema } from "../libs/iac_utils.ts";
 import { TextLineStream } from "@std/streams/text-line-stream";
+import { Bool, Obj, Opt, Str, typedParse } from "../deps/schema.ts";
 
 async function helmInstall(
   {
@@ -39,7 +38,7 @@ async function helmInstall(
     })).out,
   );
 
-  const helmLsResult = validate(HelmLsResultSchema, helmLsResultRaw);
+  const helmLsResult = typedParse(HelmLsResultSchema, helmLsResultRaw);
 
   if (!helmLsResult.isSuccess) {
     throw new Error('Failed validating result of "helm ls" command');
@@ -113,66 +112,83 @@ async function helmInstall(
 }
 
 export const ParamsSchema = {
-  name: Type.String({
+  name: Str({
     description:
       "Helm release base name. This will be used as the prefx of the different sub-releases (*-crds, *-namespaces and *-resources)",
   }),
-  namespace: Type.String({
+  namespace: Str({
     description: "The namespace where the Secrets for Helm releases are stored",
   }),
-  source: Type.String({
+  source: Str({
     description: "Path to the compiled instance generated from `helmet compile ...`",
   }),
-  wait: Type.Optional(Type.Boolean({
-    description: "Whether to pass --wait to the underlying `helm upgrade ...` process",
-    default: false,
-    examples: [false],
-  })),
-  atomic: Type.Optional(Type.Boolean({
-    description: "Whether to pass --atomic to the underlying `helm upgrade ...` process",
-    default: false,
-    examples: [false],
-  })),
-  cleanupOnFail: Type.Optional(Type.Boolean({
-    description: "Whether to pass --cleanup-on-fail to the underlying `helm upgrade ...` process",
-    default: false,
-    examples: [false],
-  })),
-  force: Type.Optional(Type.Boolean({
-    description: "Whether to pass --force to the underlying `helm upgrade ...` process",
-    default: false,
-    examples: [false],
-  })),
-  timeout: Type.Optional(Type.String({
-    description: "Pass --timeout to the underlying `helm upgrade ...` process",
-    default: "",
-    examples: ["5m0s"],
-  })),
-  createNamespace: Type.Optional(Type.Boolean({
-    description: "Whether to pass --create-namespace to the underlying `helm upgrade ...` process",
-    default: false,
-    examples: [false],
-  })),
-  debug: Type.Optional(Type.Boolean({
-    description: "Whether to pass --debug to the underlying `helm upgrade ...` process",
-    default: false,
-    examples: [false],
-  })),
+  wait: Opt(
+    Bool({
+      description: "Whether to pass --wait to the underlying `helm upgrade ...` process",
+      examples: [false],
+    }),
+    false,
+  ),
+  atomic: Opt(
+    Bool({
+      description: "Whether to pass --atomic to the underlying `helm upgrade ...` process",
+      examples: [false],
+    }),
+    false,
+  ),
+  cleanupOnFail: Opt(
+    Bool({
+      description: "Whether to pass --cleanup-on-fail to the underlying `helm upgrade ...` process",
+      examples: [false],
+    }),
+    false,
+  ),
+  force: Opt(
+    Bool({
+      description: "Whether to pass --force to the underlying `helm upgrade ...` process",
+      examples: [false],
+    }),
+    false,
+  ),
+  timeout: Opt(
+    Str({
+      description: "Pass --timeout to the underlying `helm upgrade ...` process",
+      examples: ["5m0s"],
+    }),
+    "",
+  ),
+  createNamespace: Opt(
+    Bool({
+      description: "Whether to pass --create-namespace to the underlying `helm upgrade ...` process",
+      examples: [false],
+    }),
+    false,
+  ),
+  debug: Opt(
+    Bool({
+      description: "Whether to pass --debug to the underlying `helm upgrade ...` process",
+      examples: [false],
+    }),
+    false,
+  ),
 };
+
+const ParamsSchemaObj = Obj(ParamsSchema);
+type ParamsSchema = typeof ParamsSchemaObj.infer;
 
 export async function install(
   {
     name,
     namespace,
     source,
-    wait = false,
-    atomic = false,
-    cleanupOnFail = false,
-    force = false,
-    createNamespace = false,
-    debug = false,
+    wait,
+    atomic,
+    cleanupOnFail,
+    force,
+    createNamespace,
+    debug,
     timeout,
-  }: Static<TObject<typeof ParamsSchema>>,
+  }: ParamsSchema,
 ) {
   const resolvedSource = resolvePath(source);
 

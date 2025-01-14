@@ -2,10 +2,10 @@ import { stringifyYamlRelaxed } from "../libs/yaml_utils.ts";
 import type { HelmetChartInstance } from "../libs/types.ts";
 import { join as joinPath, resolve as resolvePath } from "@std/path";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
-import { Type } from "@wok/typebox";
 import { cyan } from "@std/fmt/colors";
 import { importBundleModule } from "../libs/iac_utils.ts";
 import { K8sKind } from "@wok/utils/k8s";
+import { Str } from "../deps/schema.ts";
 
 async function generateChildChart(
   { crdsPath, resourcesPath, namespacesPath, instance }: {
@@ -269,15 +269,15 @@ export async function compile(
 }
 
 export default createCliAction({
-  version: Type.String({
+  version: Str({
     description: "Version to write to the generated Chart.yaml",
     examples: ["1.0.0"],
   }),
-  source: Type.String({
+  source: Str({
     description: "Path to the instance module's source",
     examples: ["./instances/prod.ts"],
   }),
-  destination: Type.String({
+  destination: Str({
     description: "Destination path to generate the Helm chart to",
     examples: ["/path/to/compiled-prod-chart"],
   }),

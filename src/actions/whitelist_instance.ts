@@ -1,10 +1,10 @@
 import { inheritExec, printErrLines, printOutLines } from "@wok/utils/exec";
 import { createK8sConfigMap } from "@wok/utils/k8s";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
-import { Type } from "@wok/typebox";
 import { resolve as resolvePath } from "@std/path";
 import { gray } from "@std/fmt/colors";
 import { importBundleModule } from "../libs/iac_utils.ts";
+import { Str } from "../deps/schema.ts";
 
 export const CONFIG_MAP_NAME = "helmet-whitelist";
 export const CONFIG_MAP_NAMESPACE = "default";
@@ -72,7 +72,7 @@ export async function updateWhitelist(
 
 export default createCliAction(
   {
-    path: Type.String({
+    path: Str({
       description: "Path to the instance module",
       examples: ["./instances/prod.ts"],
     }),

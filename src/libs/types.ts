@@ -1,29 +1,29 @@
 import type { K8sCrd, K8sResource } from "@wok/utils/k8s";
 import type { Range as SemverRange } from "@std/semver";
-import { type Static, Type } from "@wok/typebox";
+import { Arr, Bool, Obj, Opt, Rec, Str, Unk } from "../deps/schema.ts";
 
-export const ChartRepoReleaseSchema = Type.Object({
-  apiVersion: Type.Optional(Type.String()),
-  version: Type.String(),
-  name: Type.String(),
-  urls: Type.Array(Type.String()),
+export const ChartRepoReleaseSchema = Obj({
+  apiVersion: Opt(Str()),
+  version: Str(),
+  name: Str(),
+  urls: Arr(Str()),
 }, {
   additionalProperties: true,
 });
 
-export type ChartRepoRelease = Static<typeof ChartRepoReleaseSchema>;
+export type ChartRepoRelease = typeof ChartRepoReleaseSchema.infer;
 
-export const ChartRepoIndexSchema = Type.Object({
-  apiVersion: Type.String(),
-  entries: Type.Record(
-    Type.String(),
-    Type.Array(ChartRepoReleaseSchema),
+export const ChartRepoIndexSchema = Obj({
+  apiVersion: Str(),
+  entries: Rec(
+    Str(),
+    Arr(ChartRepoReleaseSchema),
   ),
 }, {
   additionalProperties: true,
 });
 
-export type ChartRepoIndex = Static<typeof ChartRepoIndexSchema>;
+export type ChartRepoIndex = typeof ChartRepoIndexSchema.infer;
 
 export enum RemoteChartSource {
   HelmRepo,
@@ -72,27 +72,27 @@ export type RemoteChartConfigMap = {
   [name: string]: RemoteChartConfig;
 };
 
-export const ChartMetadataSchema = Type.Object({
-  apiVersion: Type.String(),
-  name: Type.String(),
-  version: Type.String(),
-  kubeVersion: Type.Optional(Type.String()), // A SemVer range of compatible Kubernetes versions (optional)
-  description: Type.Optional(Type.String()), // A single-sentence description of this project (optional)
-  type: Type.Optional(Type.String()), // The type of the chart (optional)
-  keywords: Type.Optional(Type.Array(Type.String())), // A list of keywords about this project (optional)
-  home: Type.Optional(Type.String()), // The URL of this projects home page (optional)
-  sources: Type.Optional(Type.Array(Type.String())), // A list of URLs to source code for this project (optional)
-  dependencies: Type.Optional(Type.Any()), // A list of the chart requirements (optional)
-  maintainers: Type.Optional(Type.Any()),
-  icon: Type.Optional(Type.String()), // A URL to an SVG or PNG image to be used as an icon (optional).
-  appVersion: Type.Optional(Type.String()), // The version of the app that this contains (optional). This needn't be SemVer.
-  deprecated: Type.Optional(Type.Boolean()), // Whether this chart is deprecated (optional, boolean)
-  annotations: Type.Optional(Type.Any()),
+export const ChartMetadataSchema = Obj({
+  apiVersion: Str(),
+  name: Str(),
+  version: Str(),
+  kubeVersion: Opt(Str()), // A SemVer range of compatible Kubernetes versions (optional)
+  description: Opt(Str()), // A single-sentence description of this project (optional)
+  type: Opt(Str()), // The type of the chart (optional)
+  keywords: Opt(Arr(Str())), // A list of keywords about this project (optional)
+  home: Opt(Str()), // The URL of this projects home page (optional)
+  sources: Opt(Arr(Str())), // A list of URLs to source code for this project (optional)
+  dependencies: Opt(Unk()), // A list of the chart requirements (optional)
+  maintainers: Opt(Unk()),
+  icon: Opt(Str()), // A URL to an SVG or PNG image to be used as an icon (optional).
+  appVersion: Opt(Str()), // The version of the app that this contains (optional). This needn't be SemVer.
+  deprecated: Opt(Bool()), // Whether this chart is deprecated (optional, boolean)
+  annotations: Opt(Unk()),
 }, {
   additionalProperties: true,
 });
 
-export type ChartMetadata = Static<typeof ChartMetadataSchema>;
+export type ChartMetadata = typeof ChartMetadataSchema.infer;
 
 export interface ChartInstanceConfig<V> {
   name: string;
@@ -116,9 +116,9 @@ export interface HelmetBundle {
   create: () => Promise<HelmetChartInstance[]>;
 }
 
-export const KubectlClientVersionCmdOutputSchema = Type.Object({
-  clientVersion: Type.Object({
-    gitVersion: Type.String({ minLength: 1 }),
+export const KubectlClientVersionCmdOutputSchema = Obj({
+  clientVersion: Obj({
+    gitVersion: Str({ minLength: 1 }),
   }, {
     additionalProperties: true,
   }),
@@ -126,9 +126,9 @@ export const KubectlClientVersionCmdOutputSchema = Type.Object({
   additionalProperties: true,
 });
 
-export const KubectlServerVersionCmdOutputSchema = Type.Object({
-  serverVersion: Type.Object({
-    gitVersion: Type.String({ minLength: 1 }),
+export const KubectlServerVersionCmdOutputSchema = Obj({
+  serverVersion: Obj({
+    gitVersion: Str({ minLength: 1 }),
   }, {
     additionalProperties: true,
   }),

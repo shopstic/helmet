@@ -6,7 +6,7 @@ ENTRY_FILE="./src/cli.ts"
 MOD_FILE="./src/mod.ts"
 
 update_deps() {
-  deno run -A jsr:@wok/deup@1.3.1 update "$@"
+  deno run -A jsr:@wok/deup@2.0.0 update "$@"
   "$0" update_lock
 }
 

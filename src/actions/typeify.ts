@@ -8,8 +8,8 @@ import { pascalCase } from "@wok/case";
 import { captureExec, inheritExec, printErrLines } from "@wok/utils/exec";
 import { K8sCrdApiVersionV1beta1 } from "@wok/utils/k8s";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
-import { Type } from "@wok/typebox";
 import { cyan, gray } from "@std/fmt/colors";
+import { Str } from "../deps/schema.ts";
 
 export type ClassifiedType =
   | "array"
@@ -554,7 +554,8 @@ export async function typeifyChart(chartPath: string, typesPath: string) {
 
       return versions.map((version) => {
         const schema = version.schema?.openAPIV3Schema ||
-          crd.spec.validation?.openAPIV3Schema;
+          (typeof crd.spec.validation === "object" && crd.spec.validation !== null &&
+            (crd.spec.validation as Record<string, unknown>).openAPIV3Schema);
 
         if (schema) {
           return generateCrdInterface(
@@ -687,11 +688,11 @@ ${crdInterfaces}
 
 export default createCliAction(
   {
-    charts: Type.String({
+    charts: Str({
       description: "Glob pattern to match directories of Helm charts, for which types will be generated",
       examples: ["./charts/*"],
     }),
-    types: Type.String({
+    types: Str({
       description: "Path to the destination directory where types will be generated into",
       examples: ["./types"],
     }),

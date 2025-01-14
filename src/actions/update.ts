@@ -2,8 +2,6 @@ import { inheritExec } from "@wok/utils/exec";
 import { exists as fsExists, expandGlobSync } from "@std/fs";
 import { dirname, join as joinPath, resolve as resolvePath } from "@std/path";
 import { parse as parseYaml } from "@std/yaml";
-import { Type } from "@wok/typebox";
-import { validate } from "@wok/utils/validation";
 import {
   format as semverFormat,
   maxSatisfying as maxSatisfyingSemver,
@@ -27,6 +25,7 @@ import {
 import { typeifyChart } from "./typeify.ts";
 import { bold, gray, green, red } from "@std/fmt/colors";
 import { checkAndImport } from "../mod.ts";
+import { Opt, Str, typedParse } from "../deps/schema.ts";
 
 interface ChartUpdateFailure {
   isSuccess: false;
@@ -49,7 +48,7 @@ async function getCurrentChartMetadata(
     const currentChartMetaRaw = parseYaml(
       await Deno.readTextFile(joinPath(chartPath, "Chart.yaml")),
     );
-    const currentChartMetaResult = validate(
+    const currentChartMetaResult = typedParse(
       ChartMetadataSchema,
       currentChartMetaRaw,
     );
@@ -319,7 +318,7 @@ async function updateHelmRepoChart({
   const remoteRepoIndexRaw = parseYaml(
     await fetchRemoteRepoIndexYaml(remoteRepoUrl),
   );
-  const remoteRepoIndexResult = validate(
+  const remoteRepoIndexResult = typedParse(
     ChartRepoIndexSchema,
     remoteRepoIndexRaw,
   );
@@ -437,19 +436,19 @@ async function updateHelmRepoChart({
 
 export default createCliAction(
   {
-    manifest: Type.String({
+    manifest: Str({
       description: "Path to the manifest module",
       examples: ["./manifest.ts"],
     }),
-    charts: Type.String({
+    charts: Str({
       description: "Path to the directory where all charts are unpacked into",
       examples: ["./charts"],
     }),
-    types: Type.String({
+    types: Str({
       description: "Path to the destination directory where types will be generated into",
       examples: ["./types"],
     }),
-    only: Type.Optional(Type.String({
+    only: Opt(Str({
       description: "Optional filter which partially matches the name of only a certain chart to update",
     })),
   },
