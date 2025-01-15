@@ -25,7 +25,7 @@ import {
 import { typeifyChart } from "./typeify.ts";
 import { bold, gray, green, red } from "@std/fmt/colors";
 import { checkAndImport } from "../mod.ts";
-import { Opt, Str, typedParse } from "../deps/schema.ts";
+import { Opt, Str, validate } from "../deps/schema.ts";
 
 interface ChartUpdateFailure {
   isSuccess: false;
@@ -48,7 +48,7 @@ async function getCurrentChartMetadata(
     const currentChartMetaRaw = parseYaml(
       await Deno.readTextFile(joinPath(chartPath, "Chart.yaml")),
     );
-    const currentChartMetaResult = typedParse(
+    const currentChartMetaResult = validate(
       ChartMetadataSchema,
       currentChartMetaRaw,
     );
@@ -318,7 +318,7 @@ async function updateHelmRepoChart({
   const remoteRepoIndexRaw = parseYaml(
     await fetchRemoteRepoIndexYaml(remoteRepoUrl),
   );
-  const remoteRepoIndexResult = typedParse(
+  const remoteRepoIndexResult = validate(
     ChartRepoIndexSchema,
     remoteRepoIndexRaw,
   );

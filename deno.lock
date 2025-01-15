@@ -14,10 +14,9 @@
     "jsr:@wok/case@^1.0.2": "1.0.2",
     "jsr:@wok/k8s@^1.32.0": "1.32.0",
     "jsr:@wok/openapi-client@^1.0.2": "1.0.2",
-    "jsr:@wok/schema@^2.0.1": "2.0.2",
-    "jsr:@wok/schema@^2.0.2": "2.0.2",
-    "jsr:@wok/typebox@1": "1.0.0",
-    "jsr:@wok/utils@^4.0.2": "4.0.2",
+    "jsr:@wok/schema@^2.1.0": "2.1.0",
+    "jsr:@wok/typebox@^1.1.0": "1.1.0",
+    "jsr:@wok/utils@^4.1.0": "4.1.0",
     "npm:@sinclair/typebox@~0.34.13": "0.34.13",
     "npm:type-fest@^4.32.0": "4.32.0"
   },
@@ -72,22 +71,21 @@
     "@wok/openapi-client@1.0.2": {
       "integrity": "a92ce6ce959bc4e0d742b0957a403de4b81da1be46cbc1ac7ec68c5e2ddf2f18"
     },
-    "@wok/schema@2.0.2": {
-      "integrity": "a17e4c518d6d86ab59654f373502b39692d709ec6bb1c78bea4ea812beedb6fd",
+    "@wok/schema@2.1.0": {
+      "integrity": "6e46324b03b49dbdc84486ec2a1949b9525ee1d8269e32c2f0e51baf8883f6ce",
       "dependencies": [
         "jsr:@wok/typebox",
-        "npm:@sinclair/typebox",
         "npm:type-fest"
       ]
     },
-    "@wok/typebox@1.0.0": {
-      "integrity": "b530e8b9b839406ead5f522e1ea78a5eabb9161e757120a518346b3e8d522df5",
+    "@wok/typebox@1.1.0": {
+      "integrity": "09a56923782648ae74d54a4839e808fa0b3bbef17c0b0879d654f42cc8b20b2e",
       "dependencies": [
         "npm:@sinclair/typebox"
       ]
     },
-    "@wok/utils@4.0.2": {
-      "integrity": "69444ea6e3c5244164b0758279d75e0c3b361e00e2741bd51e9f4c41bb1a5c3d",
+    "@wok/utils@4.1.0": {
+      "integrity": "20e1aeb4d71076a5864f9acacee1df75345d1a69735dfcf71ac9a0a24fe03983",
       "dependencies": [
         "jsr:@std/assert",
         "jsr:@std/cli",
@@ -95,9 +93,8 @@
         "jsr:@std/streams",
         "jsr:@wok/case",
         "jsr:@wok/k8s",
-        "jsr:@wok/schema@^2.0.1",
+        "jsr:@wok/schema",
         "jsr:@wok/typebox",
-        "npm:@sinclair/typebox",
         "npm:type-fest"
       ]
     }
@@ -120,8 +117,8 @@
       "jsr:@std/streams@^1.0.8",
       "jsr:@std/yaml@^1.0.5",
       "jsr:@wok/case@^1.0.2",
-      "jsr:@wok/schema@^2.0.2",
-      "jsr:@wok/utils@^4.0.2"
+      "jsr:@wok/schema@^2.1.0",
+      "jsr:@wok/utils@^4.1.0"
     ]
   }
 }

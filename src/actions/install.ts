@@ -5,7 +5,7 @@ import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { cyan, gray } from "@std/fmt/colors";
 import { HelmLsResultSchema } from "../libs/iac_utils.ts";
 import { TextLineStream } from "@std/streams/text-line-stream";
-import { Bool, Obj, Opt, Str, typedParse } from "../deps/schema.ts";
+import { Bool, Obj, Opt, Str, validate } from "../deps/schema.ts";
 
 async function helmInstall(
   {
@@ -38,7 +38,7 @@ async function helmInstall(
     })).out,
   );
 
-  const helmLsResult = typedParse(HelmLsResultSchema, helmLsResultRaw);
+  const helmLsResult = validate(HelmLsResultSchema, helmLsResultRaw);
 
   if (!helmLsResult.isSuccess) {
     throw new Error('Failed validating result of "helm ls" command');

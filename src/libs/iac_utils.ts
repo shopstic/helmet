@@ -16,7 +16,7 @@ import { memoize } from "@wok/utils/memoize";
 import { parseMultiDocumentsYaml, stringifyYamlRelaxed } from "./yaml_utils.ts";
 import { gray } from "@std/fmt/colors";
 import { toFileUrl } from "@std/path/to-file-url";
-import { Arr, createTypedParser, Obj, type ParseResult, Str, typedParse, type TypedSchema } from "../deps/schema.ts";
+import { Arr, createValidator, Obj, Str, type TypedSchema, validate, type ValidationResult } from "../deps/schema.ts";
 
 export interface ImportDef {
   props: string[];
@@ -38,7 +38,7 @@ export function createTypeifyPatch(
 export async function decryptAndValidateSecrets<T>(
   schema: TypedSchema<T, unknown>,
   encryptedSecretsPath: string,
-): Promise<ParseResult<T>> {
+): Promise<ValidationResult<T>> {
   const raw = await (async () => {
     try {
       return (await captureExec({
@@ -54,7 +54,7 @@ export async function decryptAndValidateSecrets<T>(
 
   const decrypted = parseYaml(raw);
 
-  return typedParse(schema, decrypted);
+  return validate(schema, decrypted);
 }
 
 export function createK8sSecretsDecryptor<T>(
@@ -83,7 +83,7 @@ export function createK8sSecretsDecryptor<T>(
   });
 }
 
-const validateChartMeta = createTypedParser(ChartMetadataSchema);
+const validateChartMeta = createValidator(ChartMetadataSchema);
 
 export async function readChartMeta(chartPath: string): Promise<ChartMetadata> {
   const chartMetaPath = joinPath(
@@ -104,7 +104,7 @@ export async function readChartMeta(chartPath: string): Promise<ChartMetadata> {
   return chartMetaResult.value;
 }
 
-const validateCrds = createTypedParser(Arr(K8sCrdSchema));
+const validateCrds = createValidator(Arr(K8sCrdSchema));
 
 export async function collectCrdFiles(chartPath: string): Promise<string[]> {
   const crdsPath = joinPath(chartPath, "crds");
@@ -160,7 +160,7 @@ export async function readChartCrds(chartPath: string): Promise<K8sCrd[]> {
   );
 }
 
-const validateK8sResource = createTypedParser(K8sResourceSchema);
+const validateK8sResource = createValidator(K8sResourceSchema);
 
 const memoizedAllApiVersions = memoize(async () => {
   const apiVersionsFromEnv = Deno.env.get("HELMET_KUBECTL_API_VERSIONS");
@@ -239,14 +239,14 @@ const memoizedKubeVersion = memoize(async () => {
   const json = JSON.parse(out);
 
   if (useServerVersion) {
-    const validation = typedParse(KubectlServerVersionCmdOutputSchema, json);
+    const validation = validate(KubectlServerVersionCmdOutputSchema, json);
     if (!validation.isSuccess) {
       throw new Error(`Got invalid output for command: ${cmd.join(" ")}`);
     }
     return validation.value.serverVersion.gitVersion;
   }
 
-  const validation = typedParse(KubectlClientVersionCmdOutputSchema, json);
+  const validation = validate(KubectlClientVersionCmdOutputSchema, json);
   if (!validation.isSuccess) {
     throw new Error(`Got invalid output for command: ${cmd.join(" ")}`);
   }
@@ -335,7 +335,7 @@ ${JSON.stringify(docResult.errors, null, 2)}
   return transformedDocs;
 }
 
-const validateK8sCrd = createTypedParser(K8sCrdSchema);
+const validateK8sCrd = createValidator(K8sCrdSchema);
 
 export const HelmLsResultSchema = Arr(Obj({
   name: Str(),
