@@ -4,7 +4,7 @@
   "exports": {
     ".": "./src/mod.ts",
     "./cli": "./src/cli.ts",
-    "./deps/typebox": "./src/deps/typebox.ts",
+    "./deps/schema": "./src/deps/schema.ts",
     "./deps/k8s": "./src/deps/k8s.ts"
   },
   "publish": {
