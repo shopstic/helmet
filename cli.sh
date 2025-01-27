@@ -6,7 +6,9 @@ ENTRY_FILE="./src/cli.ts"
 MOD_FILE="./src/mod.ts"
 
 update_deps() {
-  deno run -A jsr:@wok/deup@2.1.0 update "$@"
+  local PKG
+  PKG=$(jq -er '.imports["@wok/deup"]' <deno.json) || exit $?
+  deno run -A "${PKG}" update "$@"
   "$0" update_lock
 }
 
