@@ -26,7 +26,7 @@
           hotPotPkgs = hotPot.packages.${system};
           json2ts = pkgs.callPackage ./nix/json2ts {
             npmlock2nix = (import npmlock2nix { inherit pkgs; }).v2;
-            nodejs = pkgs.nodejs_20;
+            nodejs = pkgs.nodejs_22;
           };
           deno = hotPotPkgs.deno;
           runtimeInputs = builtins.attrValues
@@ -129,7 +129,7 @@
                   inherit deno;
                   inherit (pkgs)
                     gh
-                    nodejs_20
+                    nodejs_22
                     jq
                     ;
                   inherit (hotPotPkgs)

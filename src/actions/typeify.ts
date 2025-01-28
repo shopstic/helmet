@@ -507,6 +507,8 @@ async function generateCrdInterface(
       cmd: [
         "json2ts",
         `--input=${tempFile}`,
+        "--maxItems=-1",
+        "--unknownAny",
         `--bannerComment=""`,
       ],
     })).out;
