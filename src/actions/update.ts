@@ -526,7 +526,7 @@ export default createCliAction(
             return [
               bold(red(tag)),
               "Failed updating due to an unexpected error:",
-              String(e),
+              e,
             ];
           }
         };

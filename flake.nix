@@ -51,10 +51,16 @@
                 hasSuffix "/deno.json" path
               );
             };
-          helmet-bin = pkgs.writeShellScript "helmet"
-            (if denoJson.version == "0.0.0" then ''
-              deno run -A --check ${src}/src/cli.ts "$@"
-            '' else ''
+          transpiled-src = pkgs.runCommandLocal "transpiled-src"
+            {
+              buildInputs = [ hotPotPkgs.deno-app-transpile ];
+            }
+            ''
+              cp -r ${src} $out
+              chmod -R +w $out
+              deno-app-transpile --src-path "$out" --import-map-path "$out/deno.json"
+            '';
+          helmet-bin = pkgs.writeShellScript "helmet" ''
               DENO_RUN_FLAGS=("-A")
               if [ ! -f deno.lock ]; then
                 DENO_RUN_FLAGS+=("--no-lock")
@@ -64,8 +70,13 @@
               elif [ -f deno.jsonc ]; then
                 DENO_RUN_FLAGS+=("--config=deno.jsonc")
               fi
+
+              ${(if denoJson.version == "0.0.0" then ''
+              deno run "''${DENO_RUN_FLAGS[@]}" ${transpiled-src}/src/cli.ts "$@"
+            '' else ''
               deno run "''${DENO_RUN_FLAGS[@]}" jsr:${denoJson.name}@${denoJson.version}/cli "$@"
-            '');
+            '')}
+          '';
           helmet = pkgs.runCommandLocal "helmet"
             {
               buildInputs = [ pkgs.makeWrapper ];
@@ -131,7 +142,7 @@
               '';
             };
           packages = {
-            inherit json2ts helmet;
+            inherit json2ts helmet transpiled-src helmet-bin;
             devEnv = devShell.inputDerivation;
           };
           defaultPackage = packages.helmet;
