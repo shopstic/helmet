@@ -1,35 +1,11 @@
-import { stringify as stringifyYaml } from "@std/yaml";
-import { captureExec } from "@wok/utils/exec";
+import { parseAll, stringify } from "@std/yaml";
 
-export function stringifyYamlRelaxed(value: Record<string, unknown>): string {
-  return stringifyYaml(value, {
+export function stringifyYamlRelaxed(value: unknown): string {
+  return stringify(value, {
     skipInvalid: true,
   });
 }
 
-export async function parseMultiDocumentsYaml(
-  rawYaml: string,
-): Promise<Record<string, unknown>[]> {
-  const raw = await captureExec({
-    cmd: [
-      "yq",
-      "ea",
-      "-o=json",
-      "-N",
-      ". as $doc ireduce ([]; . + $doc)",
-      "-",
-    ],
-    stdin: {
-      pipe: rawYaml,
-    },
-  }).catch((e) => {
-    console.error(rawYaml);
-    return Promise.reject(
-      new Error(
-        `Failed parsing YAML to JSON: ${e.toString()}`,
-      ),
-    );
-  });
-
-  return JSON.parse(raw.out);
+export function parseMultiDocumentsYaml(rawYaml: string): unknown[] {
+  return parseAll(rawYaml) as unknown[];
 }

@@ -5,11 +5,12 @@ import { basename, join as joinPath, resolve as resolvePath } from "@std/path";
 import { exists as fsExists, expandGlobSync } from "@std/fs";
 import { parse as parseYaml } from "@std/yaml";
 import { pascalCase } from "@wok/case";
-import { captureExec, inheritExec, printErrLines } from "@wok/utils/exec";
+import { inheritExec, printErrLines } from "@wok/utils/exec";
 import { K8sCrdApiVersionV1beta1 } from "@wok/utils/k8s";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { cyan, gray } from "@std/fmt/colors";
 import { Str } from "../deps/schema.ts";
+import { compile as jsonSchemaToTs } from "json-schema-to-typescript";
 
 export type ClassifiedType =
   | "array"
@@ -53,7 +54,7 @@ interface TypeDef {
 const imports = [
   {
     props: ["K8s"],
-    from: "../deps/helmet.ts",
+    from: "@wok/helmet",
   },
 ];
 
@@ -69,7 +70,7 @@ export const pullPolicyType: TypeDef = {
   imports: [
     {
       props: ["K8sImagePullPolicy"],
-      from: "../deps/helmet.ts",
+      from: "@wok/helmet",
     },
   ],
 };
@@ -484,6 +485,25 @@ async function readChartValues(
   return deepMerge(baseValues, values);
 }
 
+function walkAndTransformJsonSchemaInPlace(
+  schema: unknown,
+  transform: (node: unknown) => void,
+): void {
+  transform(schema);
+
+  if (schema && typeof schema === "object") {
+    if (Array.isArray(schema)) {
+      for (let i = 0; i < schema.length; i++) {
+        walkAndTransformJsonSchemaInPlace(schema[i], transform);
+      }
+    } else {
+      for (const key in schema) {
+        walkAndTransformJsonSchemaInPlace((schema as Record<string, unknown>)[key], transform);
+      }
+    }
+  }
+}
+
 async function generateCrdInterface(
   { kind, group, version, schema }: {
     kind: string;
@@ -493,32 +513,30 @@ async function generateCrdInterface(
   },
 ): Promise<string> {
   const fullName = `${pascalCase(kind)}${pascalCase(version)}`;
-  const tempDir = await Deno.makeTempDir();
+  const transformedSchema = schema ? structuredClone(schema) : {};
 
-  try {
-    const tempFile = joinPath(tempDir, `${fullName}.json`);
+  walkAndTransformJsonSchemaInPlace(transformedSchema, (node) => {
+    if (
+      typeof node === "object" && node !== null && !("type" in node) &&
+      (node as Record<string, unknown>)["x-kubernetes-preserve-unknown-fields"] === true
+    ) {
+      (node as Record<string, unknown>).tsType = "unknown";
+    }
+  });
 
-    await Deno.writeTextFile(
-      tempFile,
-      JSON.stringify(schema || {}, null, 2),
-    );
+  const generated = await jsonSchemaToTs(transformedSchema, fullName, {
+    bannerComment: "",
+    ignoreMinAndMaxItems: true,
+    unknownAny: true,
+    format: false,
+  });
 
-    const generated = (await captureExec({
-      cmd: [
-        "json2ts",
-        `--input=${tempFile}`,
-        "--maxItems=-1",
-        "--unknownAny",
-        `--bannerComment=""`,
-      ],
-    })).out;
+  const apiVersion = `${group}/${version}`;
+  const fixedGenerated = generated
+    .replace(/V1Alpha/g, "V1alpha")
+    .replace(/V1Beta/g, "V1beta");
 
-    const apiVersion = `${group}/${version}`;
-    const fixedGenerated = generated
-      .replace(/V1Alpha/g, "V1alpha")
-      .replace(/V1Beta/g, "V1beta");
-
-    const generatedWithFactory = `${fixedGenerated}
+  const generatedWithFactory = `${fixedGenerated}
  
  export function create${fullName}(obj: ${fullName} & Pick<K8sResource, "metadata">): ${fullName} & K8sResource {
    return {
@@ -531,10 +549,7 @@ async function generateCrdInterface(
  }
  `;
 
-    return generatedWithFactory.replaceAll('("");', "");
-  } finally {
-    await Deno.remove(tempDir, { recursive: true });
-  }
+  return generatedWithFactory.replaceAll('("");', "");
 }
 
 export async function typeifyChart(chartPath: string, typesPath: string) {
@@ -642,7 +657,7 @@ export async function typeifyChart(chartPath: string, typesPath: string) {
 // deno-lint-ignore-file
 // DO NOT MODIFY: This file was generated via "helmet typeify ..."
 ${imports}
-import {basename, extname, joinPath, dirname, fromFileUrl, K8sResource, ChartInstanceConfig} from "../deps/helmet.ts";
+import {basename, extname, joinPath, dirname, fromFileUrl, K8sResource, ChartInstanceConfig} from "@wok/helmet";
 
 export interface ${pascalCaseChartName}ChartValues ${generated.output}
 

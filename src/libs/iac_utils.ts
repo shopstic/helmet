@@ -131,7 +131,7 @@ export async function collectCrdFiles(chartPath: string): Promise<string[]> {
 export async function readChartCrds(chartPath: string): Promise<K8sCrd[]> {
   const crdFiles: string[] = await collectCrdFiles(chartPath);
   const parsed = await Promise.all(crdFiles.map(async (crdFile) => {
-    const rawCrd = await parseMultiDocumentsYaml(
+    const rawCrd = parseMultiDocumentsYaml(
       await Deno.readTextFile(crdFile),
     );
     const crdResult = validateCrds(rawCrd);
@@ -311,7 +311,7 @@ export async function helmTemplate(
     }
   })();
 
-  const docs = await parseMultiDocumentsYaml(rawYaml);
+  const docs = parseMultiDocumentsYaml(rawYaml);
 
   const transformedDocs: K8sResource[] = docs
     .filter((doc) => Boolean(doc))

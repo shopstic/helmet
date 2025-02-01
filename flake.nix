@@ -5,13 +5,9 @@
     hotPot.url = "github:shopstic/nix-hot-pot";
     nixpkgs.follows = "hotPot/nixpkgs";
     flakeUtils.follows = "hotPot/flakeUtils";
-    npmlock2nix = {
-      url = "github:nix-community/npmlock2nix/master";
-      flake = false;
-    };
   };
 
-  outputs = { self, nixpkgs, flakeUtils, hotPot, npmlock2nix }:
+  outputs = { self, nixpkgs, flakeUtils, hotPot }:
     flakeUtils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ]
       (system:
         let
@@ -24,19 +20,13 @@
             ];
           };
           hotPotPkgs = hotPot.packages.${system};
-          json2ts = pkgs.callPackage ./nix/json2ts {
-            npmlock2nix = (import npmlock2nix { inherit pkgs; }).v2;
-            nodejs = pkgs.nodejs_22;
-          };
           deno = hotPotPkgs.deno;
           runtimeInputs = builtins.attrValues
             {
-              inherit json2ts;
               inherit (hotPotPkgs)
                 kubernetes-helm;
               inherit (pkgs)
                 kubectl
-                yq-go
                 sops
                 ;
             };
@@ -142,7 +132,7 @@
               '';
             };
           packages = {
-            inherit json2ts helmet transpiled-src helmet-bin;
+            inherit helmet transpiled-src helmet-bin;
             devEnv = devShell.inputDerivation;
           };
           defaultPackage = packages.helmet;
