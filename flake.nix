@@ -41,14 +41,14 @@
                 hasSuffix "/deno.json" path
               );
             };
-          transpiled-src = pkgs.runCommandLocal "transpiled-src"
+          unmapped-src = pkgs.runCommandLocal "unmapped-src"
             {
-              buildInputs = [ hotPotPkgs.deno-app-transpile ];
+              buildInputs = [ hotPotPkgs.deno-ship ];
             }
             ''
               cp -r ${src} $out
               chmod -R +w $out
-              deno-app-transpile --src-path "$out" --import-map-path "$out/deno.json"
+              deno-ship unmap-specifiers --src-path "$out" --import-map-path "$out/deno.json"
             '';
           helmet-bin = pkgs.writeShellScript "helmet" ''
               DENO_RUN_FLAGS=("-A")
@@ -62,7 +62,7 @@
               fi
 
               ${(if denoJson.version == "0.0.0" then ''
-              deno run "''${DENO_RUN_FLAGS[@]}" ${transpiled-src}/src/cli.ts "$@"
+              deno run "''${DENO_RUN_FLAGS[@]}" ${unmapped-src}/src/cli.ts "$@"
             '' else ''
               deno run "''${DENO_RUN_FLAGS[@]}" jsr:${denoJson.name}@${denoJson.version}/cli "$@"
             '')}
@@ -132,7 +132,7 @@
               '';
             };
           packages = {
-            inherit helmet transpiled-src helmet-bin;
+            inherit helmet unmapped-src helmet-bin;
             devEnv = devShell.inputDerivation;
           };
           defaultPackage = packages.helmet;
