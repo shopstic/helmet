@@ -46,9 +46,9 @@
               buildInputs = [ hotPotPkgs.deno-ship ];
             }
             ''
-              cp -r ${src} $out
+              cp -r --reflink=auto ${src} $out
               chmod -R +w $out
-              deno-ship unmap-specifiers --src-path "$out" --import-map-path "$out/deno.json"
+              deno-ship unmap-specifiers --src-dir "$out" --import-map "$out/deno.json"
             '';
           helmet-bin = pkgs.writeShellScript "helmet" ''
               DENO_RUN_FLAGS=("-A")
