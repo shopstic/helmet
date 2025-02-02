@@ -457,5 +457,5 @@ export function defineChart<E>(
 }
 
 export function deriveName(moduleMeta: { url: string }): string {
-  return basename(fromFileUrl(moduleMeta.url), ".ts");
+  return basename(fromFileUrl(moduleMeta.url), ".ts").replaceAll("_", "-");
 }

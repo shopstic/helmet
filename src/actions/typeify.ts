@@ -663,7 +663,7 @@ export interface ${pascalCaseChartName}ChartValues ${generated.output}
 
 export type ${pascalCaseChartName}ChartInstanceConfig = ChartInstanceConfig<${pascalCaseChartName}ChartValues>
 
-export const defaultName = basename(import.meta.url, extname(import.meta.url))
+export const defaultName = basename(import.meta.url, extname(import.meta.url)).replaceAll("_", "-");
   
 export function create${pascalCaseChartName}(config: Partial<${pascalCaseChartName}ChartInstanceConfig> & { values: ${pascalCaseChartName}ChartValues }): ${pascalCaseChartName}ChartInstanceConfig {
   return {
