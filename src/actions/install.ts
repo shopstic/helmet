@@ -14,12 +14,16 @@ import { getDefaultLogger, type Logger } from "@wok/utils/logger";
 import { fetchCurrentWhitelist, type HelmetWhitelist } from "./whitelist_instance.ts";
 import { arrayPartition } from "@wok/utils/collection";
 
-export function createDigestConfigMap(
+function generateDigestConfigMapName(name: string) {
+  return `run.helmet.digest.v1.${name}`;
+}
+
+function createDigestConfigMap(
   { name, namespace, digest }: { name: string; namespace: string; digest: string },
 ) {
   return createK8sConfigMap({
     metadata: {
-      name: `run.helmet.digest.v1.${name}`,
+      name: generateDigestConfigMapName(name),
       namespace,
     },
     data: {
@@ -28,7 +32,7 @@ export function createDigestConfigMap(
   });
 }
 
-export async function getCurrentDigest(
+async function getCurrentDigest(
   { name, namespace }: { name: string; namespace: string },
 ): Promise<string | undefined> {
   try {
@@ -46,6 +50,24 @@ export async function getCurrentDigest(
     })).out.trim();
   } catch {
     return undefined;
+  }
+}
+
+async function deleteDigestConfigMap(
+  { name, namespace }: { name: string; namespace: string },
+): Promise<void> {
+  try {
+    await inheritExec({
+      cmd: ["kubectl", "delete", "-n", namespace, "configmap", generateDigestConfigMapName(name)],
+      stderr: {
+        ignore: true,
+      },
+      stdout: {
+        ignore: true,
+      },
+    });
+  } catch {
+    // Ignore
   }
 }
 
@@ -387,51 +409,67 @@ export async function install(
 
     logger.info?.("Executing:", cyan(kubectlApplyCmd.join(" ")));
     const tag = gray(`[$ ${kubectlApplyCmd.slice(0, 2).join(" ")} ...]`);
-    await inheritExec({
-      cmd: kubectlApplyCmd,
-      stderr: {
-        read: printErrLines((line) => `${tag} ${line}`),
-      },
-      stdout: {
-        read: printOutLines((line) => `${tag} ${line}`),
-      },
-    });
+
+    try {
+      await inheritExec({
+        cmd: kubectlApplyCmd,
+        stderr: {
+          read: printErrLines((line) => `${tag} ${line}`),
+        },
+        stdout: {
+          read: printOutLines((line) => `${tag} ${line}`),
+        },
+      });
+    } catch (e) {
+      await deleteDigestConfigMap({ name: `${name}-crds`, namespace });
+      throw e;
+    }
   } else {
     logger.info?.("Skipping CRDs, no changes detected");
   }
 
   if (shouldInstallNamespaces) {
-    await helmInstall({
-      name: `${name}-namespaces`,
-      namespace,
-      chartPath: namespacesPath,
-      wait,
-      atomic,
-      cleanupOnFail,
-      force,
-      timeout,
-      createNamespace,
-      debug,
-      logger,
-    });
+    try {
+      await helmInstall({
+        name: `${name}-namespaces`,
+        namespace,
+        chartPath: namespacesPath,
+        wait,
+        atomic,
+        cleanupOnFail,
+        force,
+        timeout,
+        createNamespace,
+        debug,
+        logger,
+      });
+    } catch (e) {
+      await deleteDigestConfigMap({ name: `${name}-namespaces`, namespace });
+      throw e;
+    }
   } else {
     logger.info?.("Skipping namespaces, no changes detected");
   }
 
   if (shouldInstallResources) {
-    await helmInstall({
-      name: `${name}-resources`,
-      namespace,
-      chartPath: resourcesPath,
-      wait,
-      atomic,
-      cleanupOnFail,
-      force,
-      timeout,
-      createNamespace,
-      debug,
-      logger,
-    });
+    try {
+      await helmInstall({
+        name: `${name}-resources`,
+        namespace,
+        chartPath: resourcesPath,
+        wait,
+        atomic,
+        cleanupOnFail,
+        force,
+        timeout,
+        createNamespace,
+        debug,
+        logger,
+      });
+    } catch (e) {
+      await deleteDigestConfigMap({ name: `${name}-resources`, namespace });
+      throw e;
+    }
   } else {
     logger.info?.("Skipping resources, no changes detected");
   }
