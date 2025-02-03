@@ -1,11 +1,13 @@
 import { stringifyYamlRelaxed } from "../libs/yaml_utils.ts";
-import type { HelmetChartInstance } from "../libs/types.ts";
-import { join as joinPath, resolve as resolvePath } from "@std/path";
+import type { CompiledBundleMetaSchema, HelmetChartInstance } from "../libs/types.ts";
+import { basename, join as joinPath, resolve as resolvePath } from "@std/path";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
-import { cyan } from "@std/fmt/colors";
+import { cyan, gray } from "@std/fmt/colors";
 import { importBundleModule } from "../libs/iac_utils.ts";
-import { K8sKind } from "@wok/utils/k8s";
-import { Str } from "../deps/schema.ts";
+import { isK8sNamespace, K8sKind } from "@wok/utils/k8s";
+import { Arr, Str } from "../deps/schema.ts";
+import { getDefaultLogger, type Logger } from "@wok/utils/logger";
+import { extname } from "@std/path/extname";
 
 async function generateChildChart(
   { crdsPath, resourcesPath, namespacesPath, instance }: {
@@ -15,7 +17,7 @@ async function generateChildChart(
     instance: HelmetChartInstance;
   },
 ): Promise<void> {
-  const resourcesWithoutNamespaces = instance.resources.filter((r) => r.kind !== "Namespace");
+  const resourcesWithoutNamespaces = instance.resources.filter((r) => !isK8sNamespace(r));
   const namespaces = instance
     .resources
     .filter((r) => r.kind === "Namespace")
@@ -113,11 +115,12 @@ async function generateChart(
 }
 
 export async function generateParentChart(
-  { name, version, targetPath, children }: {
+  { name, version, targetPath, children, logger }: {
     name: string;
     version: string;
     targetPath: string;
     children: HelmetChartInstance[];
+    logger: Logger;
   },
 ): Promise<void> {
   const crdsPath = joinPath(targetPath, "crds");
@@ -150,8 +153,7 @@ export async function generateParentChart(
           resourcesPath: joinPath(resourcesPath, "rendered"),
           namespacesPath: joinPath(namespacesPath, "rendered"),
           instance,
-        })
-          .then(() => console.error("Generated instance", cyan(instance.name)))
+        }).then(() => logger.info?.("Generated instance", cyan(instance.name)))
       ),
   );
 }
@@ -161,12 +163,14 @@ export async function compile(
     version: string;
     source: string;
     destination: string;
+    logger: Logger;
   },
 ) {
+  const logger = args.logger;
   const source = resolvePath(args.source);
   const destination = resolvePath(args.destination);
 
-  console.error("Importing module", cyan(source));
+  logger.info?.("Importing module", cyan(source));
 
   const bundleModule = await importBundleModule(source);
 
@@ -178,7 +182,7 @@ export async function compile(
 
   const releaseId = bundleModule.releaseId;
 
-  console.error("Creating bundle with releaseId", cyan(releaseId));
+  logger.info?.("Creating bundle with releaseId", cyan(releaseId));
   const chartInstances = await bundleModule.create();
 
   if (!Array.isArray(chartInstances)) {
@@ -193,48 +197,48 @@ export async function compile(
     return map;
   }, new Map<string, number>());
 
-  const resourceDuplicateDetectionMap = chartInstances.flatMap((
-    { namespace, crds, resources },
-  ) => [
-    ...crds,
-    ...resources.map((r) => {
-      const { kind, apiVersion, metadata } = r;
-      return kind !== K8sKind.Namespace && metadata.namespace === undefined
-        ? ({
-          kind,
-          apiVersion,
-          metadata: {
-            name: metadata.name,
-            namespace,
-          },
-        })
-        : r;
-    }),
-  ]).reduce(
-    (map, resource) => {
-      const namespace = resource.metadata.namespace as string | undefined ?? "";
-      const kind = `${resource.kind}/${resource.apiVersion}`;
-      let byNamespaceMap = map.get(kind);
+  const resourceDuplicateDetectionMap = chartInstances
+    .flatMap(({ namespace, crds, resources }) => [
+      ...crds,
+      ...resources.map((r) => {
+        const { kind, apiVersion, metadata } = r;
+        return kind !== K8sKind.Namespace && metadata.namespace === undefined
+          ? ({
+            kind,
+            apiVersion,
+            metadata: {
+              name: metadata.name,
+              namespace,
+            },
+          })
+          : r;
+      }),
+    ])
+    .reduce(
+      (map, resource) => {
+        const namespace = resource.metadata.namespace as string | undefined ?? "";
+        const kind = `${resource.kind}/${resource.apiVersion}`;
+        let byNamespaceMap = map.get(kind);
 
-      if (!byNamespaceMap) {
-        byNamespaceMap = new Map<string, Map<string, number>>();
-        map.set(kind, byNamespaceMap);
-      }
+        if (!byNamespaceMap) {
+          byNamespaceMap = new Map<string, Map<string, number>>();
+          map.set(kind, byNamespaceMap);
+        }
 
-      let byNameMap = byNamespaceMap.get(namespace);
+        let byNameMap = byNamespaceMap.get(namespace);
 
-      if (!byNameMap) {
-        byNameMap = new Map<string, number>();
-        byNamespaceMap.set(namespace, byNameMap);
-      }
+        if (!byNameMap) {
+          byNameMap = new Map<string, number>();
+          byNamespaceMap.set(namespace, byNameMap);
+        }
 
-      const name = resource.metadata.name;
-      const count = byNameMap.get(name) ?? 0;
-      byNameMap.set(name, count + 1);
-      return map;
-    },
-    new Map<string, Map<string, Map<string, number>>>(),
-  );
+        const name = resource.metadata.name;
+        const count = byNameMap.get(name) ?? 0;
+        byNameMap.set(name, count + 1);
+        return map;
+      },
+      new Map<string, Map<string, Map<string, number>>>(),
+    );
 
   for (const [name, count] of chartInstanceDuplicateDetectionMap) {
     if (count > 1) {
@@ -256,15 +260,25 @@ export async function compile(
     }
   }
 
-  console.error("Compiling", source, "to", destination);
+  logger.info?.("Compiling", source, "to", destination);
 
-  await generateParentChart(
-    {
-      name: releaseId,
-      version: args.version,
-      targetPath: destination,
-      children: chartInstances,
-    },
+  await generateParentChart({
+    name: releaseId,
+    version: args.version,
+    targetPath: destination,
+    children: chartInstances,
+    logger,
+  });
+
+  const meta: typeof CompiledBundleMetaSchema.inferInput = {
+    name: releaseId,
+    namespace: bundleModule.releaseNamespace,
+    pure: bundleModule.pure,
+  };
+
+  await Deno.writeTextFile(
+    joinPath(destination, "meta.json"),
+    JSON.stringify(meta, null, 2),
   );
 }
 
@@ -273,20 +287,26 @@ export default createCliAction({
     description: "Version to write to the generated Chart.yaml",
     examples: ["1.0.0"],
   }),
-  source: Str({
-    description: "Path to the instance module's source",
-    examples: ["./instances/prod.ts"],
+  output: Str({
+    description: "Destination path to generate the Helm charts to",
+    examples: ["/path/to/compiled"],
   }),
-  destination: Str({
-    description: "Destination path to generate the Helm chart to",
-    examples: ["/path/to/compiled-prod-chart"],
+  _: Arr(Str(), {
+    description: "Paths to the instance modules",
+    examples: [["/path/to/foo.ts", "/path/to/bar.ts"]],
+    minItems: 1,
+    title: "sources",
   }),
-}, async ({ version, source, destination }) => {
-  await compile({
-    version,
-    source,
-    destination,
-  });
+}, async ({ version, output, _: sources }) => {
+  await Promise.all(sources.map(async (source) => {
+    const name = basename(source, extname(source));
+    await compile({
+      version,
+      source,
+      destination: joinPath(output, name),
+      logger: getDefaultLogger().prefixed(gray(name)),
+    });
+  }));
 
   return ExitCode.Zero;
 });

@@ -2,15 +2,16 @@ import { deepMerge } from "../libs/patch_utils.ts";
 
 import { checkAndImport, type ImportDef, readChartCrds, type TypeifyPatch } from "../libs/iac_utils.ts";
 import { basename, join as joinPath, resolve as resolvePath } from "@std/path";
-import { exists as fsExists, expandGlobSync } from "@std/fs";
+import { exists as fsExists } from "@std/fs";
 import { parse as parseYaml } from "@std/yaml";
 import { pascalCase } from "@wok/case";
 import { inheritExec, printErrLines } from "@wok/utils/exec";
 import { K8sCrdApiVersionV1beta1 } from "@wok/utils/k8s";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { cyan, gray } from "@std/fmt/colors";
-import { Str } from "../deps/schema.ts";
+import { Arr, Str } from "../deps/schema.ts";
 import { compile as jsonSchemaToTs } from "json-schema-to-typescript";
+import { getDefaultLogger, type Logger } from "@wok/utils/logger";
 
 export type ClassifiedType =
   | "array"
@@ -440,7 +441,7 @@ function adaptCrdSchemaToJsonSchema(maybeSchema: unknown): unknown {
 }
 
 async function readChartValues(
-  chartPath: string,
+  { chartPath, logger }: { chartPath: string; logger: Logger },
 ): Promise<Record<string, unknown>> {
   const baseValues: Record<string, unknown> = {};
 
@@ -453,7 +454,7 @@ async function readChartValues(
       if (entry.isDirectory) {
         const subChartName = entry.name;
         const subValues = await readChartValues(
-          joinPath(chartPath, "charts", subChartName),
+          { chartPath: joinPath(chartPath, "charts", subChartName), logger },
         );
         deepMerge(baseValues, { [subChartName]: subValues });
       }
@@ -471,8 +472,8 @@ async function readChartValues(
       try {
         return parseYaml(raw);
       } catch (e) {
-        console.warn(
-          `Failed parsing ${valuesPath}, going types ignore it`,
+        logger.warn?.(
+          `Failed parsing ${valuesPath}, going to ignore it`,
           e,
         );
         return {};
@@ -552,7 +553,9 @@ async function generateCrdInterface(
   return generatedWithFactory.replaceAll('("");', "");
 }
 
-export async function typeifyChart(chartPath: string, typesPath: string) {
+export async function typeifyChart(
+  { chartPath, typesPath, logger }: { chartPath: string; typesPath: string; logger: Logger },
+) {
   const crds = await readChartCrds(chartPath);
 
   const schemas = crds.flatMap((crd) => {
@@ -611,7 +614,7 @@ export async function typeifyChart(chartPath: string, typesPath: string) {
 
   const crdInterfaces = (await Promise.all(schemas)).join("\n");
 
-  const values = await readChartValues(chartPath);
+  const values = await readChartValues({ chartPath, logger });
 
   const chartName = basename(chartPath);
 
@@ -620,7 +623,7 @@ export async function typeifyChart(chartPath: string, typesPath: string) {
   const hasPatch = await fsExists(patchPath);
 
   if (hasPatch) {
-    console.log(cyan(`[${chartName}]`), "Applying patch", patchPath);
+    logger.info?.(cyan(`[${chartName}]`), "Applying patch", patchPath);
   }
 
   const patch = hasPatch ? (await checkAndImport(patchPath)).default as TypeifyPatch : {
@@ -705,27 +708,20 @@ ${crdInterfaces}
 
 export default createCliAction(
   {
-    charts: Str({
-      description: "Glob pattern to match directories of Helm charts, for which types will be generated",
-      examples: ["./charts/*"],
-    }),
     types: Str({
       description: "Path to the destination directory where types will be generated into",
       examples: ["./types"],
     }),
+    _: Arr(Str(), {
+      description: "Paths to directories containing Helm charts",
+      examples: [["./charts/cert-manager"]],
+      minItems: 1,
+    }),
   },
-  async ({ charts, types }) => {
+  async ({ types, _: charts }) => {
+    const logger = getDefaultLogger();
     const resolvedTypesPath = resolvePath(types);
-
-    await Promise.all(
-      Array
-        .from(expandGlobSync(charts, {
-          root: Deno.cwd(),
-        }))
-        .filter((entry) => entry.isDirectory)
-        .map((entry) => typeifyChart(entry.path, resolvedTypesPath)),
-    );
-
+    await Promise.all(charts.map((chartPath) => typeifyChart({ chartPath, typesPath: resolvedTypesPath, logger })));
     return ExitCode.Zero;
   },
 );

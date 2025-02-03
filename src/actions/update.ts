@@ -26,6 +26,7 @@ import { typeifyChart } from "./typeify.ts";
 import { bold, gray, green, red } from "@std/fmt/colors";
 import { checkAndImport } from "../mod.ts";
 import { Opt, Str, validate } from "../deps/schema.ts";
+import { getDefaultLogger, type Logger } from "@wok/utils/logger";
 
 interface ChartUpdateFailure {
   isSuccess: false;
@@ -83,6 +84,7 @@ function fetchRemoteRepoIndexYaml(url: string): Promise<string> {
 async function updateChart(
   ctx: ChartUpdateContext & {
     chartName: string;
+    logger: Logger;
   },
 ): Promise<ChartUpdateResult> {
   const {
@@ -90,6 +92,7 @@ async function updateChart(
     chartPath,
     typesPath,
     remote,
+    logger,
   } = ctx;
   const result = await (() => {
     switch (remote.source) {
@@ -99,18 +102,21 @@ async function updateChart(
           chartPath,
           typesPath,
           remote,
+          logger,
         });
       case RemoteChartSource.OciRegistry:
         return updateOciChart({
           chartPath,
           typesPath,
           remote,
+          logger,
         });
       case RemoteChartSource.RemoteArchive:
         return updateRemoteArchiveChart({
           chartPath,
           typesPath,
           remote,
+          logger,
         });
     }
   })();
@@ -126,10 +132,12 @@ async function updateRemoteArchiveChart({
   chartPath,
   typesPath,
   remote,
+  logger,
 }: {
   chartPath: string;
   typesPath: string;
   remote: RemoteArchiveChartConfig;
+  logger: Logger;
 }): Promise<ChartUpdateResult> {
   const currentChartMeta = await getCurrentChartMetadata(chartPath);
 
@@ -195,7 +203,7 @@ async function updateRemoteArchiveChart({
     if (remote.onDownloaded) {
       await remote.onDownloaded({ chartPath, typesPath, remote });
     }
-    await typeifyChart(chartPath, typesPath);
+    await typeifyChart({ chartPath, typesPath, logger });
 
     return {
       isSuccess: true,
@@ -219,10 +227,12 @@ async function updateOciChart(
     chartPath,
     typesPath,
     remote,
+    logger,
   }: {
     chartPath: string;
     typesPath: string;
     remote: OciRegistryChartConfig;
+    logger: Logger;
   },
 ): Promise<ChartUpdateResult> {
   const currentChartMeta = await getCurrentChartMetadata(chartPath);
@@ -282,7 +292,7 @@ async function updateOciChart(
     if (remote.onDownloaded) {
       await remote.onDownloaded({ chartPath, typesPath, remote });
     }
-    await typeifyChart(chartPath, typesPath);
+    await typeifyChart({ chartPath, typesPath, logger });
 
     return {
       isSuccess: true,
@@ -306,11 +316,13 @@ async function updateHelmRepoChart({
   chartPath,
   typesPath,
   remote,
+  logger,
 }: {
   chartName: string;
   chartPath: string;
   typesPath: string;
   remote: HelmRepoChartConfig;
+  logger: Logger;
 }): Promise<ChartUpdateResult> {
   const { remoteRepoUrl, remoteName } = remote;
   const currentChartMeta = await getCurrentChartMetadata(chartPath);
@@ -412,7 +424,7 @@ async function updateHelmRepoChart({
       if (remote.onDownloaded) {
         await remote.onDownloaded({ chartPath, typesPath, remote });
       }
-      await typeifyChart(chartPath, typesPath);
+      await typeifyChart({ chartPath, typesPath, logger });
 
       return {
         isSuccess: true,
@@ -453,6 +465,7 @@ export default createCliAction(
     })),
   },
   async ({ manifest, charts: chartsPath, types: typesPath, only }) => {
+    const logger = getDefaultLogger();
     const resolvedManifest = resolvePath(manifest);
     const resolvedChartsPath = resolvePath(chartsPath);
     const resolvedTypesPath = resolvePath(typesPath);
@@ -497,6 +510,7 @@ export default createCliAction(
               remote,
               chartPath,
               typesPath: resolvedTypesPath,
+              logger,
             });
 
             if (result.isSuccess) {

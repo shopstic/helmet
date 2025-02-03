@@ -1,6 +1,6 @@
 {
   "name": "@wok/helmet",
-  "version": "0.0.0",
+  "version": "*",
   "exports": {
     ".": "./src/mod.ts",
     "./cli": "./src/cli.ts",
@@ -29,16 +29,16 @@
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.11",
-    "@std/fmt": "jsr:@std/fmt@^1.0.4",
-    "@std/fs": "jsr:@std/fs@^1.0.10",
+    "@std/fmt": "jsr:@std/fmt@^1.0.5",
+    "@std/fs": "jsr:@std/fs@^1.0.11",
     "@std/path": "jsr:@std/path@^1.0.8",
     "@std/semver": "jsr:@std/semver@^1.0.3",
-    "@std/streams": "jsr:@std/streams@^1.0.8",
+    "@std/streams": "jsr:@std/streams@^1.0.9",
     "@std/yaml": "jsr:@std/yaml@^1.0.5",
     "@wok/case": "jsr:@wok/case@^1.0.2",
     "@wok/deup": "jsr:@wok/deup@^2.1.2",
     "@wok/schema": "jsr:@wok/schema@^2.2.0",
-    "@wok/utils": "jsr:@wok/utils@^4.2.6",
+    "@wok/utils": "jsr:@wok/utils@^4.2.9",
     "json-schema-to-typescript": "npm:json-schema-to-typescript@^15.0.4"
   }
 }

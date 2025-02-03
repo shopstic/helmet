@@ -1,11 +1,52 @@
 import { captureExec, inheritExec, printErrLines, printOutLines } from "@wok/utils/exec";
 import { join as joinPath, resolve as resolvePath } from "@std/path";
-import { expandGlobSync } from "@std/fs";
+import { expandGlob } from "@std/fs";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
-import { cyan, gray } from "@std/fmt/colors";
+import { bold, cyan, gray, yellow } from "@std/fmt/colors";
 import { HelmLsResultSchema } from "../libs/iac_utils.ts";
 import { TextLineStream } from "@std/streams/text-line-stream";
-import { Bool, Obj, Opt, Str, validate } from "../deps/schema.ts";
+import { Arr, Bool, Obj, Opt, Str, validate } from "../deps/schema.ts";
+import { CompiledBundleMetaSchema } from "../libs/types.ts";
+import { createK8sConfigMap } from "../deps/k8s.ts";
+import { calculateDirectoryDigest, getCurrentKubeContext } from "../libs/cli_utils.ts";
+import { stringifyYamlRelaxed } from "../libs/yaml_utils.ts";
+import { getDefaultLogger, type Logger } from "@wok/utils/logger";
+import { fetchCurrentWhitelist, type HelmetWhitelist } from "./whitelist_instance.ts";
+
+export function createDigestConfigMap(
+  { name, namespace, digest }: { name: string; namespace: string; digest: string },
+) {
+  return createK8sConfigMap({
+    metadata: {
+      name: `run.helmet.digest.v1.${name}`,
+      namespace,
+    },
+    data: {
+      digest,
+    },
+  });
+}
+
+export async function getCurrentDigest(
+  { name, namespace }: { name: string; namespace: string },
+): Promise<string | undefined> {
+  try {
+    return (await captureExec({
+      cmd: [
+        "kubectl",
+        "get",
+        "-n",
+        namespace,
+        "configmap",
+        `run.helmet.digest.v1.${name}`,
+        "-o",
+        "jsonpath={.data.digest}",
+      ],
+    })).out.trim();
+  } catch {
+    return undefined;
+  }
+}
 
 async function helmInstall(
   {
@@ -19,6 +60,7 @@ async function helmInstall(
     force,
     createNamespace,
     debug,
+    logger,
   }: {
     name: string;
     namespace: string;
@@ -30,6 +72,7 @@ async function helmInstall(
     force: boolean;
     createNamespace: boolean;
     debug: boolean;
+    logger: Logger;
   },
 ) {
   const helmLsResultRaw = JSON.parse(
@@ -79,7 +122,7 @@ async function helmInstall(
       chartPath,
     ];
 
-  console.log(`Executing:`, cyan(helmUpgradeCmd.join(" ")));
+  logger.info?.(`Executing:`, cyan(helmUpgradeCmd.join(" ")));
 
   const tag = gray(`[$ ${helmUpgradeCmd.slice(0, 2).join(" ")} ...]`);
   let redactingOutput = false;
@@ -112,16 +155,6 @@ async function helmInstall(
 }
 
 export const ParamsSchema = {
-  name: Str({
-    description:
-      "Helm release base name. This will be used as the prefx of the different sub-releases (*-crds, *-namespaces and *-resources)",
-  }),
-  namespace: Str({
-    description: "The namespace where the Secrets for Helm releases are stored",
-  }),
-  source: Str({
-    description: "Path to the compiled instance generated from `helmet compile ...`",
-  }),
   wait: Opt(
     Bool({
       description: "Whether to pass --wait to the underlying `helm upgrade ...` process",
@@ -171,96 +204,196 @@ export const ParamsSchema = {
     }),
     false,
   ),
+  ignorePurity: Opt(
+    Bool({
+      description: "Whether to ignore the purity of the bundle and install it anyway",
+      examples: [false],
+    }),
+    false,
+  ),
+  _: Arr(Str(), {
+    description: "Paths to the compiled instances generated from `helmet compile ...`",
+    title: "sources",
+    minItems: 1,
+  }),
 };
 
 const ParamsSchemaObj = Obj(ParamsSchema);
 type ParamsSchema = typeof ParamsSchemaObj.infer;
 
 export async function install(
-  {
-    name,
-    namespace,
-    source,
-    wait,
-    atomic,
-    cleanupOnFail,
-    force,
-    createNamespace,
-    debug,
-    timeout,
-  }: ParamsSchema,
-) {
+  { source, wait, atomic, cleanupOnFail, force, createNamespace, debug, timeout, ignorePurity, logger, whitelist }:
+    & Omit<ParamsSchema, "_">
+    & { source: string; logger: Logger; whitelist: HelmetWhitelist },
+): Promise<boolean> {
   const resolvedSource = resolvePath(source);
+  const metaPath = resolvePath(joinPath(resolvedSource, "meta.json"));
+  const crdsPath = joinPath(resolvedSource, "crds");
+  const namespacesPath = joinPath(resolvedSource, "namespaces");
+  const resourcesPath = joinPath(resolvedSource, "resources");
+  let currentCrdsDigest: string | undefined;
+  let currentNamespacesDigest: string | undefined;
+  let currentResourcesDigest: string | undefined;
 
-  console.log(`Installing ${resolvedSource}`);
-  const crdsRenderedPath = joinPath(resolvedSource, "crds/rendered");
+  let newCrdsDigest: string | undefined;
+  let newNamespacesDigest: string | undefined;
+  let newResourcesDigest: string | undefined;
 
-  const hasCrds = Array
-    .from(expandGlobSync("*.yaml", {
-      root: crdsRenderedPath,
-    })).length > 0;
+  logger.info?.(`Installing ${cyan(resolvedSource)}`);
+  const metaJson = JSON.parse(await Deno.readTextFile(metaPath));
+  const metaValidation = validate(CompiledBundleMetaSchema, metaJson);
+
+  if (!metaValidation.isSuccess) {
+    logger.error?.("Failed validating compiled bundle meta.json", JSON.stringify(metaValidation.errors, null, 2));
+    return false;
+  }
+
+  const { pure, name, namespace } = metaValidation.value;
+  const installLogger = logger.prefixed(gray(name));
+
+  if (!whitelist.set.has(name)) {
+    const currentKubeContext = await getCurrentKubeContext();
+    installLogger.error?.("Bundle instance", bold(yellow(name)), "is not whitelisted");
+    installLogger.error?.("Current Kubernetes context is", cyan(currentKubeContext.trim()));
+    installLogger.error?.("The current whitelisted set is", whitelist.set);
+    return false;
+  }
+
+  if (pure) {
+    [
+      newCrdsDigest,
+      newNamespacesDigest,
+      newResourcesDigest,
+    ] = await Promise.all([
+      calculateDirectoryDigest(crdsPath),
+      calculateDirectoryDigest(namespacesPath),
+      calculateDirectoryDigest(resourcesPath),
+    ]);
+
+    if (ignorePurity) {
+      installLogger.info?.("Bundle is marked pure but --ignore-purity is set, skipping digest comparison");
+    } else {
+      installLogger.info?.("Bundle is marked pure, fetching current digests and calculating new digests...");
+      [
+        currentCrdsDigest,
+        currentNamespacesDigest,
+        currentResourcesDigest,
+      ] = await Promise.all([
+        getCurrentDigest({ name: `${name}-crds`, namespace }),
+        getCurrentDigest({ name: `${name}-namespaces`, namespace }),
+        getCurrentDigest({ name: `${name}-resources`, namespace }),
+      ]);
+      installLogger.debug?.("CRDs digest", currentCrdsDigest, "vs", newCrdsDigest);
+      installLogger.debug?.("Namespaces digest", currentNamespacesDigest, "vs", newNamespacesDigest);
+      installLogger.debug?.("Resources digest", currentResourcesDigest, "vs", newResourcesDigest);
+    }
+  }
+
+  const crdsRenderedPath = joinPath(crdsPath, "rendered");
+
+  const hasCrds = (await Array.fromAsync(expandGlob("*.yaml", { root: crdsRenderedPath }))).length > 0;
 
   if (hasCrds) {
-    const kubectlApplyCmd = [
-      "kubectl",
-      "apply",
-      "--server-side",
-      "--force-conflicts",
-      "-f",
-      crdsRenderedPath,
-    ];
+    if (newCrdsDigest !== undefined && newCrdsDigest === currentCrdsDigest) {
+      installLogger.info?.("CRDs have not changed, skipping installation");
+    } else {
+      if (newCrdsDigest !== undefined) {
+        await Deno.writeTextFile(
+          joinPath(crdsRenderedPath, `digest-${newCrdsDigest}.yaml`),
+          stringifyYamlRelaxed(createDigestConfigMap({ name: `${name}-crds`, namespace, digest: newCrdsDigest })),
+        );
+      }
 
-    console.log("Executing:", cyan(kubectlApplyCmd.join(" ")));
-    const tag = gray(`[$ ${kubectlApplyCmd.slice(0, 2).join(" ")} ...]`);
-    await inheritExec({
-      cmd: kubectlApplyCmd,
-      stderr: {
-        read: printErrLines((line) => `${tag} ${line}`),
-      },
-      stdout: {
-        read: printOutLines((line) => `${tag} ${line}`),
-      },
+      const kubectlApplyCmd = [
+        "kubectl",
+        "apply",
+        "--server-side",
+        "--force-conflicts",
+        "-f",
+        crdsRenderedPath,
+      ];
+
+      installLogger.info?.("Executing:", cyan(kubectlApplyCmd.join(" ")));
+      const tag = gray(`[$ ${kubectlApplyCmd.slice(0, 2).join(" ")} ...]`);
+      await inheritExec({
+        cmd: kubectlApplyCmd,
+        stderr: {
+          read: printErrLines((line) => `${tag} ${line}`),
+        },
+        stdout: {
+          read: printOutLines((line) => `${tag} ${line}`),
+        },
+      });
+    }
+  }
+
+  if (newNamespacesDigest !== undefined && newNamespacesDigest === currentNamespacesDigest) {
+    installLogger.info?.("Namespaces have not changed, skipping installation");
+  } else {
+    if (newNamespacesDigest !== undefined) {
+      await Deno.writeTextFile(
+        joinPath(namespacesPath, "rendered", `digest-${newNamespacesDigest}.yaml`),
+        stringifyYamlRelaxed(
+          createDigestConfigMap({ name: `${name}-namespaces`, namespace, digest: newNamespacesDigest }),
+        ),
+      );
+    }
+
+    await helmInstall({
+      name: `${name}-namespaces`,
+      namespace,
+      chartPath: namespacesPath,
+      wait,
+      atomic,
+      cleanupOnFail,
+      force,
+      timeout,
+      createNamespace,
+      debug,
+      logger: installLogger,
     });
   }
 
-  await helmInstall({
-    name: `${name}-namespaces`,
-    namespace,
-    chartPath: joinPath(resolvedSource, "namespaces"),
-    wait,
-    atomic,
-    cleanupOnFail,
-    force,
-    timeout,
-    createNamespace,
-    debug,
-  });
+  if (newResourcesDigest !== undefined && newResourcesDigest === currentResourcesDigest) {
+    installLogger.info?.("Resources have not changed, skipping installation");
+  } else {
+    if (newResourcesDigest !== undefined) {
+      await Deno.writeTextFile(
+        joinPath(resourcesPath, "rendered", `digest-${newResourcesDigest}.yaml`),
+        stringifyYamlRelaxed(
+          createDigestConfigMap({ name: `${name}-resources`, namespace, digest: newResourcesDigest }),
+        ),
+      );
+    }
 
-  /* await inheritExec({
-      cmd: [
-        "kubectl",
-        "apply",
-        "--dry-run=client",
-        "-f",
-        joinPath(source, "resources", "templates"),
-      ],
+    await helmInstall({
+      name: `${name}-resources`,
+      namespace,
+      chartPath: resourcesPath,
+      wait,
+      atomic,
+      cleanupOnFail,
+      force,
+      timeout,
+      createNamespace,
+      debug,
+      logger: installLogger,
     });
- */
-  await helmInstall({
-    name: `${name}-resources`,
-    namespace,
-    chartPath: joinPath(resolvedSource, "resources"),
-    wait,
-    atomic,
-    cleanupOnFail,
-    force,
-    timeout,
-    createNamespace,
-    debug,
-  });
+  }
+
+  return true;
 }
 
-export default createCliAction(ParamsSchema, async (args) => {
-  await install(args);
+export default createCliAction(ParamsSchema, async ({ _: sources, ...args }) => {
+  const logger = getDefaultLogger();
+
+  const whitelist = await fetchCurrentWhitelist();
+
+  for (const source of sources) {
+    if (!await install({ ...args, source, logger, whitelist })) {
+      return ExitCode.One;
+    }
+  }
+
   return ExitCode.Zero;
 });

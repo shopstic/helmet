@@ -113,6 +113,7 @@ export interface HelmetChartInstance {
 export interface HelmetBundle {
   releaseId: string;
   releaseNamespace: string;
+  pure?: boolean;
   create: () => Promise<HelmetChartInstance[]>;
 }
 
@@ -134,4 +135,10 @@ export const KubectlServerVersionCmdOutputSchema = Obj({
   }),
 }, {
   additionalProperties: true,
+});
+
+export const CompiledBundleMetaSchema = Obj({
+  name: Str(),
+  namespace: Str(),
+  pure: Opt(Bool(), false),
 });

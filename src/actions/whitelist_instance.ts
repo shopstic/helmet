@@ -1,22 +1,27 @@
 import { inheritExec, printErrLines, printOutLines } from "@wok/utils/exec";
-import { createK8sConfigMap } from "@wok/utils/k8s";
+import { createK8sConfigMap, type K8sConfigMap } from "@wok/utils/k8s";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { resolve as resolvePath } from "@std/path";
 import { gray } from "@std/fmt/colors";
 import { importBundleModule } from "../libs/iac_utils.ts";
-import { Str } from "../deps/schema.ts";
+import { Arr, Str } from "../deps/schema.ts";
 
-export const CONFIG_MAP_NAME = "helmet-whitelist";
+export const CONFIG_MAP_NAME = "run.helmet.whitelist.v1";
 export const CONFIG_MAP_NAMESPACE = "default";
 
-export async function fetchCurrentWhitelist(): Promise<Set<string>> {
+export interface HelmetWhitelist {
+  set: Set<string>;
+  resourceVersion?: string;
+}
+
+export async function fetchCurrentWhitelist(): Promise<HelmetWhitelist> {
   const output = await new Deno.Command("kubectl", {
     args: [
       "get",
       `configmap/${CONFIG_MAP_NAME}`,
       "-n",
       CONFIG_MAP_NAMESPACE,
-      "-o=jsonpath={.data}",
+      "-o=json",
     ],
     stdout: "piped",
     stderr: "piped",
@@ -27,30 +32,32 @@ export async function fetchCurrentWhitelist(): Promise<Set<string>> {
     if (stderr.indexOf("not found") === -1) {
       throw new Error(stderr);
     }
-    return new Set<string>();
+    return { set: new Set<string>() };
   }
 
   const stdout = new TextDecoder().decode(output.stdout);
 
   if (stdout.length === 0) {
-    return new Set<string>();
+    return { set: new Set<string>() };
   }
 
-  const data: Record<string, string> = JSON.parse(stdout);
+  const configMap: K8sConfigMap = JSON.parse(stdout);
 
-  return new Set(Object.keys(data).filter((k) => data[k] === "yes"));
+  return {
+    set: new Set(Object.entries(configMap.data ?? {}).filter(([_, v]) => v === "yes").map(([k]) => k)),
+    resourceVersion: configMap.metadata.resourceVersion,
+  };
 }
 
-export async function updateWhitelist(
-  instances: Set<string>,
-): Promise<void> {
+export async function updateWhitelist(whitelist: HelmetWhitelist): Promise<void> {
   const newConfigMap = createK8sConfigMap({
     metadata: {
       name: CONFIG_MAP_NAME,
       namespace: CONFIG_MAP_NAMESPACE,
+      resourceVersion: whitelist.resourceVersion,
     },
     data: Object.fromEntries(
-      Array.from(instances).map((name) => [name, "yes"]),
+      Array.from(whitelist.set).map((name) => [name, "yes"]),
     ),
   });
 
@@ -72,21 +79,24 @@ export async function updateWhitelist(
 
 export default createCliAction(
   {
-    path: Str({
-      description: "Path to the instance module",
-      examples: ["./instances/prod.ts"],
+    _: Arr(Str(), {
+      description: "Paths to the instance modules",
+      examples: [["./instances/one.ts"], ["./instances/two.ts"]],
+      title: "paths",
+      minItems: 1,
     }),
   },
-  async ({ path }) => {
-    const source = resolvePath(path);
+  async ({ _: paths }) => {
+    const whitelist = await fetchCurrentWhitelist();
 
-    const bundleModule = await importBundleModule(source);
-    const { releaseId } = bundleModule;
-    const whitelistedSet = await fetchCurrentWhitelist();
+    await Promise.all(paths.map(async (path) => {
+      const source = resolvePath(path);
+      const bundleModule = await importBundleModule(source);
+      const { releaseId } = bundleModule;
+      whitelist.set.add(releaseId);
+    }));
 
-    whitelistedSet.add(releaseId);
-
-    await updateWhitelist(whitelistedSet);
+    await updateWhitelist(whitelist);
 
     return ExitCode.Zero;
   },

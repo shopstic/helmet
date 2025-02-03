@@ -5,7 +5,6 @@ import typeify from "./actions/typeify.ts";
 import update from "./actions/update.ts";
 import whitelistInstance from "./actions/whitelist_instance.ts";
 import blacklistInstance from "./actions/blacklist_instance.ts";
-import ensureInstanceWhitelisted from "./actions/ensure_instance_whitelisted.ts";
 import { CliProgram } from "@wok/utils/cli";
 import version from "./actions/version.ts";
 import { bold, red } from "@std/fmt/colors";
@@ -18,7 +17,6 @@ const program = new CliProgram()
   .addAction("update", update)
   .addAction("whitelist", whitelistInstance)
   .addAction("blacklist", blacklistInstance)
-  .addAction("ensure-whitelisted", ensureInstanceWhitelisted)
   .addAction("version", version);
 
 try {

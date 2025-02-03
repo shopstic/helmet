@@ -6,7 +6,7 @@ export default createCliAction(
   () => {
     console.log(JSON.stringify(
       {
-        app: config.version === "0.0.0" ? "dev" : config.version,
+        app: config.version === "*" ? "dev" : config.version,
         ...Deno.version,
       },
       null,

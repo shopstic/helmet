@@ -28,6 +28,8 @@
               inherit (pkgs)
                 kubectl
                 sops
+                gnutar
+                coreutils
                 ;
             };
           denoJson = builtins.fromJSON (builtins.readFile ./deno.json);
@@ -61,7 +63,7 @@
                 DENO_RUN_FLAGS+=("--config=deno.jsonc")
               fi
 
-              ${(if denoJson.version == "0.0.0" then ''
+              ${(if denoJson.version == "*" then ''
               deno run "''${DENO_RUN_FLAGS[@]}" ${unmapped-src}/src/cli.ts "$@"
             '' else ''
               deno run "''${DENO_RUN_FLAGS[@]}" jsr:${denoJson.name}@${denoJson.version}/cli "$@"
