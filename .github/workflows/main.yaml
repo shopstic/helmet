@@ -18,6 +18,7 @@ jobs:
     runs-on: [self-hosted, nix, general, "${{ matrix.arch.runner }}", small]
     timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         arch:
           - nix: x86_64-linux
@@ -46,14 +47,18 @@ jobs:
         env:
           NIX_OUTPUT: .#packages.${{ matrix.arch.nix }}.devEnv
         run: |
-          nix store sign "${NIX_OUTPUT}" -v -r -k ~/.secrets/nix-cache-private-key
+          NIX_CACHE_SIGNING_PRIVATE_KEY_PATH=${NIX_CACHE_SIGNING_PRIVATE_KEY_PATH:?"NIX_CACHE_SIGNING_PRIVATE_KEY_PATH env var is not set"}
+          NIX_CACHE_BUCKET_NAME=${NIX_CACHE_BUCKET_NAME:?"NIX_CACHE_BUCKET_NAME env var is not set"}
+          NIX_CACHE_BUCKET_REGION=${NIX_CACHE_BUCKET_REGION:?"NIX_CACHE_BUCKET_REGION env var is not set"}
+
+          nix store sign "${NIX_OUTPUT}" -v -r -k "${NIX_CACHE_SIGNING_PRIVATE_KEY_PATH}"
           nix copy -v --to "s3://${NIX_CACHE_BUCKET_NAME}/cache?region=${NIX_CACHE_BUCKET_REGION}&compression=zstd&parallel-compression=true" "${NIX_OUTPUT}"
 
       - name: Cache helmet
         env:
           NIX_OUTPUT: .#defaultPackage.${{ matrix.arch.nix }}
         run: |
-          nix store sign "${NIX_OUTPUT}" -v -r -k ~/.secrets/nix-cache-private-key
+          nix store sign "${NIX_OUTPUT}" -v -r -k "${NIX_CACHE_SIGNING_PRIVATE_KEY_PATH}"
           nix copy -v --to "s3://${NIX_CACHE_BUCKET_NAME}/cache?region=${NIX_CACHE_BUCKET_REGION}&compression=zstd&parallel-compression=true" "${NIX_OUTPUT}"
 
   release:
