@@ -65,7 +65,7 @@ jobs:
     name: Release ${{ github.event.inputs.version }}
     if: github.event.inputs.version
     needs: [build]
-    runs-on: [self-hosted, nix, general, arm64-linux, small]
+    runs-on: [self-hosted, nix, general, amd64-linux, small]
     permissions:
       contents: write
       id-token: write    
