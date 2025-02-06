@@ -6,9 +6,9 @@ ENTRY_FILE="./src/cli.ts"
 MOD_FILE="./src/mod.ts"
 
 update_deps() {
-  local PKG
-  PKG=$(jq -er '.imports["@wok/deup"]' <deno.json) || exit $?
-  deno run -A "${PKG}" update "$@"
+  local pkg
+  pkg=$(jq -er '.imports["@wok/deup"]' <deno.json) || exit $?
+  deno run -A "${pkg}" update "$@"
   "$0" update_lock
 }
 
@@ -37,10 +37,10 @@ auto_fmt() {
 }
 
 set_version() {
-  local VERSION=${1:-"dev"}
-  local JSR_JSON
-  JSR_JSON=$(jq -e --arg VERSION "${VERSION}" '.version=$VERSION' ./deno.json)
-  echo "${JSR_JSON}" >./deno.json
+  local version=${1:-"dev"}
+  local jsr_json
+  jsr_json=$(jq -e --arg VERSION "${version}" '.version=$VERSION' ./deno.json)
+  echo "${jsr_json}" >./deno.json
 }
 
 jsr_publish() {
@@ -48,18 +48,18 @@ jsr_publish() {
 }
 
 create_release() {
-  local RELEASE_VERSION=${1:?"Release version is required"}
-  local RELEASE_BRANCH="releases/${RELEASE_VERSION}"
+  local release_version=${1:?"Release version is required"}
+  local release_branch="releases/${release_version}"
 
   git config --global user.email "ci-runner@shopstic.com"
   git config --global user.name "CI Runner"
-  git checkout -b "${RELEASE_BRANCH}"
+  git checkout -b "${release_branch}"
 
   git add ./deno.json
-  git commit -m "Release ${RELEASE_VERSION}"
-  git push origin "${RELEASE_BRANCH}"
+  git commit -m "Release ${release_version}"
+  git push origin "${release_branch}"
 
-  gh release create "${RELEASE_VERSION}" --title "Release ${RELEASE_VERSION}" --notes "" --target "${RELEASE_BRANCH}"
+  gh release create "${release_version}" --title "Release ${release_version}" --notes "" --target "${release_branch}"
 }
 
 update_cache() {
