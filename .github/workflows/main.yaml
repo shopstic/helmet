@@ -8,6 +8,11 @@ on:
         description: "Release version"
         required: true
 
+env:
+  NIX_CACHE_BUCKET_NAME: ${{ vars.NIX_CACHE_BUCKET_NAME }}
+  NIX_CACHE_BUCKET_REGION: ${{ vars.NIX_CACHE_BUCKET_REGION }}
+  NIX_CACHE_SIGNING_PRIVATE_KEY: ${{ secrets.NIX_CACHE_SIGNING_PRIVATE_KEY }}
+
 defaults:
   run:
     shell: nix develop -v -c bash {0}
@@ -47,18 +52,14 @@ jobs:
         env:
           NIX_OUTPUT: .#packages.${{ matrix.arch.nix }}.devEnv
         run: |
-          NIX_CACHE_SIGNING_PRIVATE_KEY_PATH=${NIX_CACHE_SIGNING_PRIVATE_KEY_PATH:?"NIX_CACHE_SIGNING_PRIVATE_KEY_PATH env var is not set"}
-          NIX_CACHE_BUCKET_NAME=${NIX_CACHE_BUCKET_NAME:?"NIX_CACHE_BUCKET_NAME env var is not set"}
-          NIX_CACHE_BUCKET_REGION=${NIX_CACHE_BUCKET_REGION:?"NIX_CACHE_BUCKET_REGION env var is not set"}
-
-          nix store sign "${NIX_OUTPUT}" -v -r -k "${NIX_CACHE_SIGNING_PRIVATE_KEY_PATH}"
+          nix store sign "${NIX_OUTPUT}" -v -r -k <(echo -n "${NIX_CACHE_SIGNING_PRIVATE_KEY}")
           nix copy -v --to "s3://${NIX_CACHE_BUCKET_NAME}/cache?region=${NIX_CACHE_BUCKET_REGION}&compression=zstd&parallel-compression=true" "${NIX_OUTPUT}"
 
       - name: Cache helmet
         env:
           NIX_OUTPUT: .#defaultPackage.${{ matrix.arch.nix }}
         run: |
-          nix store sign "${NIX_OUTPUT}" -v -r -k "${NIX_CACHE_SIGNING_PRIVATE_KEY_PATH}"
+          nix store sign "${NIX_OUTPUT}" -v -r -k <(echo -n "${NIX_CACHE_SIGNING_PRIVATE_KEY}")
           nix copy -v --to "s3://${NIX_CACHE_BUCKET_NAME}/cache?region=${NIX_CACHE_BUCKET_REGION}&compression=zstd&parallel-compression=true" "${NIX_OUTPUT}"
 
   release:
