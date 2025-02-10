@@ -82,11 +82,12 @@
             text = builtins.toJSON {
               "deno.enable" = true;
               "deno.lint" = true;
-              "deno.unstable" = true;
               "deno.path" = deno + "/bin/deno";
               "deno.suggest.imports.hosts" = {
                 "https://deno.land" = false;
               };
+              "deno.codeLens.test" = true;
+              "deno.codeLens.testArgs" = [ "-A" "--check" ];
               "editor.tabSize" = 2;
               "[typescript]" = {
                 "editor.defaultFormatter" = "denoland.vscode-deno";

@@ -26,7 +26,7 @@ export type ClassifiedType =
 export type Expectation = (value: unknown) => boolean;
 
 export function isObject(value: unknown): value is Record<string, unknown> {
-  return value === "object" && value !== null && !Array.isArray(value);
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 export function isArray(value: unknown): value is unknown[] {
@@ -35,23 +35,6 @@ export function isArray(value: unknown): value is unknown[] {
 
 export function isString(value: unknown): value is string {
   return typeof value === "string";
-}
-
-export function isNumber(value: unknown): value is number {
-  return typeof value === "number";
-}
-
-export function isBoolean(value: unknown): value is boolean {
-  return typeof value === "boolean";
-}
-
-export function isSymbol(value: unknown): value is symbol {
-  return typeof value === "symbol";
-}
-
-export function isUnknown(value: unknown): value is unknown {
-  return !isObject(value) && !isArray(value) && !isString(value) && !isNumber(value) && !isBoolean(value) &&
-    !isSymbol(value) && value !== null;
 }
 
 export function classifyType(value: unknown): ClassifiedType {
@@ -134,7 +117,7 @@ export const pullPolicyType: TypeDef = {
   ],
 };
 
-const propToTypeMap = {
+export const propToTypeMap = {
   imagePullSecrets: inferArrayType("core.v1.LocalObjectReference"),
   pullPolicy: pullPolicyType,
   imagePullPolicy: pullPolicyType,
