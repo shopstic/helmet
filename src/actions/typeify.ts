@@ -89,16 +89,37 @@ const imports = [
   },
 ];
 
-const localObjectReferenceTypeName = "core.v1.LocalObjectReference" as const;
-export const localObjectReferencesType: TypeDef = {
-  expectation: (value) =>
-    value === null ||
-    (isArray(value) && value.every((v) => {
-      return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[localObjectReferenceTypeName].has(key));
-    })),
-  type: `Array<K8s[${localObjectReferenceTypeName}]>`,
-  imports,
-};
+function inferObjectType<T extends keyof typeof K8sKnownTypeKeySets>(typeName: T): TypeDef {
+  return {
+    expectation: (value) =>
+      value === null || (isObject(value) &&
+        Object.keys(value).every((key) => K8sKnownTypeKeySets[typeName].has(key))),
+    type: `K8s[${JSON.stringify(typeName)}]`,
+    imports,
+  } satisfies TypeDef;
+}
+
+function inferArrayType<T extends keyof typeof K8sKnownTypeKeySets>(typeName: T): TypeDef {
+  return {
+    expectation: (value) =>
+      value === null ||
+      (isArray(value) && value.every((v) => {
+        return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[typeName].has(key));
+      })),
+    type: `Array<K8s[${JSON.stringify(typeName)}]>`,
+    imports,
+  } satisfies TypeDef;
+}
+
+function inferRecordType() {
+  return {
+    expectation: (value) =>
+      value === null ||
+      (isObject(value) && Object.entries(value).every(([key, value]) => isString(key) && isString(value))),
+    type: `Record<string, string>`,
+    imports: [],
+  } satisfies TypeDef;
+}
 
 const pullPolicyTypeName = "K8sImagePullPolicy" as const;
 const knownPullPolicies = new Set(["Always", "IfNotPresent", "Never"]);
@@ -113,177 +134,33 @@ export const pullPolicyType: TypeDef = {
   ],
 };
 
-const annotationsTypeName = "Record<string, string>" as const;
-export const annotationsType: TypeDef = {
-  expectation: (value) =>
-    value === null ||
-    (isObject(value) && Object.entries(value).every(([key, value]) => isString(key) && isString(value))),
-  type: annotationsTypeName,
-  imports: [],
-};
-
-const labelsTypeName = "Record<string, string>" as const;
-export const labelsType: TypeDef = {
-  expectation: (value) =>
-    value === null ||
-    (isObject(value) && Object.entries(value).every(([key, value]) => isString(key) && isString(value))),
-  type: labelsTypeName,
-  imports: [],
-};
-
-const podSecurityContextTypeName = "core.v1.PodSecurityContext" as const;
-export const podSecurityContextType: TypeDef = {
-  expectation: (value) =>
-    value === null || (isObject(value) &&
-      Object.keys(value).every((key) => K8sKnownTypeKeySets[podSecurityContextTypeName].has(key))),
-  type: `K8s[${podSecurityContextTypeName}]`,
-  imports,
-};
-
-const securityContextTypeName = "core.v1.SecurityContext" as const;
-export const securityContextType: TypeDef = {
-  expectation: (value) =>
-    value === null || (isObject(value) &&
-      Object.keys(value).every((key) => K8sKnownTypeKeySets[securityContextTypeName].has(key))),
-  type: `K8s[${securityContextTypeName}]`,
-  imports,
-};
-
-const nodeSelectorTypeName = "Record<string, string>" as const;
-export const nodeSelectorType: TypeDef = {
-  expectation: (value) =>
-    value === null ||
-    (isObject(value) && Object.entries(value).every(([key, value]) => isString(key) && isString(value))),
-  type: nodeSelectorTypeName,
-  imports: [],
-};
-
-const tolerationsTypeName = "core.v1.Toleration" as const;
-export const tolerationsType: TypeDef = {
-  expectation: (value) =>
-    value === null ||
-    (isArray(value) && value.every((v) => {
-      return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[tolerationsTypeName].has(key));
-    })),
-  type: `Array<K8s[${tolerationsTypeName}]>`,
-  imports,
-};
-
-const resourcesTypeName = "core.v1.ResourceRequirements" as const;
-export const resourcesType: TypeDef = {
-  expectation: (value) =>
-    value === null || (isObject(value) &&
-      Object.keys(value).every((key) => K8sKnownTypeKeySets[resourcesTypeName].has(key))),
-  type: `K8s[${resourcesTypeName}]`,
-  imports,
-};
-
-const affinityTypeName = "core.v1.Affinity" as const;
-export const affinityType: TypeDef = {
-  expectation: (value) =>
-    value === null || (isObject(value) &&
-      Object.keys(value).every((key) => K8sKnownTypeKeySets[affinityTypeName].has(key))),
-  type: `K8s[${affinityTypeName}]`,
-  imports,
-};
-
-const envTypeName = "core.v1.EnvVar" as const;
-export const envType: TypeDef = {
-  expectation: (value) =>
-    value === null || (isArray(value) && value.every((v) => {
-      return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[envTypeName].has(key));
-    })),
-  type: `Array<K8s[${envTypeName}]>`,
-  imports,
-};
-
-const probeTypeName = "core.v1.Probe" as const;
-export const probeType: TypeDef = {
-  expectation: (value) =>
-    value === null || (isObject(value) &&
-      Object.keys(value).every((key) => K8sKnownTypeKeySets[probeTypeName].has(key))),
-  type: `K8s[${probeTypeName}]`,
-  imports,
-};
-
-const volumesTypeName = "core.v1.Volume" as const;
-export const volumesType: TypeDef = {
-  expectation: (value) =>
-    value === null || (isArray(value) && value.every((v) => {
-      return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[volumesTypeName].has(key));
-    })),
-  type: `Array<K8s[${volumesTypeName}]>`,
-  imports,
-};
-
-const volumeMountsTypeName = "core.v1.VolumeMount" as const;
-export const volumeMountsType: TypeDef = {
-  expectation: (value) =>
-    value === null ||
-    (isArray(value) && value.every((v) => {
-      return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[volumeMountsTypeName].has(key));
-    })),
-  type: `Array<K8s[${volumeMountsTypeName}]>`,
-  imports,
-};
-
-const dnsConfigTypeName = "core.v1.PodDNSConfig" as const;
-export const dnsConfigType: TypeDef = {
-  expectation: (value) =>
-    value === null ||
-    (isObject(value) &&
-      Object.keys(value).every((key) => K8sKnownTypeKeySets[dnsConfigTypeName].has(key))),
-  type: `K8s[${dnsConfigTypeName}]`,
-  imports,
-};
-
-const containersTypeName = "core.v1.Container" as const;
-export const containersType: TypeDef = {
-  expectation: (value) =>
-    value === null ||
-    (isArray(value) && value.every((v) => {
-      return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[containersTypeName].has(key));
-    })),
-  type: `Array<K8s[${containersTypeName}]>`,
-  imports,
-};
-
-const podDisruptionBudgetTypeName = "policy.v1.PodDisruptionBudgetSpec" as const;
-export const podDisruptionBudgetType: TypeDef = {
-  expectation: (value) =>
-    value === null ||
-    (isObject(value) && Object.keys(value).every((key) => K8sKnownTypeKeySets[podDisruptionBudgetTypeName].has(key))),
-  type: `K8s[${podDisruptionBudgetTypeName}]`,
-  imports,
-};
-
 const propToTypeMap = {
-  imagePullSecrets: localObjectReferencesType,
+  imagePullSecrets: inferArrayType("core.v1.LocalObjectReference"),
   pullPolicy: pullPolicyType,
   imagePullPolicy: pullPolicyType,
-  labels: labelsType,
-  podLabels: labelsType,
-  extraLabels: labelsType,
-  annotations: annotationsType,
-  podAnnotations: annotationsType,
-  podSecurityContext: podSecurityContextType,
-  securityContext: securityContextType,
-  containerSecurityContext: securityContextType,
-  nodeSelector: nodeSelectorType,
-  tolerations: tolerationsType,
-  affinity: affinityType,
-  resources: resourcesType,
-  env: envType,
-  livenessProbe: probeType,
-  readinessProbe: probeType,
-  volumes: volumesType,
-  extraVolumes: volumesType,
-  volumeMounts: volumeMountsType,
-  extraVolumeMounts: volumeMountsType,
-  extraHostVolumeMounts: volumeMountsType,
-  dnsConfig: dnsConfigType,
-  extraContainers: containersType,
-  podDisruptionBudget: podDisruptionBudgetType,
+  labels: inferRecordType(),
+  podLabels: inferRecordType(),
+  extraLabels: inferRecordType(),
+  annotations: inferRecordType(),
+  podAnnotations: inferRecordType(),
+  podSecurityContext: inferObjectType("core.v1.PodSecurityContext"),
+  securityContext: inferObjectType("core.v1.SecurityContext"),
+  containerSecurityContext: inferObjectType("core.v1.SecurityContext"),
+  nodeSelector: inferRecordType(),
+  tolerations: inferArrayType("core.v1.Toleration"),
+  affinity: inferObjectType("core.v1.Affinity"),
+  resources: inferObjectType("core.v1.ResourceRequirements"),
+  env: inferArrayType("core.v1.EnvVar"),
+  livenessProbe: inferObjectType("core.v1.Probe"),
+  readinessProbe: inferObjectType("core.v1.Probe"),
+  volumes: inferArrayType("core.v1.Volume"),
+  extraVolumes: inferArrayType("core.v1.Volume"),
+  volumeMounts: inferArrayType("core.v1.VolumeMount"),
+  extraVolumeMounts: inferArrayType("core.v1.VolumeMount"),
+  extraHostVolumeMounts: inferArrayType("core.v1.VolumeMount"),
+  dnsConfig: inferObjectType("core.v1.PodDNSConfig"),
+  extraContainers: inferArrayType("core.v1.Container"),
+  podDisruptionBudget: inferObjectType("policy.v1.PodDisruptionBudgetSpec"),
 };
 
 type KnownKey = keyof typeof propToTypeMap;
