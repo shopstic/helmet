@@ -12,6 +12,7 @@ import { cyan, gray } from "@std/fmt/colors";
 import { Arr, Str } from "../deps/schema.ts";
 import { compile as jsonSchemaToTs } from "json-schema-to-typescript";
 import { getDefaultLogger, type Logger } from "@wok/utils/logger";
+import { K8sKnownTypeKeySets } from "@wok/k8s/known-type-key-sets";
 
 export type ClassifiedType =
   | "array"
@@ -23,6 +24,35 @@ export type ClassifiedType =
   | "unknown";
 
 export type Expectation = (value: unknown) => boolean;
+
+export function isObject(value: unknown): value is Record<string, unknown> {
+  return value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function isArray(value: unknown): value is unknown[] {
+  return Array.isArray(value);
+}
+
+export function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
+export function isNumber(value: unknown): value is number {
+  return typeof value === "number";
+}
+
+export function isBoolean(value: unknown): value is boolean {
+  return typeof value === "boolean";
+}
+
+export function isSymbol(value: unknown): value is symbol {
+  return typeof value === "symbol";
+}
+
+export function isUnknown(value: unknown): value is unknown {
+  return !isObject(value) && !isArray(value) && !isString(value) && !isNumber(value) && !isBoolean(value) &&
+    !isSymbol(value) && value !== null;
+}
 
 export function classifyType(value: unknown): ClassifiedType {
   const typ = typeof value;
@@ -59,15 +89,22 @@ const imports = [
   },
 ];
 
+const localObjectReferenceTypeName = "core.v1.LocalObjectReference" as const;
 export const localObjectReferencesType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "array",
-  type: `Array<K8s["core.v1.LocalObjectReference"]>`,
+  expectation: (value) =>
+    value === null ||
+    (isArray(value) && value.every((v) => {
+      return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[localObjectReferenceTypeName].has(key));
+    })),
+  type: `Array<K8s[${localObjectReferenceTypeName}]>`,
   imports,
 };
 
+const pullPolicyTypeName = "K8sImagePullPolicy" as const;
+const knownPullPolicies = new Set(["Always", "IfNotPresent", "Never"]);
 export const pullPolicyType: TypeDef = {
-  expectation: (value) => classifyType(value) === "string",
-  type: "K8sImagePullPolicy",
+  expectation: (value) => isString(value) && knownPullPolicies.has(value),
+  type: pullPolicyTypeName,
   imports: [
     {
       props: ["K8sImagePullPolicy"],
@@ -76,95 +113,147 @@ export const pullPolicyType: TypeDef = {
   ],
 };
 
+const annotationsTypeName = "Record<string, string>" as const;
 export const annotationsType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "object",
-  type: "Record<string, string>",
+  expectation: (value) =>
+    value === null ||
+    (isObject(value) && Object.entries(value).every(([key, value]) => isString(key) && isString(value))),
+  type: annotationsTypeName,
   imports: [],
 };
 
+const labelsTypeName = "Record<string, string>" as const;
 export const labelsType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "object",
-  type: "Record<string, string>",
+  expectation: (value) =>
+    value === null ||
+    (isObject(value) && Object.entries(value).every(([key, value]) => isString(key) && isString(value))),
+  type: labelsTypeName,
   imports: [],
 };
 
+const podSecurityContextTypeName = "core.v1.PodSecurityContext" as const;
 export const podSecurityContextType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "object",
-  type: `K8s["core.v1.PodSecurityContext"]`,
+  expectation: (value) =>
+    value === null || (isObject(value) &&
+      Object.keys(value).every((key) => K8sKnownTypeKeySets[podSecurityContextTypeName].has(key))),
+  type: `K8s[${podSecurityContextTypeName}]`,
   imports,
 };
 
+const securityContextTypeName = "core.v1.SecurityContext" as const;
 export const securityContextType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "object",
-  type: `K8s["core.v1.SecurityContext"]`,
+  expectation: (value) =>
+    value === null || (isObject(value) &&
+      Object.keys(value).every((key) => K8sKnownTypeKeySets[securityContextTypeName].has(key))),
+  type: `K8s[${securityContextTypeName}]`,
   imports,
 };
 
+const nodeSelectorTypeName = "Record<string, string>" as const;
 export const nodeSelectorType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "object",
-  type: "Record<string, string>",
+  expectation: (value) =>
+    value === null ||
+    (isObject(value) && Object.entries(value).every(([key, value]) => isString(key) && isString(value))),
+  type: nodeSelectorTypeName,
   imports: [],
 };
 
+const tolerationsTypeName = "core.v1.Toleration" as const;
 export const tolerationsType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "array",
-  type: `Array<K8s["core.v1.Toleration"]>`,
+  expectation: (value) =>
+    value === null ||
+    (isArray(value) && value.every((v) => {
+      return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[tolerationsTypeName].has(key));
+    })),
+  type: `Array<K8s[${tolerationsTypeName}]>`,
   imports,
 };
 
+const resourcesTypeName = "core.v1.ResourceRequirements" as const;
 export const resourcesType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "object",
-  type: `K8s["core.v1.ResourceRequirements"]`,
+  expectation: (value) =>
+    value === null || (isObject(value) &&
+      Object.keys(value).every((key) => K8sKnownTypeKeySets[resourcesTypeName].has(key))),
+  type: `K8s[${resourcesTypeName}]`,
   imports,
 };
 
+const affinityTypeName = "core.v1.Affinity" as const;
 export const affinityType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "object",
-  type: `K8s["core.v1.Affinity"]`,
+  expectation: (value) =>
+    value === null || (isObject(value) &&
+      Object.keys(value).every((key) => K8sKnownTypeKeySets[affinityTypeName].has(key))),
+  type: `K8s[${affinityTypeName}]`,
   imports,
 };
 
+const envTypeName = "core.v1.EnvVar" as const;
 export const envType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "array",
-  type: `Array<K8s["core.v1.EnvVar"]>`,
+  expectation: (value) =>
+    value === null || (isArray(value) && value.every((v) => {
+      return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[envTypeName].has(key));
+    })),
+  type: `Array<K8s[${envTypeName}]>`,
   imports,
 };
 
+const probeTypeName = "core.v1.Probe" as const;
 export const probeType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "object",
-  type: `K8s["core.v1.Probe"]`,
+  expectation: (value) =>
+    value === null || (isObject(value) &&
+      Object.keys(value).every((key) => K8sKnownTypeKeySets[probeTypeName].has(key))),
+  type: `K8s[${probeTypeName}]`,
   imports,
 };
 
+const volumesTypeName = "core.v1.Volume" as const;
 export const volumesType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "array",
-  type: `Array<K8s["core.v1.Volume"]>`,
+  expectation: (value) =>
+    value === null || (isArray(value) && value.every((v) => {
+      return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[volumesTypeName].has(key));
+    })),
+  type: `Array<K8s[${volumesTypeName}]>`,
   imports,
 };
 
+const volumeMountsTypeName = "core.v1.VolumeMount" as const;
 export const volumeMountsType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "array",
-  type: `Array<K8s["core.v1.VolumeMount"]>`,
+  expectation: (value) =>
+    value === null ||
+    (isArray(value) && value.every((v) => {
+      return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[volumeMountsTypeName].has(key));
+    })),
+  type: `Array<K8s[${volumeMountsTypeName}]>`,
   imports,
 };
 
+const dnsConfigTypeName = "core.v1.PodDNSConfig" as const;
 export const dnsConfigType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "object",
-  type: `K8s["core.v1.PodDNSConfig"]`,
+  expectation: (value) =>
+    value === null ||
+    (isObject(value) &&
+      Object.keys(value).every((key) => K8sKnownTypeKeySets[dnsConfigTypeName].has(key))),
+  type: `K8s[${dnsConfigTypeName}]`,
   imports,
 };
 
+const containersTypeName = "core.v1.Container" as const;
 export const containersType: TypeDef = {
-  expectation: (value) => value === null || classifyType(value) === "array",
-  type: `Array<K8s["core.v1.Container"]>`,
+  expectation: (value) =>
+    value === null ||
+    (isArray(value) && value.every((v) => {
+      return isObject(v) && Object.keys(v).every((key) => K8sKnownTypeKeySets[containersTypeName].has(key));
+    })),
+  type: `Array<K8s[${containersTypeName}]>`,
   imports,
 };
 
+const podDisruptionBudgetTypeName = "policy.v1.PodDisruptionBudgetSpec" as const;
 export const podDisruptionBudgetType: TypeDef = {
   expectation: (value) =>
     value === null ||
-    (classifyType(value) === "object" && Object.keys(value!).length === 0),
-  type: `K8s["policy.v1.PodDisruptionBudgetSpec"]`,
+    (isObject(value) && Object.keys(value).every((key) => K8sKnownTypeKeySets[podDisruptionBudgetTypeName].has(key))),
+  type: `K8s[${podDisruptionBudgetTypeName}]`,
   imports,
 };
 
