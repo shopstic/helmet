@@ -20,7 +20,7 @@
             ];
           };
           hotPotPkgs = hotPot.packages.${system};
-          deno = hotPotPkgs.deno;
+          deno = hotPotPkgs.deno_2_2_x;
           runtimeInputs = builtins.attrValues
             {
               inherit (hotPotPkgs)
