@@ -13,20 +13,17 @@
     "jsr:@std/yaml@^1.0.5": "1.0.5",
     "jsr:@wok/case@^1.0.2": "1.0.2",
     "jsr:@wok/k8s-api@^1.32.2": "1.32.2",
-    "jsr:@wok/k8s-utils@2": "2.0.0",
+    "jsr:@wok/k8s-utils@^2.0.1": "2.0.1",
     "jsr:@wok/schema@3": "3.0.0",
     "jsr:@wok/typebox@2": "2.0.0",
-    "jsr:@wok/utils@^5.0.1": "5.0.1",
+    "jsr:@wok/utils@^5.0.2": "5.0.2",
     "npm:@sinclair/typebox@~0.34.28": "0.34.28",
     "npm:json-schema-to-typescript@^15.0.4": "15.0.4",
     "npm:type-fest@^4.37.0": "4.37.0"
   },
   "jsr": {
     "@std/assert@1.0.11": {
-      "integrity": "2461ef3c368fe88bc60e186e7744a93112f16fd110022e113a0849e94d1c83c1",
-      "dependencies": [
-        "jsr:@std/internal"
-      ]
+      "integrity": "2461ef3c368fe88bc60e186e7744a93112f16fd110022e113a0849e94d1c83c1"
     },
     "@std/bytes@1.0.5": {
       "integrity": "4465dd739d7963d964c809202ebea6d5c6b8e3829ef25c6a224290fbb8a1021e"
@@ -67,8 +64,8 @@
     "@wok/k8s-api@1.32.2": {
       "integrity": "3e56aa0784fd0cd21a761399022546369fef7faaf15c6ad12dd73092549cebe9"
     },
-    "@wok/k8s-utils@2.0.0": {
-      "integrity": "815ed4a3910c0eeca03697c7ef822d1397362db14677d537be49bf8c7060e850",
+    "@wok/k8s-utils@2.0.1": {
+      "integrity": "b6a12c46e685a67d167f74a169c68b889d7271f0699efd4d609df802d07f1c38",
       "dependencies": [
         "jsr:@wok/k8s-api",
         "jsr:@wok/schema"
@@ -87,8 +84,8 @@
         "npm:@sinclair/typebox"
       ]
     },
-    "@wok/utils@5.0.1": {
-      "integrity": "b2d7a48fd338317a6ad1193c22b9b8160b620a4aaacf07291d02c3b72288e450",
+    "@wok/utils@5.0.2": {
+      "integrity": "a5ef0501fb0f33c13b833587ae7c99c23280844c6e62e727336af11bc2be57dc",
       "dependencies": [
         "jsr:@std/assert",
         "jsr:@std/cli",
@@ -197,9 +194,9 @@
       "jsr:@wok/case@^1.0.2",
       "jsr:@wok/deup@3",
       "jsr:@wok/k8s-api@^1.32.2",
-      "jsr:@wok/k8s-utils@2",
+      "jsr:@wok/k8s-utils@^2.0.1",
       "jsr:@wok/schema@3",
-      "jsr:@wok/utils@^5.0.1",
+      "jsr:@wok/utils@^5.0.2",
       "npm:json-schema-to-typescript@^15.0.4"
     ]
   }

@@ -38,9 +38,9 @@
     "@wok/case": "jsr:@wok/case@^1.0.2",
     "@wok/deup": "jsr:@wok/deup@^3.0.0",
     "@wok/k8s-api": "jsr:@wok/k8s-api@^1.32.2",
-    "@wok/k8s-utils": "jsr:@wok/k8s-utils@^2.0.0",
+    "@wok/k8s-utils": "jsr:@wok/k8s-utils@^2.0.1",
     "@wok/schema": "jsr:@wok/schema@^3.0.0",
-    "@wok/utils": "jsr:@wok/utils@^5.0.1",
+    "@wok/utils": "jsr:@wok/utils@^5.0.2",
     "json-schema-to-typescript": "npm:json-schema-to-typescript@^15.0.4"
   }
 }
