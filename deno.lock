@@ -16,7 +16,7 @@
     "jsr:@wok/k8s-utils@^2.0.1": "2.0.1",
     "jsr:@wok/schema@3": "3.0.0",
     "jsr:@wok/typebox@2": "2.0.0",
-    "jsr:@wok/utils@^5.0.3": "5.0.3",
+    "jsr:@wok/utils@^5.0.5": "5.0.5",
     "npm:@sinclair/typebox@~0.34.28": "0.34.28",
     "npm:json-schema-to-typescript@^15.0.4": "15.0.4",
     "npm:type-fest@^4.37.0": "4.37.0"
@@ -84,8 +84,8 @@
         "npm:@sinclair/typebox"
       ]
     },
-    "@wok/utils@5.0.3": {
-      "integrity": "234279d9f338a7da0434397ac342b8b480499c0f29cc801a98ad5aac2e4ae71b",
+    "@wok/utils@5.0.5": {
+      "integrity": "127a8900d6c333161caf3b087c632ea160c9239b5251ac205a3ec4bed84877dc",
       "dependencies": [
         "jsr:@std/assert",
         "jsr:@std/cli",
@@ -196,7 +196,7 @@
       "jsr:@wok/k8s-api@^1.32.2",
       "jsr:@wok/k8s-utils@^2.0.1",
       "jsr:@wok/schema@3",
-      "jsr:@wok/utils@^5.0.3",
+      "jsr:@wok/utils@^5.0.5",
       "npm:json-schema-to-typescript@^15.0.4"
     ]
   }
