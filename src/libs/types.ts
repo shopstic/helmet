@@ -1,4 +1,4 @@
-import type { K8sCrd, K8sResource } from "@wok/utils/k8s";
+import type { K8sCrd, K8sResource } from "@wok/k8s-utils";
 import type { Range as SemverRange } from "@std/semver";
 import { Arr, Bool, Obj, Opt, Rec, Str, Unk } from "../deps/schema.ts";
 

@@ -1,5 +1,5 @@
 import { captureExec, inheritExec, NonZeroExitError, printErrLines } from "@wok/utils/exec";
-import { type K8sCrd, K8sCrdKind, K8sCrdSchema, type K8sResource, K8sResourceSchema } from "@wok/utils/k8s";
+import { type K8sCrd, K8sCrdKind, K8sCrdSchema, type K8sResource, K8sResourceSchema } from "@wok/k8s-utils";
 import { exists as fsExists, expandGlob } from "@std/fs";
 import { basename, dirname, fromFileUrl, join as joinPath } from "@std/path";
 import { parse as parseYaml } from "@std/yaml";

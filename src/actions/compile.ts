@@ -4,7 +4,7 @@ import { basename, join as joinPath, resolve as resolvePath } from "@std/path";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { cyan, gray } from "@std/fmt/colors";
 import { importBundleModule } from "../libs/iac_utils.ts";
-import { isK8sNamespace, K8sKind } from "@wok/utils/k8s";
+import { isK8sNamespace, K8sKind } from "@wok/k8s-utils";
 import { Arr, Str } from "../deps/schema.ts";
 import { getDefaultLogger, type Logger } from "@wok/utils/logger";
 import { extname } from "@std/path/extname";

@@ -6,13 +6,13 @@ import { exists as fsExists } from "@std/fs";
 import { parse as parseYaml } from "@std/yaml";
 import { pascalCase } from "@wok/case";
 import { inheritExec, printErrLines } from "@wok/utils/exec";
-import { K8sCrdApiVersionV1beta1 } from "@wok/utils/k8s";
+import { K8sCrdApiVersionV1beta1 } from "@wok/k8s-utils";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { cyan, gray } from "@std/fmt/colors";
 import { Arr, Str } from "../deps/schema.ts";
 import { compile as jsonSchemaToTs } from "json-schema-to-typescript";
 import { getDefaultLogger, type Logger } from "@wok/utils/logger";
-import { K8sKnownTypeKeySets } from "@wok/k8s/known-type-key-sets";
+import { K8sKnownTypeKeySets } from "@wok/k8s-api/known-type-key-sets";
 
 export type ClassifiedType =
   | "array"

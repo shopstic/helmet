@@ -1,5 +1,5 @@
 import { inheritExec, printErrLines, printOutLines } from "@wok/utils/exec";
-import { createK8sConfigMap, type K8sConfigMap } from "@wok/utils/k8s";
+import { createK8sConfigMap, type K8sConfigMap } from "@wok/k8s-utils";
 import { createCliAction, ExitCode } from "@wok/utils/cli";
 import { resolve as resolvePath } from "@std/path";
 import { gray } from "@std/fmt/colors";
