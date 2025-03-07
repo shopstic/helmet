@@ -52,7 +52,7 @@ export async function decryptAndValidateSecrets<T>(
     }
   })();
 
-  const decrypted = parseYaml(raw);
+  const decrypted = parseYaml(raw, { allowDuplicateKeys: true });
 
   return validate(schema, decrypted);
 }
@@ -92,7 +92,7 @@ export async function readChartMeta(chartPath: string): Promise<ChartMetadata> {
   );
 
   const chartMetaResult = validateChartMeta(
-    parseYaml(await Deno.readTextFile(chartMetaPath)),
+    parseYaml(await Deno.readTextFile(chartMetaPath), { allowDuplicateKeys: true }),
   );
 
   if (!chartMetaResult.isSuccess) {

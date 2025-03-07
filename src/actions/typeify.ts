@@ -419,7 +419,7 @@ async function readChartValues(
 
     const parsed = (() => {
       try {
-        return parseYaml(raw);
+        return parseYaml(raw, { allowDuplicateKeys: true });
       } catch (e) {
         logger.warn?.(
           `Failed parsing ${valuesPath}, going to ignore it`,

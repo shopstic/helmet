@@ -7,5 +7,5 @@ export function stringifyYamlRelaxed(value: unknown): string {
 }
 
 export function parseMultiDocumentsYaml(rawYaml: string): unknown[] {
-  return parseAll(rawYaml) as unknown[];
+  return parseAll(rawYaml, { allowDuplicateKeys: true }) as unknown[];
 }

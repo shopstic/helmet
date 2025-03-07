@@ -48,6 +48,7 @@ async function getCurrentChartMetadata(
   if (await fsExists(chartPath)) {
     const currentChartMetaRaw = parseYaml(
       await Deno.readTextFile(joinPath(chartPath, "Chart.yaml")),
+      { allowDuplicateKeys: true },
     );
     const currentChartMetaResult = validate(
       ChartMetadataSchema,
@@ -329,6 +330,7 @@ async function updateHelmRepoChart({
 
   const remoteRepoIndexRaw = parseYaml(
     await fetchRemoteRepoIndexYaml(remoteRepoUrl),
+    { allowDuplicateKeys: true },
   );
   const remoteRepoIndexResult = validate(
     ChartRepoIndexSchema,
