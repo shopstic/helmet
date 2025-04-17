@@ -40,7 +40,7 @@
     "@wok/k8s-api": "jsr:@wok/k8s-api@^1.32.2",
     "@wok/k8s-utils": "jsr:@wok/k8s-utils@^2.2.1",
     "@wok/schema": "jsr:@wok/schema@^3.0.0",
-    "@wok/utils": "jsr:@wok/utils@^5.2.2",
+    "@wok/utils": "jsr:@wok/utils@^5.2.3",
     "json-schema-to-typescript": "npm:json-schema-to-typescript@^15.0.4"
   }
 }
