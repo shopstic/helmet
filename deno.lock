@@ -16,7 +16,7 @@
     "jsr:@wok/k8s-utils@^2.2.1": "2.2.1",
     "jsr:@wok/schema@3": "3.0.0",
     "jsr:@wok/typebox@2": "2.0.0",
-    "jsr:@wok/utils@^5.2.3": "5.2.3",
+    "jsr:@wok/utils@^5.2.4": "5.2.4",
     "npm:@sinclair/typebox@~0.34.28": "0.34.33",
     "npm:json-schema-to-typescript@^15.0.4": "15.0.4",
     "npm:type-fest@^4.37.0": "4.40.0",
@@ -85,8 +85,8 @@
         "npm:@sinclair/typebox"
       ]
     },
-    "@wok/utils@5.2.3": {
-      "integrity": "14eee02f005da613b25f8642749a244a26af293a492fe327a219f21100cb7869",
+    "@wok/utils@5.2.4": {
+      "integrity": "110339864ca8ef47a7baa4014e6033010d277348de52936498445253b8398c57",
       "dependencies": [
         "jsr:@std/assert",
         "jsr:@std/cli",
@@ -125,8 +125,8 @@
     "argparse@2.0.1": {
       "integrity": "sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q=="
     },
-    "fdir@6.4.3_picomatch@4.0.2": {
-      "integrity": "sha512-PMXmW2y1hDDfTSRc9gaXIuCCRpuoz3Kaz8cUelp3smouvfT632ozg2vrT6lJsHKKOF59YLbOGfAWGUcKEfRMQw==",
+    "fdir@6.4.4_picomatch@4.0.2": {
+      "integrity": "sha512-1NZP+GK4GfuAv3PqKvxQRDMjdSRZjnkq7KfhlNrCNNlZ0ygQFpebfrnfnq/W7fpUnAv9aGWmY1zKx7FYL3gwhg==",
       "dependencies": [
         "picomatch"
       ]
@@ -172,8 +172,8 @@
     "prettier@3.5.3": {
       "integrity": "sha512-QQtaxnoDJeAkDvDKWCLiwIXkTgRhwYDEQCghU9Z6q03iyek/rxRh/2lC3HB7P8sWT2xC/y5JDctPLBIGzHKbhw=="
     },
-    "tinyglobby@0.2.12_picomatch@4.0.2": {
-      "integrity": "sha512-qkf4trmKSIiMTs/E63cxH+ojC2unam7rJ0WrauAzpT3ECNTxGRMlaXxVbfxMUC/w0LaYk6jQ4y/nGR9uBO3tww==",
+    "tinyglobby@0.2.13_picomatch@4.0.2": {
+      "integrity": "sha512-mEwzpUgrLySlveBwEVDMKk5B57bhLPYovRfPAXD5gA/98Opn0rCDj3GtLwFvCvH5RK9uPCExUROW5NjDwvqkxw==",
       "dependencies": [
         "fdir",
         "picomatch"
@@ -197,7 +197,7 @@
       "jsr:@wok/k8s-api@^1.32.2",
       "jsr:@wok/k8s-utils@^2.2.1",
       "jsr:@wok/schema@3",
-      "jsr:@wok/utils@^5.2.3",
+      "jsr:@wok/utils@^5.2.4",
       "npm:json-schema-to-typescript@^15.0.4"
     ]
   }
