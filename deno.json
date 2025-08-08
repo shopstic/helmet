@@ -1,6 +1,6 @@
 {
   "name": "@wok/helmet",
-  "version": "*",
+  "version": "4.0.14",
   "exports": {
     ".": "./src/mod.ts",
     "./cli": "./src/cli.ts",
@@ -8,8 +8,15 @@
     "./deps/k8s": "./src/deps/k8s.ts"
   },
   "publish": {
-    "include": ["./src", "./deno.json", "./README.md", "./LICENSE"],
-    "exclude": ["**/*.test.ts"]
+    "include": [
+      "./src",
+      "./deno.json",
+      "./README.md",
+      "./LICENSE"
+    ],
+    "exclude": [
+      "**/*.test.ts"
+    ]
   },
   "fmt": {
     "lineWidth": 120,
@@ -24,7 +31,9 @@
       "examples"
     ],
     "rules": {
-      "exclude": ["no-slow-types"]
+      "exclude": [
+        "no-slow-types"
+      ]
     }
   },
   "imports": {
