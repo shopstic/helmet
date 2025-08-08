@@ -3,18 +3,18 @@
   "specifiers": {
     "jsr:@std/assert@^1.0.12": "1.0.13",
     "jsr:@std/bytes@^1.0.6": "1.0.6",
-    "jsr:@std/cli@^1.0.16": "1.0.20",
+    "jsr:@std/cli@^1.0.16": "1.0.21",
     "jsr:@std/fmt@^1.0.6": "1.0.8",
     "jsr:@std/fmt@^1.0.8": "1.0.8",
     "jsr:@std/fs@^1.0.19": "1.0.19",
-    "jsr:@std/internal@^1.0.6": "1.0.9",
-    "jsr:@std/internal@^1.0.9": "1.0.9",
+    "jsr:@std/internal@^1.0.6": "1.0.10",
+    "jsr:@std/internal@^1.0.9": "1.0.10",
     "jsr:@std/path@^1.1.1": "1.1.1",
     "jsr:@std/semver@^1.0.5": "1.0.5",
     "jsr:@std/streams@^1.0.10": "1.0.10",
     "jsr:@std/streams@^1.0.9": "1.0.10",
-    "jsr:@std/yaml@^1.0.5": "1.0.8",
-    "jsr:@std/yaml@^1.0.8": "1.0.8",
+    "jsr:@std/yaml@^1.0.5": "1.0.9",
+    "jsr:@std/yaml@^1.0.9": "1.0.9",
     "jsr:@wok/case@^1.0.2": "1.0.2",
     "jsr:@wok/k8s-api@^1.32.2": "1.32.2",
     "jsr:@wok/k8s-utils@^2.2.1": "2.2.1",
@@ -33,8 +33,8 @@
     "@std/bytes@1.0.6": {
       "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
     },
-    "@std/cli@1.0.20": {
-      "integrity": "a8c384a2c98cec6ec6a2055c273a916e2772485eb784af0db004c5ab8ba52333"
+    "@std/cli@1.0.21": {
+      "integrity": "cd25b050bdf6282e321854e3822bee624f07aca7636a3a76d95f77a3a919ca2a"
     },
     "@std/fmt@1.0.8": {
       "integrity": "71e1fc498787e4434d213647a6e43e794af4fd393ef8f52062246e06f7e372b7"
@@ -46,8 +46,8 @@
         "jsr:@std/path"
       ]
     },
-    "@std/internal@1.0.9": {
-      "integrity": "bdfb97f83e4db7a13e8faab26fb1958d1b80cc64366501af78a0aee151696eb8"
+    "@std/internal@1.0.10": {
+      "integrity": "e3be62ce42cab0e177c27698e5d9800122f67b766a0bea6ca4867886cbde8cf7"
     },
     "@std/path@1.1.1": {
       "integrity": "fe00026bd3a7e6a27f73709b83c607798be40e20c81dde655ce34052fd82ec76",
@@ -64,8 +64,8 @@
         "jsr:@std/bytes"
       ]
     },
-    "@std/yaml@1.0.8": {
-      "integrity": "90b8aab62995e929fa0ea5f4151c287275b63e321ac375c35ff7406ca60c169d"
+    "@std/yaml@1.0.9": {
+      "integrity": "6bad3dc766dd85b4b37eabcba81b6aa4eac7a392792ae29abcfb0f90602d55bb"
     },
     "@wok/case@1.0.2": {
       "integrity": "5d7c4da6ac87a372d603c6ab6fb0e07ec74d4a712c3cb9051961a0892b1f3090"
@@ -205,7 +205,7 @@
       "jsr:@std/path@^1.1.1",
       "jsr:@std/semver@^1.0.5",
       "jsr:@std/streams@^1.0.10",
-      "jsr:@std/yaml@^1.0.8",
+      "jsr:@std/yaml@^1.0.9",
       "jsr:@wok/case@^1.0.2",
       "jsr:@wok/deup@3",
       "jsr:@wok/k8s-api@^1.32.2",

@@ -34,7 +34,7 @@
     "@std/path": "jsr:@std/path@^1.1.1",
     "@std/semver": "jsr:@std/semver@^1.0.5",
     "@std/streams": "jsr:@std/streams@^1.0.10",
-    "@std/yaml": "jsr:@std/yaml@^1.0.8",
+    "@std/yaml": "jsr:@std/yaml@^1.0.9",
     "@wok/case": "jsr:@wok/case@^1.0.2",
     "@wok/deup": "jsr:@wok/deup@^3.0.0",
     "@wok/k8s-api": "jsr:@wok/k8s-api@^1.32.2",
