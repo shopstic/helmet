@@ -117,6 +117,7 @@
         rec {
           devShell = pkgs.mkShellNoCC
             {
+              inherit runtimeInputs;
               buildInputs = runtimeInputs ++ builtins.attrValues
                 {
                   inherit deno;
